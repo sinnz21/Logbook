@@ -1,6 +1,5 @@
 ISU INFIRMARY LOG BOOK SYSTEM
 DATABASE PLAN
-========================================
 
 The database is separated into different tables so patient information,
 users, visits, special cases, medicines, supplies, stock, and requests
@@ -10,13 +9,12 @@ The tables are connected using Primary Keys (PK) and Foreign Keys (FK).
 
 
 1. USERS
-========================================
 Purpose:
 Stores all system accounts such as Admin, Nurse, Doctor, and Staff.
 
 Fields:
 - user_id - INT, PRIMARY KEY, AUTO_INCREMENT
-- full_name - VARCHAR(150), NOT NULL
+- full_name - VARCHAR(150), NOT NULL/ this has to be not full name. it has to be, First Name, Last Name Middle name all separated but combined
 - username - VARCHAR(50), UNIQUE, NOT NULL
 - password_hash - VARCHAR(255), NOT NULL
 - role - ENUM('admin','nurse','doctor','staff'), NOT NULL
@@ -33,7 +31,6 @@ Relationships:
 
 
 2. PATIENT_TYPES
-========================================
 Purpose:
 Stores the type of patient.
 
@@ -45,14 +42,13 @@ Fields:
 Sample values:
 - Student
 - Faculty
-- Visitor
+- None teaching staffs
 
 Relationships:
 - One patient type can belong to many patients.
 
 
 3. PATIENTS
-========================================
 Purpose:
 Stores the permanent/basic information of each patient.
 
@@ -66,7 +62,7 @@ Fields:
 - age - INT
 - contact_number - VARCHAR(30)
 - patient_type_id - INT, FOREIGN KEY -> patient_types.patient_type_id
-- department - VARCHAR(150)
+- department - VARCHAR(150)/only for Students and Teachings staffs or faculty member or when adding a new faculty member cause its already pre recorded if your a faculty member.
 - program - VARCHAR(150)
 - year_level - VARCHAR(50)
 - created_at - DATETIME
@@ -78,7 +74,6 @@ Relationships:
 
 
 4. VISITS
-========================================
 Purpose:
 Stores every visit made by a patient to the infirmary.
 
@@ -110,7 +105,6 @@ Relationships:
 
 
 5. DISPOSITIONS
-========================================
 Purpose:
 Stores the available outcomes/dispositions of a visit.
 
@@ -132,7 +126,6 @@ Relationships:
 
 
 6. SPECIAL_CASE_TYPES
-========================================
 Purpose:
 Stores the types of special cases that can be flagged.
 
@@ -147,14 +140,13 @@ Sample values:
 - Senior Citizen
 - Anxiety
 - Asthma
-- Other Special Case
+- Other Special Case -> you can add more types of special cases/ type it
 
 Relationships:
 - One special-case type can be used in many visit special-case records.
 
 
 7. VISIT_SPECIAL_CASES
-========================================
 Purpose:
 Connects a visit to one or more special-case types.
 This supports the PWD / Senior Citizen / Special Cases filters.
@@ -183,7 +175,6 @@ A separate relationship table is easier to expand and filter.
 
 
 8. MEDICINE_CATEGORIES
-========================================
 Purpose:
 Stores medicine categories.
 
@@ -207,7 +198,6 @@ Relationships:
 
 
 9. MEDICINES
-========================================
 Purpose:
 Stores the master list of medicines.
 This table identifies the medicine, while stock quantity is stored separately.
@@ -238,7 +228,6 @@ Relationships:
 
 
 10. MEDICINE_STOCK
-========================================
 Purpose:
 Stores the current inventory quantity and stock condition of medicines.
 
@@ -264,7 +253,6 @@ Recommended rule:
 
 
 11. SUPPLIES
-========================================
 Purpose:
 Stores the master list of non-medicine infirmary supplies.
 
@@ -289,7 +277,6 @@ Relationships:
 
 
 12. SUPPLY_STOCK
-========================================
 Purpose:
 Stores the current quantity and status of supplies.
 
@@ -310,7 +297,6 @@ Recommended rule:
 
 
 13. VISIT_MEDICINES
-========================================
 Purpose:
 Junction table connecting visits and medicines.
 A visit may use multiple medicines, and the same medicine may be used
@@ -337,7 +323,6 @@ Relationships:
 
 
 14. STOCK_REQUESTS
-========================================
 Purpose:
 Stores requests made by a Nurse when medicine or supplies need to be
 restocked. Admin reviews the request and accepts or denies it.
@@ -368,7 +353,6 @@ Relationships:
 
 
 15. STOCK_REQUEST_ITEMS
-========================================
 Purpose:
 Stores the specific medicines or supplies included in a stock request.
 
@@ -396,7 +380,6 @@ should be NULL.
 
 
 16. INVENTORY_TRANSACTIONS
-========================================
 Purpose:
 Stores the history of changes to medicine and supply stock.
 
@@ -431,7 +414,6 @@ Keeps a history so the system knows why stock increased or decreased.
 
 
 17. SYSTEM_SETTINGS
-========================================
 Purpose:
 Stores configurable Admin settings.
 
@@ -451,9 +433,7 @@ Possible settings:
 - maintenance_mode
 
 
-========================================
 FOREIGN KEY RELATIONSHIP SUMMARY
-========================================
 
 patient_types.patient_type_id
     -> patients.patient_type_id
@@ -501,9 +481,7 @@ users.user_id
     -> visit_medicines.given_by
 
 
-========================================
-MAIN DATABASE FLOW
-========================================
+MAIN DATABASE FLOW -> hindi ko pa ito na finalize
 
 PATIENT
   |
@@ -515,9 +493,9 @@ PATIENT
         |
         +-- ATTENDING MEDICAL PERSONNEL (USER)
         |
-        +-- SPECIAL CASES
+        +-- SPECIAL CASES/complaint
         |
-        +-- MEDICINES GIVEN
+        +-- MEDICINES/TReatment GIVEN
                  |
                  +-- MEDICINE
                          |
@@ -540,9 +518,7 @@ NURSE
                     +-- STOCK UPDATED
 
 
-========================================
 UI FEATURES SUPPORTED BY THIS DATABASE
-========================================
 
 NURSE UI
 - Dashboard
@@ -555,7 +531,7 @@ NURSE UI
 
 ADD VISIT RECORD
 - Patient information
-- Chief complaint
+- Complaint
 - Vital signs
 - Treatment / medication given
 - Disposition
@@ -586,9 +562,7 @@ ADMIN UI
 - View system information and reports
 
 
-========================================
-APRlORI / INSIGHTS
-========================================
+APRlORI / INSIGHTS -> change apiori to something a staff can easily understand cause this is a data analyst term and thy cant understand that. and other insights
 
 The system does not need to show technical terms such as:
 - Support
@@ -609,15 +583,13 @@ The database can use the existing VISITS and VISIT_MEDICINES tables for
 this analysis instead of creating an unnecessary Apriori table.
 
 
-========================================
 IMPORTANT DESIGN RULES
-========================================
 
 1. Keep PATIENTS separate from VISITS.
    A patient can have many visits.
 
 2. Keep USERS separate from PATIENTS.
-   Nurses, Admins, and other system accounts are system users.
+   Nurses and Admins
 
 3. Keep MEDICINES separate from MEDICINE_STOCK.
    Medicine information and current quantity are different things.
@@ -644,11 +616,8 @@ IMPORTANT DESIGN RULES
     rather than completely separate account systems.
 
 
-========================================
 TOTAL RECOMMENDED TABLES
-========================================
-
-1. users
+1. users -> staffs and admin, this are the only users that will use the system
 2. patient_types
 3. patients
 4. visits
