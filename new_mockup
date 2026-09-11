@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISU Infirmary — Patient Records & Logbook System</title>
+<style>
+  :root{
+    --teal-900:#0b3d3a; --teal-700:#0f5e56; --teal-600:#137a6d; --teal-500:#1a9484;
+    --teal-100:#e3f3ef; --teal-50:#f2f9f7;
+    --ink:#12211f; --muted:#5c706c; --line:#e1e9e6; --bg:#f4f8f6;
+    --amber:#b8790f; --amber-bg:#fdf3e2; --amber-line:#f0d9a8;
+    --red:#b0332b; --red-bg:#fbeae8; --red-line:#f0c4c0;
+    --green:#1f7a4d; --green-bg:#e6f5ec; --blue:#1d6fa5; --blue-bg:#eaf4fb;
+    --font-display:"Iowan Old Style","Georgia",serif;
+    --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+
+  /* ===== LOGIN ===== */
+  #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;background:var(--bg);}
+  .login-brand{text-align:center;margin-bottom:22px;}
+  .login-brand .seal{width:56px;height:56px;border-radius:16px;background:var(--teal-600);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-display);font-weight:700;font-size:20px;}
+  .login-brand h1{font-family:var(--font-display);font-size:24px;margin:0 0 4px;color:var(--ink);}
+  .login-brand .s1{font-size:13px;color:var(--muted);margin-bottom:2px;}
+  .login-brand .s2{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+  .login-card{background:#fff;border-radius:14px;padding:26px;width:340px;box-shadow:0 6px 24px rgba(11,61,58,0.08);border:1px solid var(--line);}
+  .login-card .lbl-top{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;text-align:center;margin-bottom:12px;}
+  .role-pick{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+  .role-pick button{background:var(--teal-600);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s;}
+  .role-pick button.sel{outline:2px solid var(--teal-900);outline-offset:2px;background:var(--teal-700);}
+  .login-card label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;display:block;margin:12px 0 5px;}
+  .login-card input{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:13px;background:var(--teal-50);}
+  .login-hint{font-size:10.5px;color:var(--muted);margin-top:6px;}
+  .login-forgot{text-align:right;font-size:11px;color:var(--teal-700);font-weight:700;margin:8px 0;cursor:pointer;}
+  .login-card .go{width:100%;background:var(--teal-600);color:#fff;border:none;border-radius:8px;padding:11px;font-size:13.5px;font-weight:700;cursor:pointer;margin-top:6px;}
+  .login-foot{font-size:11px;color:var(--muted);margin-top:16px;}
+
+  /* ===== APP SHELL ===== */
+  #app{display:none;}
+  #app.active{display:flex;min-height:100vh;}
+  .sidebar{width:230px;background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:18px 14px;flex-shrink:0;}
+  .sidebar .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 14px;}
+  .sidebar .brand .seal{width:32px;height:32px;border-radius:8px;background:var(--teal-600);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;font-family:var(--font-display);}
+  .sidebar .brand .txt div:first-child{font-weight:700;font-size:13px;}
+  .sidebar .brand .txt div:last-child{font-size:10px;color:var(--muted);}
+  .sidebar .user{display:flex;align-items:center;gap:10px;padding:8px;margin-bottom:10px;background:var(--teal-50);border-radius:8px;}
+  .sidebar .user .av{width:28px;height:28px;border-radius:50%;background:var(--teal-100);color:var(--teal-700);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+  .sidebar .user div div:first-child{font-size:12.5px;font-weight:600;}
+  .sidebar .user div div:last-child{font-size:10.5px;color:var(--muted);}
+  .nav{list-style:none;margin:0;padding:0;flex:1;}
+  .nav li{margin-bottom:3px;}
+  .nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13px;color:var(--muted);font-weight:500;cursor:pointer;transition:all 0.1s;}
+  .nav a .ic{width:16px;text-align:center;font-size:13px;}
+  .nav a.active{background:var(--teal-600);color:#fff;font-weight:600;}
+  .nav a:not(.active):hover{background:var(--teal-50);color:var(--ink);}
+  .signout{display:flex;align-items:center;gap:8px;padding:9px 10px;font-size:13px;color:var(--muted);cursor:pointer;border-top:1px solid var(--line);margin-top:auto;}
+
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-y:auto;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 26px;background:#fff;border-bottom:1px solid var(--line);}
+  .topbar .crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+  .topbar .icons{display:flex;align-items:center;gap:14px;font-size:14px;color:var(--muted);}
+  .content{padding:22px 26px 60px;max-width:1380px;}
+  .view{display:none;}
+  .view.active{display:block;}
+  .page-head{margin-bottom:18px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;}
+  .page-head h1{font-family:var(--font-display);font-size:22px;margin:0 0 4px;color:var(--teal-900);}
+  .page-head .sub{font-size:12.5px;color:var(--muted);}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px;}
+  .card h3{font-family:var(--font-display);font-size:15px;margin:0 0 12px;color:var(--teal-900);}
+
+  /* Split layout for Visit Records + Today's Queue */
+  .layout-split{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
+
+  /* KPI */
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;cursor:pointer;transition:box-shadow .15s,transform .15s;}
+  .kpi:hover{box-shadow:0 4px 14px rgba(11,61,58,0.08);transform:translateY(-1px);}
+  .kpi.primary{background:var(--teal-600);color:#fff;border-color:var(--teal-600);}
+  .kpi .ic-badge{width:30px;height:30px;border-radius:8px;background:var(--teal-100);color:var(--teal-700);display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px;}
+  .kpi.primary .ic-badge{background:rgba(255,255,255,0.18);color:#fff;}
+  .kpi.warn .ic-badge{background:var(--amber-bg);color:var(--amber);}
+  .kpi.pending .ic-badge{background:var(--red-bg);color:var(--red);}
+  .kpi .label{font-size:11px;text-transform:uppercase;letter-spacing:0.4px;font-weight:700;color:var(--muted);}
+  .kpi.primary .label{color:rgba(255,255,255,0.75);}
+  .kpi .value{font-family:var(--font-display);font-size:24px;font-weight:700;margin-top:6px;}
+  .kpi.warn .value{color:var(--amber);}
+  .kpi.pending .value{color:var(--red);}
+  .kpi .foot{font-size:11px;color:var(--muted);margin-top:4px;}
+  .kpi.primary .foot{color:rgba(255,255,255,0.75);}
+
+  /* Range bar */
+  .range-bar{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;flex-wrap:wrap;margin-bottom:16px;}
+  .range-bar .presets{display:flex;gap:4px;background:var(--teal-50);border-radius:7px;padding:3px;}
+  .range-bar .presets button{border:none;background:transparent;padding:6px 11px;border-radius:5px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;}
+  .range-bar .presets button.active{background:var(--teal-600);color:#fff;}
+  .range-bar select{border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-size:12.5px;}
+  .range-bar .live-note{font-size:11px;color:var(--teal-700);display:flex;align-items:center;gap:5px;margin-left:auto;}
+  .range-bar .live-note .dot{width:6px;height:6px;border-radius:50%;background:var(--teal-500);animation:pulse 1.8s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+  .alert-banner{background:var(--amber-bg);border:1px solid var(--amber-line);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+  .alert-banner .ic{color:var(--amber);font-size:16px;}
+  .alert-banner .txt strong{font-size:12.5px;color:#8a5c0a;display:block;}
+  .alert-banner .txt span{font-size:11.5px;color:#8a5c0a;opacity:0.85;}
+  .alert-banner .go{margin-left:auto;background:#fff;border:1px solid var(--amber-line);color:#8a5c0a;border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+  .bars{display:flex;align-items:flex-end;gap:14px;height:150px;padding-top:8px;}
+  .bars .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;}
+  .bars .bar{width:60%;background:var(--teal-600);border-radius:4px 4px 0 0;}
+  .bars .bar-col .num{font-size:10px;color:var(--muted);font-weight:600;}
+  .bars .bar-col .lbl{font-size:10.5px;color:var(--muted);}
+
+  .chart-row{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;}
+  .donut-wrap{display:flex;align-items:center;gap:18px;}
+  .donut-legend{display:flex;flex-direction:column;gap:9px;flex:1;}
+  .legend-row{display:flex;align-items:center;gap:8px;font-size:12px;}
+  .legend-row .sw{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .legend-row .pct{margin-left:auto;font-weight:700;}
+  .legend-row .name{color:var(--muted);}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line);}
+  td{padding:11px 10px;border-bottom:1px solid var(--line);}
+  tr:last-child td{border-bottom:none;}
+  tr.rowlink{cursor:pointer;}
+  tr.rowlink:hover{background:var(--teal-50);}
+  .nm{font-weight:600;color:var(--ink);}
+  .sub{font-size:11px;color:var(--muted);}
+  
+  /* Badges & Tags */
+  .pill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;display:inline-block;}
+  .pill.high-stock{background:var(--green-bg);color:var(--green);}
+  .pill.low-stock{background:var(--amber-bg);color:var(--amber);}
+  .pill.out-stock{background:var(--red-bg);color:var(--red);}
+  .pill.pwd-badge{background:var(--teal-100);color:var(--teal-700);font-size:9.5px;padding:2px 6px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;margin-left:4px;}
+  .pill.senior-badge{background:var(--blue-bg);color:var(--blue);font-size:9.5px;padding:2px 6px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;margin-left:4px;}
+  .flag-tag-red{background:#fff;border:1px solid var(--red-line);color:#8a2a24;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-block;}
+  .pill.active{background:var(--green-bg);color:var(--green);}
+  .pill.inactive{background:var(--red-bg);color:var(--red);}
+  .pill.pending{background:var(--amber-bg);color:var(--amber);}
+
+  .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+  .toolbar input[type=text], .toolbar input[type=date], .toolbar select{border:1px solid var(--line);border-radius:8px;padding:8px 11px;font-size:12.5px;}
+  .toolbar input[type=text]{flex:1;min-width:200px;}
+  th.sortable{cursor:pointer;user-select:none;}
+  th.sortable:hover{color:var(--teal-700);}
+  .sort-ic{font-size:9px;opacity:0.6;}
+  .pagination-bar{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:12.5px;color:var(--muted);padding:8px 4px;}
+  .pg-size select{border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px;margin:0 4px;}
+  .pg-nav{display:flex;align-items:center;gap:8px;}
+  .pg-nav button{background:#fff;border:1px solid var(--line);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;color:var(--ink);}
+  .pg-nav button:hover{background:var(--teal-50);}
+  .pg-current{font-weight:700;color:var(--teal-700);padding:0 4px;}
+  .tabs{display:flex;gap:8px;margin-bottom:14px;}
+  .tabs button{flex:1;background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;}
+  .tabs button.active{background:var(--teal-600);color:#fff;border-color:var(--teal-600);}
+
+  .btn{border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);display:inline-flex;align-items:center;justify-content:center;gap:6px;}
+  .btn-primary{background:var(--teal-600);color:#fff;}
+  .btn-primary:hover{background:var(--teal-700);}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink);}
+  .btn-outline{background:#fff;border:1px solid var(--teal-500);color:var(--teal-700);}
+  .btn-danger{background:var(--red);color:#fff;}
+  .btn-sm{padding:6px 12px;font-size:11.5px;}
+
+  /* Forms & Search */
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+  .field-row.three{grid-template-columns:1fr 1fr 1fr;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field.full{grid-column:1/-1;}
+  .field label{font-size:11px;font-weight:700;color:var(--teal-700);text-transform:uppercase;letter-spacing:0.4px;}
+  .field .opt{font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;}
+  input[type=text],input[type=date],input[type=number],select,textarea{border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:13px;font-family:var(--font-body);color:var(--ink);background:#fff;width:100%;}
+  textarea{resize:vertical;min-height:56px;}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal-500);box-shadow:0 0 0 3px rgba(26,148,132,0.15);}
+  input[readonly]{background:var(--teal-50);color:var(--muted);}
+  .segmented{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+  .segmented button{flex:1;border:none;background:#fff;padding:9px 6px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-right:1px solid var(--line);}
+  .segmented button:last-child{border-right:none;}
+  .segmented button.active{background:var(--teal-600);color:#fff;}
+  .checkbox-row{display:flex;gap:14px;flex-wrap:wrap;}
+  .checkbox-row label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);font-weight:500;cursor:pointer;text-transform:none;letter-spacing:0;}
+
+  .roster-search{position:relative;margin-bottom:10px;}
+  .roster-search input{padding-left:34px;height:42px;}
+  .roster-search .ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;}
+  .roster-results{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;margin-bottom:14px;}
+  .roster-row{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line);font-size:12.5px;}
+  .roster-row:last-child{border-bottom:none;}
+  .roster-row:hover{background:var(--teal-50);}
+
+  /* Side panel Today's visits */
+  .today-panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;}
+  .today-panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line);}
+  .today-panel-head h3{font-family:var(--font-display);font-size:16px;margin:0;color:var(--teal-900);}
+  .today-panel-head span{font-size:11px;color:var(--muted);}
+  .visit-mini-card{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--teal-50);}
+  .visit-mini-card .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;}
+  .visit-mini-card .name{font-weight:700;font-size:13px;color:var(--ink);}
+  .visit-mini-card .meta{font-size:11px;color:var(--muted);margin-bottom:6px;}
+  .visit-mini-card .diag{font-size:11.5px;color:var(--ink);margin-bottom:8px;line-height:1.4;}
+  .visit-mini-card .actions{display:flex;justify-content:space-between;align-items:center;font-size:11px;}
+
+  /* Modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(11,61,58,0.45);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .modal-backdrop.open{display:flex;}
+  .modal{background:#fff;border-radius:14px;padding:0;width:520px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,0.15);}
+  .modal.wide{width:620px;}
+  .modal-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+  .modal-head h3{font-family:var(--font-display);margin:0;font-size:16px;color:var(--teal-900);}
+  .modal-head .sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .modal-close{background:none;border:none;font-size:16px;color:var(--muted);cursor:pointer;}
+  .modal-body{padding:20px 22px;}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;padding:14px 22px;border-top:1px solid var(--line);background:#fafdfc;}
+
+  .settings-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+  .settings-row:last-child{border-bottom:none;}
+  .settings-row .t{font-size:13px;font-weight:600;}
+  .settings-row .d{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .toggle{width:40px;height:22px;border-radius:20px;background:var(--line);position:relative;cursor:pointer;flex-shrink:0;}
+  .toggle.on{background:var(--teal-600);}
+  .toggle .knob{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:left .15s;}
+  .toggle.on .knob{left:21px;}
+
+  @media(max-width:1080px){.layout-split{grid-template-columns:1fr;}.kpi-row{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- ============================= LOGIN ============================= -->
+<div id="loginScreen">
+  <div class="login-brand">
+    <div class="seal">ISU</div>
+    <h1>ISU Infirmary</h1>
+    <div class="s1">Infirmary Log Book System</div>
+    <div class="s2">Isabela State University</div>
+  </div>
+  <div class="login-card">
+    <div class="lbl-top">Sign in as</div>
+    <div class="role-pick">
+      <button class="sel" id="pickNurse" onclick="pickRole('nurse')">🛡 Nurse / Staff</button>
+      <button id="pickAdmin" onclick="pickRole('admin')">👥 Admin</button>
+    </div>
+    <label>Username</label>
+    <input type="text" id="loginUser" placeholder="e.g. nsantos" value="nsantos">
+    <label>Password</label>
+    <input type="password" placeholder="••••••••" value="password123!">
+    <div class="login-hint">Minimum 8 characters, at least 1 symbol.</div>
+    <div class="login-forgot" onclick="openModal('forgotModal')">Forgot Password?</div>
+    <button class="go" onclick="login()">Sign In</button>
+  </div>
+  <div class="login-foot">ISU Infirmary Log Book System · 2026 Formalized</div>
+</div>
+
+<!-- ============================= APP SHELL ============================= -->
+<div id="app">
+  <div class="sidebar">
+    <div class="brand">
+      <div class="seal">ISU</div>
+      <div class="txt"><div>ISU Infirmary</div><div>Log Book System</div></div>
+    </div>
+    <div class="user">
+      <div class="av" id="userAv">NS</div>
+      <div><div id="userName">Nurse Santos</div><div id="userRole">Nurse</div></div>
+    </div>
+    <ul class="nav" id="navList"></ul>
+    <div class="signout" onclick="logout()">⏻ Sign Out</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb" id="crumbTxt">☰ Dashboard</div>
+      <div class="icons"><span>🔔</span><span id="topRolePill">👤 Nurse</span></div>
+    </div>
+
+    <div class="content">
+
+      <!-- ========================================================= -->
+      <!-- NURSE VIEWS                                              -->
+      <!-- ========================================================= -->
+
+      <!-- Nurse Dashboard -->
+      <div class="view" id="view-nurse-dash">
+        <div class="page-head"><div><h1>Nurse Dashboard</h1><div class="sub">ISU Infirmary · August 14, 2026</div></div></div>
+
+        <div class="range-bar">
+          <div class="presets">
+            <button class="active" onclick="setRange(this,'today')">Today</button>
+            <button onclick="setRange(this,'week')">This Week</button>
+            <button onclick="setRange(this,'month')">This Month</button>
+          </div>
+          <div class="divider" style="width:1px;height:22px;background:var(--line);"></div>
+          <label style="font-size:11px;font-weight:700;color:var(--muted);">From</label>
+          <input type="date" value="2026-08-01" style="max-width:145px;">
+          <span style="font-size:12px;color:var(--muted);">to</span>
+          <input type="date" value="2026-08-14" style="max-width:145px;">
+          <button class="btn btn-primary btn-sm">Apply</button>
+          <div class="live-note"><span class="dot"></span>Auto-updates on change</div>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi primary" onclick="showView('view-visit-hub')"><div class="ic-badge">🩺</div><div class="label">Today's Visits</div><div class="value">4</div><div class="foot">1 Waiting Check-Out</div></div>
+          <div class="kpi" onclick="showView('view-visit-hub')"><div class="ic-badge">📈</div><div class="label">Range Total</div><div class="value">84</div><div class="foot">Mon–Sun total</div></div>
+          <div class="kpi" onclick="showView('view-visit-hub')"><div class="ic-badge">⚠</div><div class="label">Referred Today</div><div class="value">2</div><div class="foot">To hospital/doctor</div></div>
+          <div class="kpi warn" onclick="showView('view-stock')"><div class="ic-badge">🧪</div><div class="label">Low / Out of Stock</div><div class="value">4</div><div class="foot">2 Low · 2 Out of Stock</div></div>
+        </div>
+
+        <div class="chart-row">
+          <div class="card">
+            <h3>Weekly Visit Trend</h3>
+            <div class="bars">
+              <div class="bar-col"><span class="num">9</span><div class="bar" style="height:37%;"></div><span class="lbl">Mon</span></div>
+              <div class="bar-col"><span class="num">21</span><div class="bar" style="height:87%;"></div><span class="lbl">Tue</span></div>
+              <div class="bar-col"><span class="num">11</span><div class="bar" style="height:45%;"></div><span class="lbl">Wed</span></div>
+              <div class="bar-col"><span class="num">24</span><div class="bar" style="height:100%;"></div><span class="lbl">Thu</span></div>
+              <div class="bar-col"><span class="num">19</span><div class="bar" style="height:79%;"></div><span class="lbl">Fri</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Top Complaints</h3>
+            <div class="donut-wrap">
+              <svg width="100" height="100" viewBox="0 0 42 42">
+                <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#e3f3ef" stroke-width="6"></circle>
+                <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#137a6d" stroke-width="6" stroke-dasharray="32 68" stroke-dashoffset="25"></circle>
+                <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#1a9484" stroke-width="6" stroke-dasharray="18 82" stroke-dashoffset="-7"></circle>
+                <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#6fb8ac" stroke-width="6" stroke-dasharray="14 86" stroke-dashoffset="-25"></circle>
+                <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#b8790f" stroke-width="6" stroke-dasharray="12 88" stroke-dashoffset="-39"></circle>
+                <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#c8d6d2" stroke-width="6" stroke-dasharray="24 76" stroke-dashoffset="-51"></circle>
+              </svg>
+              <div class="donut-legend">
+                <div class="legend-row"><span class="sw" style="background:#137a6d;"></span><span class="name">Fever / Headache</span><span class="pct">32%</span></div>
+                <div class="legend-row"><span class="sw" style="background:#1a9484;"></span><span class="name">Flu / Colds</span><span class="pct">18%</span></div>
+                <div class="legend-row"><span class="sw" style="background:#6fb8ac;"></span><span class="name">Menstrual Cramps</span><span class="pct">14%</span></div>
+                <div class="legend-row"><span class="sw" style="background:#b8790f;"></span><span class="name">Wounds / Injuries</span><span class="pct">12%</span></div>
+                <div class="legend-row"><span class="sw" style="background:#c8d6d2;"></span><span class="name">Others</span><span class="pct">24%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert-banner">
+          <span class="ic">⚠</span>
+          <div class="txt"><strong>4 stock items need immediate restock</strong><span>Antacid (Kremil-S) and Surgical Gloves (M) are Out of Stock.</span></div>
+          <button class="go" onclick="openModal('requestRestockModal')">Request Restock to Admin →</button>
+        </div>
+      </div>
+
+      <!-- Combined Visit Records + Today's Visits (Docx Layout) -->
+      <div class="view" id="view-visit-hub">
+        <div class="page-head">
+          <div><h1>Visit Records</h1><div class="sub">1,247 total records logged</div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary btn-sm" onclick="openModal('addPatientModal')">＋ Add Visit Record</button>
+            <button class="btn btn-outline btn-sm" onclick="openModal('exportModal')">⬇ Export (PDF / CSV)</button>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('printModal')">🖨 Customize Print</button>
+            <button class="btn btn-outline btn-sm" onclick="showView('view-flag-cases')">🚩 Priority &amp; Special Cases</button>
+          </div>
+        </div>
+
+        <div class="layout-split">
+          <!-- Left: Main Visit Records Table -->
+          <div>
+            <div class="toolbar">
+              <input type="text" placeholder="🔍 Search By Name, ID, or Complaint...">
+              <select style="max-width:130px;"><option>Gender: All</option><option>Female</option><option>Male</option></select>
+              <select style="max-width:140px;"><option>Year Level: All</option><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select>
+              <select style="max-width:140px;"><option>Program: All</option><option>BSCS</option><option>BS Nursing</option><option>BSIT</option></select>
+              <select style="max-width:160px;"><option>Department: All</option><option>College of Nursing</option><option>CICS</option><option>CAS</option></select>
+            </div>
+
+            <div class="card" style="padding:0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="sortable">NAME ↕</th>
+                    <th>TYPE</th>
+                    <th>GENDER</th>
+                    <th>YEAR LEVEL</th>
+                    <th>PROGRAM</th>
+                    <th>DEPARTMENT</th>
+                    <th class="sortable">DATE ↕</th>
+                    <th>ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="rowlink">
+                    <td><div class="nm">Aira Domingo <span class="pill pwd-badge">★ PWD</span></div></td>
+                    <td>Student</td>
+                    <td>Female</td>
+                    <td>2nd Year</td>
+                    <td>BS Nursing</td>
+                    <td>College of Nursing</td>
+                    <td>Aug 15, 2026<br><span class="sub">9:42 AM</span></td>
+                    <td><button class="btn btn-ghost btn-sm" onclick="openModal('editPatientModal')">✎</button> <button class="btn btn-ghost btn-sm" onclick="openModal('softDeleteModal')">🗑</button></td>
+                  </tr>
+                  <tr class="rowlink">
+                    <td><div class="nm">Prof. Andrew Ramos</div></td>
+                    <td>Faculty</td>
+                    <td>Male</td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>College of Engineering</td>
+                    <td>Aug 15, 2026<br><span class="sub">10:15 AM</span></td>
+                    <td><button class="btn btn-ghost btn-sm" onclick="openModal('editPatientModal')">✎</button> <button class="btn btn-ghost btn-sm" onclick="openModal('softDeleteModal')">🗑</button></td>
+                  </tr>
+                  <tr class="rowlink">
+                    <td><div class="nm">Alwyna Reyes <span class="pill senior-badge">★ SENIOR</span></div></td>
+                    <td>Visitor</td>
+                    <td>Female</td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>Aug 21, 2026<br><span class="sub">10:15 AM</span></td>
+                    <td><button class="btn btn-ghost btn-sm" onclick="openModal('editPatientModal')">✎</button> <button class="btn btn-ghost btn-sm" onclick="openModal('softDeleteModal')">🗑</button></td>
+                  </tr>
+                  <tr class="rowlink">
+                    <td><div class="nm">Santos, Maria R.</div></td>
+                    <td>Student</td>
+                    <td>Female</td>
+                    <td>3rd Year</td>
+                    <td>BSCS</td>
+                    <td>CCSICT</td>
+                    <td>Aug 14, 2026<br><span class="sub">8:42 AM</span></td>
+                    <td><button class="btn btn-ghost btn-sm" onclick="openModal('editPatientModal')">✎</button> <button class="btn btn-ghost btn-sm" onclick="openModal('softDeleteModal')">🗑</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pagination-bar">
+              <div class="pg-size">Show <select><option>25</option><option selected>50</option><option>100</option></select> per page</div>
+              <div class="pg-nav">
+                <button>‹</button>
+                <span class="pg-current">1</span>
+                <span>25</span>
+                <button>›</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Today's Visits Panel (From Figma Blueprint) -->
+          <div class="today-panel">
+            <div class="today-panel-head">
+              <h3>Today's Visits</h3>
+              <span>4 total · 1 in care</span>
+            </div>
+
+            <div class="visit-mini-card">
+              <div class="top">
+                <div class="name">Santos, Maria R.</div>
+                <span class="pill pending">● In Care</span>
+              </div>
+              <div class="meta">Student · BS Computer Science · 3rd Year · 2023-04512</div>
+              <div class="diag">Mild headache, dizziness → Biogesic 500mg, rest 30 mins</div>
+              <div class="actions">
+                <span class="sub">Arrived <strong>8:42 AM</strong></span>
+                <button class="btn btn-primary btn-sm" onclick="openModal('checkoutModal')">Sign Out</button>
+              </div>
+            </div>
+
+            <div class="visit-mini-card" style="background:#fff;">
+              <div class="top">
+                <div class="name">Ramirez, Jon P.</div>
+                <span class="pill active">● Completed</span>
+              </div>
+              <div class="meta">Faculty · CCSICT Department</div>
+              <div class="diag">Elevated BP → Monitored, advised to rest</div>
+              <div class="actions">
+                <span class="sub">8:05 AM – 8:30 AM (&lt;1hr)</span>
+                <button class="btn btn-ghost btn-sm" onclick="showView('view-profile')">View Record</button>
+              </div>
+            </div>
+
+            <div class="visit-mini-card" style="background:#fff;">
+              <div class="top">
+                <div class="name">Cruz, Bea L.</div>
+                <span class="pill active">● Completed</span>
+              </div>
+              <div class="meta">Student · BS Nursing · 1st Year · 2024-01188</div>
+              <div class="diag">Menstrual cramps → Mefenamic acid 500mg</div>
+              <div class="actions">
+                <span class="sub">7:50 AM – 8:15 AM (&lt;1hr)</span>
+                <button class="btn btn-ghost btn-sm" onclick="showView('view-profile')">View Record</button>
+              </div>
+            </div>
+
+            <div class="visit-mini-card" style="background:#fff;">
+              <div class="top">
+                <div class="name">Tan, Erika V.</div>
+                <span class="pill active">● Completed</span>
+              </div>
+              <div class="meta">Visitor · Parent (Campus event)</div>
+              <div class="diag">Minor scrape on knee → Cleaned + bandaged</div>
+              <div class="actions">
+                <span class="sub">7:20 AM – 7:35 AM (&lt;1hr)</span>
+                <button class="btn btn-ghost btn-sm" onclick="showView('view-profile')">View Record</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Priority & Special Cases / PWD / Senior Citizen Hub -->
+      <div class="view" id="view-flag-cases">
+        <div class="page-head">
+          <div>
+            <h1>Priority &amp; Special Cases</h1>
+            <div class="sub">Flags this patient for priority handling (PWD / Senior) and logs persistent conditions (allergies, chronic illnesses) to show on every future visit.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('specialFlagModal')">＋ Flag Patient</button>
+        </div>
+
+        <div class="card">
+          <div class="roster-search">
+            <span class="ic">⌕</span>
+            <input type="text" id="flagSearchInput" placeholder="Search roster by name, ID, or case type..." oninput="filterFlags()">
+          </div>
+
+          <!-- Pagination Filter for Category -->
+          <div class="tabs" style="margin-bottom:12px;">
+            <button class="active" onclick="filterFlagCategory(this, 'all')">All Priority Cases (5)</button>
+            <button onclick="filterFlagCategory(this, 'pwd')">PWD (1)</button>
+            <button onclick="filterFlagCategory(this, 'senior')">Senior Citizen (1)</button>
+            <button onclick="filterFlagCategory(this, 'medical')">Allergies &amp; Chronic (3)</button>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th class="sortable">DATE/TIME ↕</th>
+                <th class="sortable">NAME ↕</th>
+                <th>CASE TYPE</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="flagsTableBody">
+              <tr data-cat="medical">
+                <td>August 14, 2026<br><span class="sub">8:24 AM</span></td>
+                <td><div class="nm">Santos, Maria</div><div class="sub">Student 23-2125</div></td>
+                <td><span class="flag-tag-red">Allergies: Penicillin</span></td>
+                <td><span class="pill active">ACTIVE</span></td>
+              </tr>
+              <tr data-cat="medical">
+                <td>August 25, 2026<br><span class="sub">9:50 PM</span></td>
+                <td><div class="nm">Cruz, Maximo</div><div class="sub">Student 23-2167</div></td>
+                <td><span class="flag-tag-red">Anxiety</span></td>
+                <td><span class="pill active">ACTIVE</span></td>
+              </tr>
+              <tr data-cat="pwd">
+                <td>August 15, 2026<br><span class="sub">9:42 AM</span></td>
+                <td><div class="nm">Aira Domingo</div><div class="sub">Student · 2024-0012</div></td>
+                <td><span class="pill pwd-badge">★ PWD (Visual)</span></td>
+                <td><span class="pill active">ACTIVE</span></td>
+              </tr>
+              <tr data-cat="senior">
+                <td>August 21, 2026<br><span class="sub">10:15 AM</span></td>
+                <td><div class="nm">Alwyna Reyes</div><div class="sub">Visitor · Senior Citizen</div></td>
+                <td><span class="pill senior-badge">★ Senior Citizen</span></td>
+                <td><span class="pill active">ACTIVE</span></td>
+              </tr>
+              <tr data-cat="medical">
+                <td>July 02, 2026<br><span class="sub">1:15 PM</span></td>
+                <td><div class="nm">Cruz, Bea L.</div><div class="sub">Student · 2024-01188</div></td>
+                <td><span class="flag-tag-red">History of Illness: Asthma</span></td>
+                <td><span class="pill active">ACTIVE</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="pagination-bar">
+            <div class="pg-size">Showing 5 results</div>
+            <div class="pg-nav">
+              <button disabled>‹ Prev</button>
+              <span class="pg-current">1</span>
+              <button disabled>Next ›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nurse Stock & Supplies -->
+      <div class="view" id="view-stock">
+        <div class="page-head">
+          <div><h1>Stock &amp; Supplies</h1><div class="sub">10 items tracked · Live clinic inventory</div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" onclick="openModal('requestRestockModal')">📢 Request Restock</button>
+            <button class="btn btn-primary btn-sm" onclick="openModal('stockModal')">＋ Add / Restock Item</button>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="active" onclick="filterStockStatus(this,'all')">All Items (10)</button>
+          <button onclick="filterStockStatus(this,'high-stock')">High Stock (6)</button>
+          <button onclick="filterStockStatus(this,'low-stock')">Low Stock (2)</button>
+          <button onclick="filterStockStatus(this,'out-stock')">Out of Stock (2)</button>
+        </div>
+
+        <div class="toolbar">
+          <input type="text" placeholder="Search items or medicine..." id="stockSearchInput" oninput="filterStockSearch()">
+          <select id="stockCatSelect" onchange="filterStockSearch()" style="max-width:160px;">
+            <option value="all">Category: All</option>
+            <option value="Analgesic">Analgesic</option>
+            <option value="Antibiotic">Antibiotic</option>
+            <option value="Antiseptic">Antiseptic</option>
+            <option value="PPE">PPE</option>
+            <option value="Wound Care">Wound Care</option>
+          </select>
+        </div>
+
+        <div class="card" style="padding:0;">
+          <table id="nurseStockTable">
+            <thead>
+              <tr><th>Item</th><th>Category</th><th>Qty / Unit</th><th>Reorder Level</th><th>Added By</th><th>Expiry</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr data-status="high-stock" data-cat="Analgesic"><td class="nm">Paracetamol 500mg</td><td>Analgesic</td><td>240 tablets</td><td>50 tablets</td><td class="sub">N. Jaziel</td><td>2026-03</td><td><span class="pill high-stock">High Stock</span></td><td><button class="btn btn-ghost btn-sm" onclick="openModal('stockModal')">Edit</button></td></tr>
+              <tr data-status="high-stock" data-cat="Analgesic"><td class="nm">Mefenamic Acid 500mg</td><td>Analgesic</td><td>85 tablets</td><td>60 tablets</td><td class="sub">N. Jaziel</td><td>2026-01</td><td><span class="pill high-stock">High Stock</span></td><td><button class="btn btn-ghost btn-sm" onclick="openModal('stockModal')">Edit</button></td></tr>
+              <tr data-status="low-stock" data-cat="Antibiotic"><td class="nm">Amoxicillin 500mg</td><td>Antibiotic</td><td>34 capsules</td><td>40 capsules</td><td class="sub">N. Santos</td><td>2026-11</td><td><span class="pill low-stock">Low Stock</span></td><td><button class="btn btn-ghost btn-sm" onclick="openModal('requestRestockModal')">Request</button></td></tr>
+              <tr data-status="out-stock" data-cat="GI"><td class="nm">Antacid (Kremil-S)</td><td>GI</td><td>0 tablets</td><td>30 tablets</td><td class="sub">G. Cruz — Admin</td><td>2026-10</td><td><span class="pill out-stock">Out of Stock</span></td><td><button class="btn btn-danger btn-sm" onclick="openModal('requestRestockModal')">Request Restock</button></td></tr>
+              <tr data-status="high-stock" data-cat="Allergy"><td class="nm">Antihistamine (Cetirizine)</td><td>Allergy</td><td>96 tablets</td><td>40 tablets</td><td class="sub">N. Jaziel</td><td>2026-06</td><td><span class="pill high-stock">High Stock</span></td><td><button class="btn btn-ghost btn-sm" onclick="openModal('stockModal')">Edit</button></td></tr>
+              <tr data-status="low-stock" data-cat="Antiseptic"><td class="nm">Betadine Solution</td><td>Antiseptic</td><td>6 bottles</td><td>5 bottles</td><td class="sub">N. Jaziel</td><td>2026-02</td><td><span class="pill low-stock">Low Stock</span></td><td><button class="btn btn-ghost btn-sm" onclick="openModal('requestRestockModal')">Request</button></td></tr>
+              <tr data-status="high-stock" data-cat="Wound Care"><td class="nm">Sterile Gauze Pads</td><td>Wound Care</td><td>150 pcs</td><td>100 pcs</td><td class="sub">N. Jaziel</td><td>N/A</td><td><span class="pill high-stock">High Stock</span></td><td><button class="btn btn-ghost btn-sm" onclick="openModal('stockModal')">Edit</button></td></tr>
+              <tr data-status="high-stock" data-cat="Wound Care"><td class="nm">Elastic Bandage</td><td>Wound Care</td><td>22 rolls</td><td>20 rolls</td><td class="sub">N. Santos</td><td>N/A</td><td><span class="pill high-stock">High Stock</span></td><td><button class="btn btn-ghost btn-sm" onclick="openModal('stockModal')">Edit</button></td></tr>
+              <tr data-status="out-stock" data-cat="PPE"><td class="nm">Surgical Gloves (M)</td><td>PPE</td><td>0 pairs</td><td>20 pairs</td><td class="sub">N. Santos</td><td>2027-01</td><td><span class="pill out-stock">Out of Stock</span></td><td><button class="btn btn-danger btn-sm" onclick="openModal('requestRestockModal')">Request Restock</button></td></tr>
+              <tr data-status="high-stock" data-cat="Hydration"><td class="nm">Oral Rehydration Salts</td><td>Hydration</td><td>58 sachets</td><td>30 sachets</td><td class="sub">N. Jaziel</td><td>2026-04</td><td><span class="pill high-stock">High Stock</span></td><td><button class="btn btn-ghost btn-sm" onclick="openModal('stockModal')">Edit</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Humanized Clinical Insights & Associations -->
+      <div class="view" id="view-insights">
+        <div class="page-head">
+          <div><h1>Reports &amp; Health Insights</h1><div class="sub">Symptom associations · Usage patterns · Forecasts</div></div>
+        </div>
+
+        <div class="card">
+          <h3>Common Complaint &amp; Prescription Patterns</h3>
+          <div class="sub" style="margin-bottom:12px;">Identifies symptoms that occur together frequently to optimize clinic preparedness.</div>
+          <table>
+            <thead>
+              <tr>
+                <th>When Patient Has (Symptom / Trigger)</th>
+                <th>Commonly Associated With / Treatment Given</th>
+                <th>Likelihood (Match Rate)</th>
+                <th>Occurrence Strength</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="nm">Fever</td>
+                <td>Headache</td>
+                <td><strong style="color:var(--teal-700);">82% of patients</strong></td>
+                <td><span class="pill high-stock">Very Strong Pattern</span></td>
+              </tr>
+              <tr>
+                <td class="nm">Stomachache</td>
+                <td>Antacid Prescribed</td>
+                <td><strong style="color:var(--teal-700);">75% of patients</strong></td>
+                <td><span class="pill high-stock">Strong Pattern</span></td>
+              </tr>
+              <tr>
+                <td class="nm">Menstrual Cramps</td>
+                <td>Mefenamic Acid Prescribed</td>
+                <td><strong style="color:var(--teal-700);">91% of patients</strong></td>
+                <td><span class="pill high-stock">Very Strong Pattern</span></td>
+              </tr>
+              <tr>
+                <td class="nm">Open Wound / Injury</td>
+                <td>Betadine Cleaning + Sterile Bandage</td>
+                <td><strong style="color:var(--teal-700);">88% of patients</strong></td>
+                <td><span class="pill high-stock">Very Strong Pattern</span></td>
+              </tr>
+              <tr>
+                <td class="nm">Dizziness</td>
+                <td>Glucose Rest &amp; BP Monitoring</td>
+                <td><strong style="color:var(--teal-700);">70% of patients</strong></td>
+                <td><span class="pill low-stock">Moderate Pattern</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Patient Profile Preview -->
+      <div class="view" id="view-profile">
+        <div class="page-head">
+          <div><h1>Patient Profile</h1><div class="sub">Full clinical ledger + printable forms</div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" onclick="alert('Demo: Generates ISUE-UHS-MCR-007 Medical Certificate')">🖨 Medical Certificate</button>
+            <button class="btn btn-outline btn-sm" onclick="alert('Demo: Generates ISUE-UHS-PaN-006 Parental Notification')">🖨 Parental Notification</button>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('editPatientModal')">✎ Edit Record</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;gap:14px;align-items:center;">
+            <div style="width:52px;height:52px;border-radius:50%;background:var(--teal-100);color:var(--teal-700);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;">MS</div>
+            <div>
+              <div style="font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--teal-900);">Santos, Maria R.</div>
+              <div class="sub">Student · BS Computer Science · 3rd Year · 2023-04512 · CCSICT</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- ADMIN VIEWS (STRICT 3 CATEGORIES: DASH, USERS, SETTINGS)  -->
+      <!-- ========================================================= -->
+
+      <!-- Admin Dashboard -->
+      <div class="view" id="view-admin-dash">
+        <div class="page-head"><div><h1>Admin Dashboard</h1><div class="sub">Executive &amp; IT Oversight · August 14, 2026</div></div></div>
+
+        <div class="range-bar">
+          <div class="presets">
+            <button class="active">Today</button>
+            <button>This Week</button>
+            <button>This Month</button>
+            <button>Custom</button>
+          </div>
+          <div class="divider" style="width:1px;height:22px;background:var(--line);"></div>
+          <label style="font-size:11px;font-weight:700;color:var(--muted);">From</label>
+          <input type="date" value="2026-01-01" style="max-width:145px;">
+          <span style="font-size:12px;color:var(--muted);">to</span>
+          <input type="date" value="2026-02-15" style="max-width:145px;">
+          <button class="btn btn-primary btn-sm">Apply</button>
+          <div class="live-note"><span class="dot"></span>Auto-updates on change</div>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi"><div class="ic-badge">💾</div><div class="label">Last Backup Checked</div><div class="value">5</div><div class="foot">Tested 15 mins ago</div></div>
+          <div class="kpi"><div class="ic-badge">👥</div><div class="label">Active Accounts</div><div class="value">5</div><div class="foot">4 Active · 1 Inactive</div></div>
+          <div class="kpi"><div class="ic-badge">🗄</div><div class="label">Database Status</div><div class="value">Today</div><div class="foot">Automated at 12:00 AM</div></div>
+          <div class="kpi warn"><div class="ic-badge">🔔</div><div class="label">Restock Requests</div><div class="value" id="adminReqCount">2</div><div class="foot">From Duty Nurses</div></div>
+        </div>
+
+        <!-- Pending Restock Requests from Nurse -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <h3>Nurse Restock Requests (Out of Stock / Low Supplies)</h3>
+            <span class="sub">Action required to approve procurement</span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Requested Medicine</th><th>Category</th><th>Requested Qty</th><th>Urgency</th><th>Requested By</th><th>Action</th></tr>
+            </thead>
+            <tbody id="restockReqList">
+              <tr>
+                <td class="nm">Antacid (Kremil-S)</td>
+                <td>GI</td>
+                <td>100 tablets</td>
+                <td><span class="pill out-stock">Out of Stock</span></td>
+                <td class="sub">Nurse Santos (10:15 AM)</td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="resolveRestock(this, 'Approved')">✓ Accept &amp; Restock</button>
+                  <button class="btn btn-ghost btn-sm" onclick="resolveRestock(this, 'Denied')">✕ Deny</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="nm">Surgical Gloves (M)</td>
+                <td>PPE</td>
+                <td>50 pairs</td>
+                <td><span class="pill out-stock">Out of Stock</span></td>
+                <td class="sub">Nurse Santos (09:30 AM)</td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="resolveRestock(this, 'Approved')">✓ Accept &amp; Restock</button>
+                  <button class="btn btn-ghost btn-sm" onclick="resolveRestock(this, 'Denied')">✕ Deny</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Monthly Reporting Cadence</h3>
+          <div class="modal-note" style="margin:0 0 12px;background:var(--teal-50);border:1px dashed var(--teal-500);padding:8px 12px;border-radius:6px;font-size:11.5px;">Supply reports generate monthly · Medicine stock is audited every 1–2 months.</div>
+          <table>
+            <tr><td><div class="nm">Monthly Supply Report</div><div class="sub">Next due: Sept 1, 2026</div></td><td style="text-align:right;"><button class="btn btn-outline btn-sm">Generate</button></td></tr>
+            <tr><td><div class="nm">Medicine Release Cycle Report</div><div class="sub">Next due: Sept 15, 2026</div></td><td style="text-align:right;"><button class="btn btn-outline btn-sm">Generate</button></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Admin User Management -->
+      <div class="view" id="view-users">
+        <div class="page-head">
+          <div><h1>User Management</h1><div class="sub">5 system users registered</div></div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('addUserModal')">＋ Add User</button>
+        </div>
+        <div class="card" style="padding:0;">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Role</th><th>Email</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="nm">Nurse Santos</td><td>Nurse</td><td class="sub">nsantos@isu.edu.ph</td><td><span class="pill active">Active</span></td><td style="text-align:right;"><button class="btn btn-ghost btn-sm" onclick="openModal('editUserModal')">Edit</button></td></tr>
+              <tr><td class="nm">Nurse Lim</td><td>Nurse</td><td class="sub">rlim@isu.edu.ph</td><td><span class="pill active">Active</span></td><td style="text-align:right;"><button class="btn btn-ghost btn-sm" onclick="openModal('editUserModal')">Edit</button></td></tr>
+              <tr><td class="nm">Dr. Mendoza</td><td>Director</td><td class="sub">cmendoza@isu.edu.ph</td><td><span class="pill active">Active</span></td><td style="text-align:right;"><button class="btn btn-ghost btn-sm" onclick="openModal('editUserModal')">Edit</button></td></tr>
+              <tr><td class="nm">Admin Cruz</td><td>Admin</td><td class="sub">acruz@isu.edu.ph</td><td><span class="pill active">Active</span></td><td style="text-align:right;"><button class="btn btn-ghost btn-sm" onclick="openModal('editUserModal')">Edit</button></td></tr>
+              <tr><td class="nm">Nurse Ramos</td><td>Nurse</td><td class="sub">pramos@isu.edu.ph</td><td><span class="pill inactive">Inactive</span></td><td style="text-align:right;"><button class="btn btn-ghost btn-sm" onclick="openModal('editUserModal')">Edit</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Admin Settings -->
+      <div class="view" id="view-settings">
+        <div class="page-head"><div><h1>System Settings</h1><div class="sub">Configure logs, database snapshots, security, and retention</div></div></div>
+
+        <div class="chart-row">
+          <div class="card">
+            <h3>Backup Settings</h3>
+            <div class="settings-row">
+              <div><div class="t">Automated Daily Backups</div><div class="d">Daily snapshots are taken automatically at 3:00 AM.</div></div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"><div class="knob"></div></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:12px;">
+              <button class="btn btn-primary btn-sm" onclick="alert('Manual backup started successfully.')">⬇ Backup Now (Manual)</button>
+              <button class="btn btn-ghost btn-sm" onclick="openModal('recoverModal')">↻ Recover from Backup</button>
+            </div>
+            <div class="sub" style="margin-top:10px;">● Last backup: Today, 8:00 AM (automated, 41.3 MB)</div>
+          </div>
+          <div class="card">
+            <h3>Database &amp; Retention</h3>
+            <div style="display:flex;gap:10px;margin-bottom:12px;">
+              <button class="btn btn-outline btn-sm" onclick="alert('Exported .SQL dump.')">Export as SQL</button>
+              <button class="btn btn-outline btn-sm" onclick="alert('Exported .CSV dump.')">Export as .CSV</button>
+            </div>
+            <div class="settings-row" style="border:none;">
+              <div><div class="t">Soft Delete (90 Days)</div><div class="d">Deleted records are kept in trash for 90 days before permanent erase.</div></div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"><div class="knob"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Security Settings</h3>
+          <div class="field-row">
+            <div class="field"><label>Password Rules</label><input type="text" value="At least 1 symbol required" readonly></div>
+            <div class="field"><label>Failed Login Lockout</label><input type="text" value="Lock after 5 failed attempts (15 min)" readonly></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- MODALS (Figma High-Fidelity Specs)                        -->
+<!-- ========================================================= -->
+
+<!-- ADD PATIENT RECORD MODAL -->
+<div class="modal-backdrop" id="addPatientModal">
+  <div class="modal wide">
+    <div class="modal-head">
+      <div>
+        <h3>Add Patient</h3>
+        <div class="sub">Stamps Time of Arrival the moment you save</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('addPatientModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field full">
+        <label>Visitor Type</label>
+        <div class="segmented">
+          <button class="active" onclick="pickSegVisitor(this,'student')">STUDENT</button>
+          <button onclick="pickSegVisitor(this,'faculty')">FACULTY</button>
+          <button onclick="pickSegVisitor(this,'nasa')">NASA</button>
+        </div>
+      </div>
+
+      <!-- Step 1 Roster Search -->
+      <div class="roster-search">
+        <span class="ic">⌕</span>
+        <input type="text" placeholder="Search roster by name or ID...">
+      </div>
+
+      <div class="roster-results" style="margin-bottom:14px;">
+        <div class="roster-row">
+          <div><div class="nm">Gaffud, CJ N.</div><div class="sub">24-2133 · BSCS-3rd year</div></div>
+          <button class="btn btn-primary btn-sm" onclick="autofillAddDemo()">Use</button>
+        </div>
+      </div>
+
+      <!-- Step 2 Details -->
+      <div class="field-row">
+        <div class="field"><label>First Name</label><input type="text" id="addFn" placeholder="e.g. JAZIEL"></div>
+        <div class="field"><label>Last Name</label><input type="text" id="addLn" placeholder="e.g. NICOLAS"></div>
+      </div>
+      <div class="field-row three">
+        <div class="field"><label>Middle Name (Optional)</label><input type="text" placeholder="e.g. PAYUMO"></div>
+        <div class="field">
+          <label>Sex</label>
+          <select><option>MALE</option><option>FEMALE</option></select>
+        </div>
+        <div class="field"><label>Age</label><input type="number" placeholder="e.g. 20"></div>
+      </div>
+
+      <div class="field-row three">
+        <div class="field"><label>Student Number</label><input type="text" id="addId" placeholder="e.g. 24-2133"></div>
+        <div class="field"><label>Program</label><input type="text" placeholder="e.g. BS COMPUTER SCIENCE"></div>
+        <div class="field"><label>Contact Number</label><input type="text" placeholder="e.g. 09456552130"></div>
+      </div>
+
+      <div class="field-row three">
+        <div class="field">
+          <label>Year Level</label>
+          <select><option>1ST YEAR</option><option>2ND YEAR</option><option>3RD YEAR</option><option>4TH YEAR</option></select>
+        </div>
+        <div class="field"><label>College / Department</label><input type="text" placeholder="e.g. CCSICT"></div>
+        <div class="field">
+          <label>Civil Status</label>
+          <select><option>SINGLE</option><option>MARRIED</option><option>WIDOWED</option></select>
+        </div>
+      </div>
+
+      <div style="background:var(--teal-50);padding:10px 12px;border-radius:8px;margin-bottom:12px;border:1px solid var(--line);">
+        <div class="checkbox-row" style="flex-direction:column;gap:8px;">
+          <label><input type="checkbox"> <strong>PWD / Senior Citizen</strong> — flags this visit for priority handling</label>
+          <label><input type="checkbox"> <strong>Special Cases</strong> (Anxiety, asthma, penicillin allergies, etc...)</label>
+        </div>
+      </div>
+
+      <!-- Vitals & Complaints -->
+      <div class="field-row three">
+        <div class="field"><label>BP</label><input type="text" placeholder="e.g. 110/70"></div>
+        <div class="field"><label>Temperature (°C)</label><input type="text" placeholder="e.g. 36.8"></div>
+        <div class="field"><label>Pulse (bpm)</label><input type="text" placeholder="e.g. 78"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field"><label>Complaints</label><textarea placeholder="e.g. Mild headache, dizziness"></textarea></div>
+        <div class="field"><label>Management</label><textarea placeholder="e.g. Advised rest 30 mins, monitored"></textarea></div>
+      </div>
+
+      <div class="field full">
+        <label>Treatment / Medication Given</label>
+        <textarea placeholder="e.g. Biogesic 500mg, rest 30 mins"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addPatientModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="alert('Patient record saved and arrival stamped.');closeModal('addPatientModal')">Add Patient Record</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PATIENT RECORD MODAL -->
+<div class="modal-backdrop" id="editPatientModal">
+  <div class="modal wide">
+    <div class="modal-head">
+      <div>
+        <h3>Edit Patient</h3>
+        <div class="sub">Update patient details, demographics, and clinical flags</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('editPatientModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field full">
+        <label>Visitor Type</label>
+        <div class="segmented">
+          <button class="active">STUDENT</button>
+          <button>FACULTY</button>
+          <button>NASA</button>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field"><label>First Name</label><input type="text" value="JAZIEL"></div>
+        <div class="field"><label>Last Name</label><input type="text" value="NICOLAS"></div>
+      </div>
+      <div class="field-row three">
+        <div class="field"><label>Middle Name (Optional)</label><input type="text" value="PAYUMO"></div>
+        <div class="field">
+          <label>Sex</label>
+          <select><option selected>MALE</option><option>FEMALE</option></select>
+        </div>
+        <div class="field"><label>Age</label><input type="number" value="20"></div>
+      </div>
+
+      <div class="field-row three">
+        <div class="field"><label>Student Number</label><input type="text" value="24-2133"></div>
+        <div class="field"><label>Program</label><input type="text" value="BS COMPUTER SCIENCE"></div>
+        <div class="field"><label>Contact Number</label><input type="text" value="09456552130"></div>
+      </div>
+
+      <div class="field-row three">
+        <div class="field">
+          <label>Year Level</label>
+          <select><option>1ST YEAR</option><option>2ND YEAR</option><option selected>3RD YEAR</option><option>4TH YEAR</option></select>
+        </div>
+        <div class="field"><label>College / Department</label><input type="text" value="CCSICT"></div>
+        <div class="field">
+          <label>Civil Status</label>
+          <select><option selected>SINGLE</option><option>MARRIED</option><option>WIDOWED</option></select>
+        </div>
+      </div>
+
+      <div style="background:var(--teal-50);padding:10px 12px;border-radius:8px;margin-bottom:12px;border:1px solid var(--line);">
+        <div class="checkbox-row" style="flex-direction:column;gap:8px;">
+          <label><input type="checkbox"> <strong>PWD / Senior Citizen</strong> — flags this visit for priority handling</label>
+          <label><input type="checkbox" checked> <strong>Special Cases</strong> (Anxiety, asthma, penicillin allergies, etc...)</label>
+        </div>
+      </div>
+
+      <div class="field-row three">
+        <div class="field"><label>BP</label><input type="text" value="110/70"></div>
+        <div class="field"><label>Temperature (°C)</label><input type="text" value="36.8"></div>
+        <div class="field"><label>Pulse (bpm)</label><input type="text" value="78"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field"><label>Complaints</label><textarea>Mild headache, dizziness</textarea></div>
+        <div class="field"><label>Management</label><textarea>Advised rest 30 mins, monitored</textarea></div>
+      </div>
+
+      <div class="field full">
+        <label>Treatment / Medication Given</label>
+        <textarea>Biogesic 500mg, rest 30 mins</textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('editPatientModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="alert('Record updated.');closeModal('editPatientModal')">Save Patient Record</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIGN OUT / CHECKOUT MODAL -->
+<div class="modal-backdrop" id="checkoutModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Sign Out — Santos, Maria R.</h3>
+      <button class="modal-close" onclick="closeModal('checkoutModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row three">
+        <div class="field"><label>Time In</label><input type="text" value="8:30 AM" readonly></div>
+        <div class="field"><label>Time of Exit</label><input type="text" value="9:05 AM" readonly></div>
+        <div class="field"><label>Duration</label><input type="text" value="<1 hour" readonly></div>
+      </div>
+      <div class="field full" style="margin-top:10px;">
+        <label>Disposition</label>
+        <div class="checkbox-row" style="gap:16px;margin-top:6px;">
+          <label><input type="radio" name="dispChoice" checked> Sent Home</label>
+          <label><input type="radio" name="dispChoice"> Back to School / Class</label>
+          <label><input type="radio" name="dispChoice"> Hospital Admission</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="alert('Printing checkout / excuse slip.')">🖨 Print Slip</button>
+      <button class="btn btn-primary" onclick="closeModal('checkoutModal');alert('Patient signed out.')">Confirm</button>
+      <button class="btn btn-ghost" onclick="closeModal('checkoutModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- NURSE REQUEST RESTOCK MODAL -->
+<div class="modal-backdrop" id="requestRestockModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Request Medicine Restock</h3>
+        <div class="sub">Sends a restock notification to Admin for approval</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('requestRestockModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field full" style="margin-bottom:12px;">
+        <label>Medicine / Supply Item Name</label>
+        <input type="text" placeholder="e.g. Antacid (Kremil-S), Mefenamic Acid...">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Category</label>
+          <select><option>Analgesic</option><option>Antibiotic</option><option>Antiseptic</option><option>PPE</option><option>GI / Others</option></select>
+        </div>
+        <div class="field">
+          <label>Quantity Needed</label>
+          <input type="text" placeholder="e.g. 50 boxes / 200 tablets">
+        </div>
+      </div>
+      <div class="field full">
+        <label>Urgency Level</label>
+        <select>
+          <option>Out of Stock (Immediate procurement)</option>
+          <option>Low Stock (Re-order threshold reached)</option>
+        </select>
+      </div>
+      <div class="modal-note" style="margin-top:10px;font-size:11px;color:var(--muted);">
+        Logged by: <strong>Nurse Santos</strong> · Will appear immediately on Admin Dashboard.
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('requestRestockModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="alert('Restock request sent to Admin!');closeModal('requestRestockModal')">Send Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/RESTOCK ITEM MODAL (Direct Inventory Update) -->
+<div class="modal-backdrop" id="stockModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Add / Restock Item</h3>
+        <div class="sub">Update physical stock counts and batch expiry</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('stockModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field full" style="margin-bottom:12px;">
+        <label>Item Name</label>
+        <input type="text" placeholder="e.g. Paracetamol 500mg">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Category</label>
+          <select><option>Medicine</option><option>Analgesic</option><option>Antibiotic</option><option>PPE</option><option>Wound Care</option></select>
+        </div>
+        <div class="field">
+          <label>Unit</label>
+          <select><option>Box</option><option>Tablets</option><option>Bottles</option><option>Pcs</option></select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Quantity</label><input type="number" value="1"></div>
+        <div class="field"><label>Expiry Date</label><input type="date"></div>
+      </div>
+      <div class="modal-note" style="margin-top:10px;color:var(--red);font-size:11px;">
+        Added By: Cyrille. This is automatically logged.
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('stockModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('stockModal')">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- SOFT DELETE MODAL -->
+<div class="modal-backdrop" id="softDeleteModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-head">
+      <h3>🗑 Move to Trash?</h3>
+      <button class="modal-close" onclick="closeModal('softDeleteModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;line-height:1.6;color:var(--ink);margin:0;">
+        This record will be <strong>soft-deleted</strong> — hidden from normal views but kept for 90 days (see Soft Delete setting in System Admin) so it can still be recovered if needed. It won't be permanently erased.
+      </p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('softDeleteModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="closeModal('softDeleteModal');alert('Moved to trash.')">Move to Trash</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD USER MODAL (Admin) -->
+<div class="modal-backdrop" id="addUserModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h3>Add User</h3><div class="sub">Create a new account for the infirmary system</div></div>
+      <button class="modal-close" onclick="closeModal('addUserModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field full" style="margin-bottom:12px;"><label>Full Name</label><input type="text" placeholder="e.g. Nurse Gaffud"></div>
+      <div class="field-row">
+        <div class="field"><label>Role</label><select><option>Nurse</option><option>Admin</option><option>Doctor / Director</option></select></div>
+        <div class="field"><label>Status</label><select><option>Active</option><option>Inactive</option></select></div>
+      </div>
+      <div class="field full"><label>Email</label><input type="text" placeholder="e.g. cgaffud@isu.edu.ph"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addUserModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('addUserModal');alert('User account created.')">Create User</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentRole = 'nurse';
+
+  const NAVS = {
+    nurse: [
+      {id:"view-nurse-dash", ic:"▦", label:"Dashboard"},
+      {id:"view-visit-hub", ic:"▤", label:"Visit Records"},
+      {id:"view-flag-cases", ic:"🚩", label:"Priority & Special Cases"},
+      {id:"view-stock", ic:"⚕", label:"Stock & Supplies"},
+      {id:"view-insights", ic:"📈", label:"Reports & Insights"},
+    ],
+    admin: [
+      {id:"view-admin-dash", ic:"▦", label:"Dashboard"},
+      {id:"view-users", ic:"👥", label:"User Management"},
+      {id:"view-settings", ic:"⚙", label:"Settings"},
+    ]
+  };
+
+  function buildNav(role){
+    const list = document.getElementById('navList');
+    list.innerHTML = NAVS[role].map((item,i) => `<li><a class="${i===0?'active':''}" onclick="showView('${item.id}', this)"><span class="ic">${item.ic}</span>${item.label}</a></li>`).join('');
+  }
+
+  function pickRole(role){
+    currentRole = role;
+    document.getElementById('pickAdmin').classList.toggle('sel', role==='admin');
+    document.getElementById('pickNurse').classList.toggle('sel', role==='nurse');
+    document.getElementById('loginUser').value = role === 'admin' ? 'acruz' : 'nsantos';
+  }
+
+  function login(){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('active');
+    buildNav(currentRole);
+    if(currentRole === 'admin'){
+      document.getElementById('userAv').textContent = 'AD';
+      document.getElementById('userName').textContent = 'Admin Cruz';
+      document.getElementById('userRole').textContent = 'Admin';
+      document.getElementById('topRolePill').textContent = '👤 Admin';
+      showView('view-admin-dash');
+    } else {
+      document.getElementById('userAv').textContent = 'NS';
+      document.getElementById('userName').textContent = 'Nurse Santos';
+      document.getElementById('userRole').textContent = 'Nurse';
+      document.getElementById('topRolePill').textContent = '👤 Nurse';
+      showView('view-nurse-dash');
+    }
+  }
+
+  function logout(){
+    document.getElementById('app').classList.remove('active');
+    document.getElementById('loginScreen').style.display = 'flex';
+  }
+
+  function showView(id, el){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    const target = document.getElementById(id);
+    if(target) target.classList.add('active');
+    
+    document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
+    if(el) el.classList.add('active');
+    else {
+      const links = NAVS[currentRole];
+      const idx = links.findIndex(l=>l.id===id);
+      if(idx >= 0) {
+        const item = document.querySelectorAll('.nav a')[idx];
+        if(item) item.classList.add('active');
+      }
+    }
+    const found = NAVS[currentRole].find(l=>l.id===id);
+    document.getElementById('crumbTxt').textContent = found ? found.label : 'Infirmary Portal';
+  }
+
+  function openModal(id){ const el = document.getElementById(id); if(el) el.classList.add('open'); }
+  function closeModal(id){ const el = document.getElementById(id); if(el) el.classList.remove('open'); }
+
+  // Restock Approval Flow
+  function resolveRestock(btn, action){
+    const row = btn.closest('tr');
+    row.style.opacity = '0.4';
+    row.innerHTML = `<td colspan="6" style="text-align:center;color:var(--teal-700);font-weight:700;">Request has been ${action}</td>`;
+    setTimeout(()=>{
+      row.remove();
+      const count = document.querySelectorAll('#restockReqList tr').length;
+      document.getElementById('adminReqCount').textContent = count;
+    }, 1200);
+  }
+
+  // Stock Filter by High/Low/Out
+  function filterStockStatus(btn, status){
+    document.querySelectorAll('#view-stock .tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#nurseStockTable tbody tr').forEach(row=>{
+      row.style.display = (status === 'all' || row.dataset.status === status) ? '' : 'none';
+    });
+  }
+
+  function filterStockSearch(){
+    const q = document.getElementById('stockSearchInput').value.toLowerCase();
+    const cat = document.getElementById('stockCatSelect').value;
+    document.querySelectorAll('#nurseStockTable tbody tr').forEach(row=>{
+      const matchesQ = row.innerText.toLowerCase().includes(q);
+      const matchesCat = (cat === 'all' || row.dataset.cat === cat);
+      row.style.display = (matchesQ && matchesCat) ? '' : 'none';
+    });
+  }
+
+  // Flag Cases Filters
+  function filterFlagCategory(btn, cat){
+    document.querySelectorAll('#view-flag-cases .tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#flagsTableBody tr').forEach(row=>{
+      row.style.display = (cat === 'all' || row.dataset.cat === cat) ? '' : 'none';
+    });
+  }
+
+  function filterFlags(){
+    const q = document.getElementById('flagSearchInput').value.toLowerCase();
+    document.querySelectorAll('#flagsTableBody tr').forEach(row=>{
+      row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  function autofillAddDemo(){
+    document.getElementById('addFn').value = "CJ";
+    document.getElementById('addLn').value = "GAFFUD";
+    document.getElementById('addId').value = "24-2133";
+  }
+
+  function pickSegVisitor(btn, type){
+    btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
