@@ -1,0 +1,667 @@
+ISU INFIRMARY LOG BOOK SYSTEM
+DATABASE PLAN
+========================================
+
+The database is separated into different tables so patient information,
+users, visits, special cases, medicines, supplies, stock, and requests
+are easier to manage.
+
+The tables are connected using Primary Keys (PK) and Foreign Keys (FK).
+
+
+1. USERS
+========================================
+Purpose:
+Stores all system accounts such as Admin, Nurse, Doctor, and Staff.
+
+Fields:
+- user_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- full_name - VARCHAR(150), NOT NULL
+- username - VARCHAR(50), UNIQUE, NOT NULL
+- password_hash - VARCHAR(255), NOT NULL
+- role - ENUM('admin','nurse','doctor','staff'), NOT NULL
+- email - VARCHAR(150), UNIQUE
+- status - ENUM('active','inactive'), DEFAULT 'active'
+- created_at - DATETIME
+- updated_at - DATETIME
+
+Relationships:
+- One user can create many visit records.
+- One nurse/user can create many stock requests.
+- One admin/user can approve or deny many stock requests.
+- One user can perform many inventory transactions.
+
+
+2. PATIENT_TYPES
+========================================
+Purpose:
+Stores the type of patient.
+
+Fields:
+- patient_type_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- type_name - VARCHAR(50), UNIQUE, NOT NULL
+- description - VARCHAR(255)
+
+Sample values:
+- Student
+- Faculty
+- Visitor
+
+Relationships:
+- One patient type can belong to many patients.
+
+
+3. PATIENTS
+========================================
+Purpose:
+Stores the permanent/basic information of each patient.
+
+Fields:
+- patient_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- patient_number - VARCHAR(50), UNIQUE
+- first_name - VARCHAR(100), NOT NULL
+- middle_name - VARCHAR(100)
+- last_name - VARCHAR(100), NOT NULL
+- gender - VARCHAR(30)
+- age - INT
+- contact_number - VARCHAR(30)
+- patient_type_id - INT, FOREIGN KEY -> patient_types.patient_type_id
+- department - VARCHAR(150)
+- program - VARCHAR(150)
+- year_level - VARCHAR(50)
+- created_at - DATETIME
+- updated_at - DATETIME
+
+Relationships:
+- Many patients belong to one patient type.
+- One patient can have many visits.
+
+
+4. VISITS
+========================================
+Purpose:
+Stores every visit made by a patient to the infirmary.
+
+Fields:
+- visit_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- patient_id - INT, FOREIGN KEY -> patients.patient_id, NOT NULL
+- attending_user_id - INT, FOREIGN KEY -> users.user_id
+- chief_complaint - TEXT, NOT NULL
+- blood_pressure - VARCHAR(20)
+- temperature - DECIMAL(4,1)
+- pulse_rate - INT
+- treatment_notes - TEXT
+- disposition_id - INT, FOREIGN KEY -> dispositions.disposition_id
+- visit_date - DATE, NOT NULL
+- time_in - TIME
+- time_out - TIME
+- status - ENUM('waiting','in_care','completed','referred','cancelled')
+- created_by - INT, FOREIGN KEY -> users.user_id
+- created_at - DATETIME
+- updated_at - DATETIME
+
+Relationships:
+- Many visits belong to one patient.
+- One attending medical personnel can handle many visits.
+- One user can create many visits.
+- One visit has one disposition.
+- One visit can have many medicines given.
+- One visit can have many special-case flags.
+
+
+5. DISPOSITIONS
+========================================
+Purpose:
+Stores the available outcomes/dispositions of a visit.
+
+Fields:
+- disposition_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- disposition_name - VARCHAR(100), UNIQUE, NOT NULL
+- description - VARCHAR(255)
+- active - BOOLEAN, DEFAULT TRUE
+
+Sample values:
+- Sent Home
+- Back to School
+- Hospital Admission
+- Referred to Doctor
+- Observation
+
+Relationships:
+- One disposition can be used by many visits.
+
+
+6. SPECIAL_CASE_TYPES
+========================================
+Purpose:
+Stores the types of special cases that can be flagged.
+
+Fields:
+- special_case_type_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- case_name - VARCHAR(100), UNIQUE, NOT NULL
+- description - VARCHAR(255)
+- active - BOOLEAN, DEFAULT TRUE
+
+Sample values:
+- PWD
+- Senior Citizen
+- Anxiety
+- Asthma
+- Other Special Case
+
+Relationships:
+- One special-case type can be used in many visit special-case records.
+
+
+7. VISIT_SPECIAL_CASES
+========================================
+Purpose:
+Connects a visit to one or more special-case types.
+This supports the PWD / Senior Citizen / Special Cases filters.
+
+Fields:
+- visit_special_case_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- visit_id - INT, FOREIGN KEY -> visits.visit_id, NOT NULL
+- special_case_type_id - INT, FOREIGN KEY -> special_case_types.special_case_type_id, NOT NULL
+- notes - TEXT
+- flagged_by - INT, FOREIGN KEY -> users.user_id
+- flagged_at - DATETIME
+
+Relationships:
+- Many visit-special-case records belong to one visit.
+- Many visit-special-case records can use one special-case type.
+
+Important:
+Do NOT create separate columns such as:
+- is_pwd
+- is_senior
+- is_anxiety
+- is_asthma
+- is_special
+
+A separate relationship table is easier to expand and filter.
+
+
+8. MEDICINE_CATEGORIES
+========================================
+Purpose:
+Stores medicine categories.
+
+Fields:
+- category_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- category_name - VARCHAR(100), UNIQUE, NOT NULL
+- description - VARCHAR(255)
+- active - BOOLEAN, DEFAULT TRUE
+
+Sample values:
+- Analgesic
+- Antibiotic
+- Allergy
+- GI
+- Antiseptic
+- Wound Care
+- Hydration
+
+Relationships:
+- One category can contain many medicines.
+
+
+9. MEDICINES
+========================================
+Purpose:
+Stores the master list of medicines.
+This table identifies the medicine, while stock quantity is stored separately.
+
+Fields:
+- medicine_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- medicine_name - VARCHAR(150), UNIQUE, NOT NULL
+- category_id - INT, FOREIGN KEY -> medicine_categories.category_id
+- unit - VARCHAR(50), NOT NULL
+- description - VARCHAR(255)
+- active - BOOLEAN, DEFAULT TRUE
+- created_at - DATETIME
+- updated_at - DATETIME
+
+Sample values:
+- Paracetamol 500mg
+- Mefenamic Acid 500mg
+- Amoxicillin 500mg
+- Antacid (Kremil-S)
+- Cetirizine
+- Betadine Solution
+
+Relationships:
+- Many medicines belong to one category.
+- One medicine can have stock records.
+- One medicine can appear in many visit-medicine records.
+- One medicine can appear in many stock requests.
+
+
+10. MEDICINE_STOCK
+========================================
+Purpose:
+Stores the current inventory quantity and stock condition of medicines.
+
+Fields:
+- stock_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- medicine_id - INT, FOREIGN KEY -> medicines.medicine_id, NOT NULL
+- quantity - DECIMAL(10,2), DEFAULT 0
+- reorder_level - DECIMAL(10,2), DEFAULT 0
+- expiry_date - DATE
+- stock_status - ENUM('high','low','out_of_stock')
+- updated_at - DATETIME
+- updated_by - INT, FOREIGN KEY -> users.user_id
+
+Stock terminology:
+- HIGH STOCK
+- LOW STOCK
+- OUT OF STOCK
+
+Relationships:
+- One medicine can have one current stock record.
+Recommended rule:
+- UNIQUE(medicine_id)
+
+
+11. SUPPLIES
+========================================
+Purpose:
+Stores the master list of non-medicine infirmary supplies.
+
+Fields:
+- supply_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- supply_name - VARCHAR(150), UNIQUE, NOT NULL
+- category - VARCHAR(100)
+- unit - VARCHAR(50), NOT NULL
+- description - VARCHAR(255)
+- active - BOOLEAN, DEFAULT TRUE
+- created_at - DATETIME
+- updated_at - DATETIME
+
+Sample values:
+- Surgical Gloves (M)
+- Sterile Gauze Pads
+- Elastic Bandage
+
+Relationships:
+- One supply can have a stock record.
+- One supply can appear in stock requests.
+
+
+12. SUPPLY_STOCK
+========================================
+Purpose:
+Stores the current quantity and status of supplies.
+
+Fields:
+- supply_stock_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- supply_id - INT, FOREIGN KEY -> supplies.supply_id, NOT NULL
+- quantity - DECIMAL(10,2), DEFAULT 0
+- reorder_level - DECIMAL(10,2), DEFAULT 0
+- expiry_date - DATE
+- stock_status - ENUM('high','low','out_of_stock')
+- updated_at - DATETIME
+- updated_by - INT, FOREIGN KEY -> users.user_id
+
+Relationships:
+- One supply has one current stock record.
+Recommended rule:
+- UNIQUE(supply_id)
+
+
+13. VISIT_MEDICINES
+========================================
+Purpose:
+Junction table connecting visits and medicines.
+A visit may use multiple medicines, and the same medicine may be used
+for many different visits.
+
+Fields:
+- visit_medicine_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- visit_id - INT, FOREIGN KEY -> visits.visit_id, NOT NULL
+- medicine_id - INT, FOREIGN KEY -> medicines.medicine_id, NOT NULL
+- quantity_given - DECIMAL(10,2), NOT NULL
+- dosage - VARCHAR(100)
+- instructions - VARCHAR(255)
+- given_by - INT, FOREIGN KEY -> users.user_id
+- given_at - DATETIME
+
+Example:
+Visit #105
+- Paracetamol 500mg - quantity 1
+- Cetirizine 10mg - quantity 1
+
+Relationships:
+- Many visit-medicine records belong to one visit.
+- Many visit-medicine records can refer to one medicine.
+
+
+14. STOCK_REQUESTS
+========================================
+Purpose:
+Stores requests made by a Nurse when medicine or supplies need to be
+restocked. Admin reviews the request and accepts or denies it.
+
+Fields:
+- request_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- requested_by - INT, FOREIGN KEY -> users.user_id, NOT NULL
+- request_date - DATETIME, NOT NULL
+- status - ENUM('pending','approved','denied','completed')
+- approved_by - INT, FOREIGN KEY -> users.user_id
+- approved_at - DATETIME
+- admin_response - TEXT
+- remarks - TEXT
+
+Request flow:
+Nurse
+  -> Creates request
+  -> PENDING
+  -> Admin reviews
+  -> APPROVED or DENIED
+  -> If approved and delivered/restocked
+  -> COMPLETED
+
+Relationships:
+- One nurse/user can create many stock requests.
+- One admin/user can approve or deny many stock requests.
+- One request can contain many request items.
+
+
+15. STOCK_REQUEST_ITEMS
+========================================
+Purpose:
+Stores the specific medicines or supplies included in a stock request.
+
+Fields:
+- request_item_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- request_id - INT, FOREIGN KEY -> stock_requests.request_id, NOT NULL
+- item_type - ENUM('medicine','supply'), NOT NULL
+- medicine_id - INT, FOREIGN KEY -> medicines.medicine_id, NULL
+- supply_id - INT, FOREIGN KEY -> supplies.supply_id, NULL
+- requested_quantity - DECIMAL(10,2), NOT NULL
+- approved_quantity - DECIMAL(10,2)
+- reason - VARCHAR(255)
+
+Example:
+Request #1004
+- Medicine: Paracetamol 500mg - 100 tablets
+- Supply: Surgical Gloves - 50 pairs
+- Supply: Sterile Gauze Pads - 100 pcs
+
+Important:
+If item_type = 'medicine', medicine_id should have a value and supply_id
+should be NULL.
+If item_type = 'supply', supply_id should have a value and medicine_id
+should be NULL.
+
+
+16. INVENTORY_TRANSACTIONS
+========================================
+Purpose:
+Stores the history of changes to medicine and supply stock.
+
+Fields:
+- transaction_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- item_type - ENUM('medicine','supply'), NOT NULL
+- medicine_id - INT, FOREIGN KEY -> medicines.medicine_id, NULL
+- supply_id - INT, FOREIGN KEY -> supplies.supply_id, NULL
+- transaction_type - ENUM('released','restocked','adjustment','expired','damaged')
+- quantity - DECIMAL(10,2), NOT NULL
+- reference_id - INT
+- performed_by - INT, FOREIGN KEY -> users.user_id
+- transaction_date - DATETIME
+- remarks - TEXT
+
+Examples:
+
+Medicine released:
+- Paracetamol
+- -2
+- transaction_type = released
+- reference_id = Visit ID
+
+Medicine restocked:
+- Paracetamol
+- +100
+- transaction_type = restocked
+- reference_id = Stock Request ID
+
+Purpose:
+Keeps a history so the system knows why stock increased or decreased.
+
+
+17. SYSTEM_SETTINGS
+========================================
+Purpose:
+Stores configurable Admin settings.
+
+Fields:
+- setting_id - INT, PRIMARY KEY, AUTO_INCREMENT
+- setting_name - VARCHAR(100), UNIQUE, NOT NULL
+- setting_value - TEXT
+- updated_by - INT, FOREIGN KEY -> users.user_id
+- updated_at - DATETIME
+
+Possible settings:
+- soft_delete_days
+- failed_login_limit
+- password_symbol_required
+- backup_schedule
+- backup_retention
+- maintenance_mode
+
+
+========================================
+FOREIGN KEY RELATIONSHIP SUMMARY
+========================================
+
+patient_types.patient_type_id
+    -> patients.patient_type_id
+
+patients.patient_id
+    -> visits.patient_id
+
+users.user_id
+    -> visits.attending_user_id
+    -> visits.created_by
+
+dispositions.disposition_id
+    -> visits.disposition_id
+
+visits.visit_id
+    -> visit_special_cases.visit_id
+    -> visit_medicines.visit_id
+
+special_case_types.special_case_type_id
+    -> visit_special_cases.special_case_type_id
+
+medicine_categories.category_id
+    -> medicines.category_id
+
+medicines.medicine_id
+    -> medicine_stock.medicine_id
+    -> visit_medicines.medicine_id
+    -> stock_request_items.medicine_id
+    -> inventory_transactions.medicine_id
+
+supplies.supply_id
+    -> supply_stock.supply_id
+    -> stock_request_items.supply_id
+    -> inventory_transactions.supply_id
+
+stock_requests.request_id
+    -> stock_request_items.request_id
+
+users.user_id
+    -> stock_requests.requested_by
+    -> stock_requests.approved_by
+    -> inventory_transactions.performed_by
+    -> system_settings.updated_by
+    -> visit_special_cases.flagged_by
+    -> visit_medicines.given_by
+
+
+========================================
+MAIN DATABASE FLOW
+========================================
+
+PATIENT
+  |
+  +-- PATIENT TYPE
+  |
+  +-- VISITS
+        |
+        +-- DISPOSITION
+        |
+        +-- ATTENDING MEDICAL PERSONNEL (USER)
+        |
+        +-- SPECIAL CASES
+        |
+        +-- MEDICINES GIVEN
+                 |
+                 +-- MEDICINE
+                         |
+                         +-- MEDICINE STOCK
+
+
+NURSE
+  |
+  +-- STOCK REQUEST
+        |
+        +-- REQUEST ITEMS
+              |
+              +-- MEDICINE
+              +-- SUPPLY
+        |
+        +-- ADMIN APPROVES / DENIES
+              |
+              +-- INVENTORY TRANSACTION
+                    |
+                    +-- STOCK UPDATED
+
+
+========================================
+UI FEATURES SUPPORTED BY THIS DATABASE
+========================================
+
+NURSE UI
+- Dashboard
+- Add Visit Record
+- Visit Records
+- Search & History
+- Stock information
+- Request medicine/supply restock
+- Insights
+
+ADD VISIT RECORD
+- Patient information
+- Chief complaint
+- Vital signs
+- Treatment / medication given
+- Disposition
+- Attending medical personnel
+- PWD / Senior Citizen checkbox
+- Special Cases checkbox
+
+PRIORITY / SPECIAL CASES
+- All
+- PWD
+- Senior Citizen
+- Special Cases
+- Pagination
+- Search/filter by patient
+
+STOCK
+- High Stock
+- Low Stock
+- Out of Stock
+- Request restock
+
+ADMIN UI
+- Dashboard
+- User Management
+- Settings
+- Review stock requests
+- Accept / Deny nurse requests
+- View system information and reports
+
+
+========================================
+APRlORI / INSIGHTS
+========================================
+
+The system does not need to show technical terms such as:
+- Support
+- Confidence
+- Lift
+
+The analysis can be generated from the visit, complaint, and medicine
+data and shown using simple human-readable wording.
+
+Examples:
+- Fever / Headache often appear together
+- Stomachache commonly leads to antacid treatment
+- Menstrual cramps commonly use Mefenamic Acid
+- Wounds commonly use Betadine and bandaging
+- Dizziness commonly results in rest and glucose
+
+The database can use the existing VISITS and VISIT_MEDICINES tables for
+this analysis instead of creating an unnecessary Apriori table.
+
+
+========================================
+IMPORTANT DESIGN RULES
+========================================
+
+1. Keep PATIENTS separate from VISITS.
+   A patient can have many visits.
+
+2. Keep USERS separate from PATIENTS.
+   Nurses, Admins, and other system accounts are system users.
+
+3. Keep MEDICINES separate from MEDICINE_STOCK.
+   Medicine information and current quantity are different things.
+
+4. Keep SUPPLIES separate from SUPPLY_STOCK.
+   Non-medicine supplies should not be mixed with medicine master data.
+
+5. Use junction tables for many-to-many relationships.
+   - VISIT_MEDICINES
+   - VISIT_SPECIAL_CASES
+   - STOCK_REQUEST_ITEMS
+
+6. Use FOREIGN KEYS instead of repeatedly storing names.
+
+7. Keep INVENTORY_TRANSACTIONS so stock changes are traceable.
+
+8. Use soft delete where appropriate for records that should be hidden
+   but retained for recovery/audit.
+
+9. Do not permanently delete important visit or inventory history unless
+   the system's retention policy specifically allows it.
+
+10. Admin and Nurse are USERS with different roles and permissions,
+    rather than completely separate account systems.
+
+
+========================================
+TOTAL RECOMMENDED TABLES
+========================================
+
+1. users
+2. patient_types
+3. patients
+4. visits
+5. dispositions
+6. special_case_types
+7. visit_special_cases
+8. medicine_categories
+9. medicines
+10. medicine_stock
+11. supplies
+12. supply_stock
+13. visit_medicines
+14. stock_requests
+15. stock_request_items
+16. inventory_transactions
+17. system_settings
