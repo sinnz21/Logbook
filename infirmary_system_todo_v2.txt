@@ -1,0 +1,186 @@
+================================================================================
+          INFIRMARY SYSTEM - TO-DO LIST, REQUIREMENTS & ASSIGNMENTS (v2)
+          Updated after stakeholder interview + review of 3 actual UHS forms:
+          Medical Monitoring Sheet, Medical Certificate (ISUE-UHS-MCR-007),
+          Parental Notification (ISUE-UHS-PaN-006)
+================================================================================
+
+[ 1. SYSTEM ARCHITECTURE & PROTOTYPING ]
+--------------------------------------------------------------------------------
+* Design & Prototyping:
+  - Create UI/UX wireframes/mockups in Figma first ("first Figma").
+
+* System Architecture & Deployment:
+  - Cloud-based deployment: For access anytime and anywhere.
+  - LAN-based setup: Configured on a Client-Server architecture so both Admin and
+    Nurse can access the application locally.
+
+
+[ 2. ROLES & PERMISSIONS ] (CONFIRMED)
+--------------------------------------------------------------------------------
+* Nurse (Clinical):
+  - Runs daily clinical process: Vitals -> Complaints -> Management -> Treatment.
+  - Organizes/manages inventory day-to-day.
+  - Processes all patients including Faculty/Staff.
+  - Access: Add/View Patient Records, Today's Visits, Stock & Supplies.
+
+* Admin (Clerical/IT — CONFIRMED, not the University Health Director):
+  - Encodes/maintains inventory records.
+  - Manages user accounts, backups, security settings.
+  - Routes Medical Certificates to the University Health Director for
+    co-signature (Admin does not sign certificates themselves).
+  - Tracks reporting cadence (monthly supply reports, 2-3 month stock audits).
+  - Access: Superset of Nurse access + system administration + reporting.
+
+* University Health Director (Dr. Obiña, DMD):
+  - Co-signs Medical Certificates (second signature line on ISUE-UHS-MCR-007).
+  - Not a separate login role in this version — certificate routing/sign-off
+    handled as a queue Admin manages on the Director's behalf. CONFIRM with
+    prof whether Director needs their own login in a later phase.
+
+
+[ 3. PATIENT RECORDS MANAGEMENT ] (TERMINOLOGY CONFIRMED)
+--------------------------------------------------------------------------------
+* Terminology:
+  - Use "Patient" — not "Visitor." All screens/tables renamed
+    Visit Records -> Patient Records.
+
+* Roster-Based Lookup (NEW):
+  - Faculty and Security/Staff have a pre-loaded roster — not typed fresh
+    each visit.
+  - Add Patient Record must search the roster first; only create a new
+    entry if the person is genuinely not found.
+  - Students and Visitors may still be searched, but are more likely to be
+    new entries.
+
+* User Profile Fields:
+  - First Name / Last Name / Middle Name (optional)
+  - Sex
+  - Student Number (students) / Faculty Number (faculty) / Staff-Security ID
+    (security) / general reference (visitors)
+  - Course/Program & Year Level (students)
+  - Department / College
+
+* Clinical Documentation Fields (EXPANDED — was 2 fields, now 4):
+  - Vitals (e.g., BP, Temp, Pulse Rate)
+  - Complaints (signs/symptoms)
+  - Management (what was done/advised)
+  - Treatment (medicine/meds given)
+  - Attending Medical Personnel (per visit, not just whoever is logged in)
+
+* Special Case Flag (NEW — separate from the regular visit log):
+  - Categories: Allergies, Anxiety, History of Illness / Chronic Condition.
+  - Must persist on the patient's profile and display on every future visit
+    (not buried inside a single visit row).
+
+* Additional Ledger Fields (from physical logbook, cross-check before final):
+  - BP, Age, Sex, Faculty, Department/Unit ("Nasa"), Student Course/Yr,
+    Security, Signature.
+
+* Year Level Progression Logic:
+  - Define logic for updating student year levels over time.
+
+* Timestamps & Audit Logs:
+  - Account/Record Created + Modified timestamps.
+
+
+[ 4. PRINTABLE DOCUMENTS ] (NEW SECTION)
+--------------------------------------------------------------------------------
+* Medical Certificate (ISUE-UHS-MCR-007):
+  - Pulls Name/Age/Sex/Civil Status/Student-Employee Number/Department and
+    exam date directly from the patient's existing record — not retyped.
+  - Default Diagnosis: "Physically Fit @ Time of Examination" (editable).
+  - Two-signature workflow: Nurse on Duty signs first, then routes to
+    University Health Director for co-signature before the certificate
+    is considered final/printable.
+  - Note printed on document: "Not for Medico-legal purposes."
+
+* Parental Notification (ISUE-UHS-PaN-006):
+  - Pulls patient name, college, and diagnosis from the visit record.
+  - Disposition checkbox (choose one): Sent home / Back to school /
+    Hospital admission.
+  - Signed by Nurse on Duty; saved as UHS's file copy.
+
+
+[ 5. TABLE, FILTERING, SORTING & EXPORT FEATURES ]
+--------------------------------------------------------------------------------
+* Search, Export & Print:
+  - Search bar functionality across records.
+  - Export data to PDF and CSV formats.
+  - "Customize Print" needs preset templates, not just ad-hoc export:
+      - Monthly Supply Report
+      - Medicine Restock Cycle Report (every 2-3 months)
+      - Medical Certificate / Parental Notification (see Section 4)
+
+* Pagination:
+  - Page size selector (e.g., Show 50 / 100 records per page).
+
+* Column Sorting:
+  - Clickable table headers for ascending/descending sort.
+
+* Advanced Filtering:
+  - Date range filter (custom + month range).
+  - Multi-attribute filters: Gender, Year Level, Program, Department.
+
+* Search Optimization:
+  - Apply appropriate CS search algorithm for faster queries.
+
+
+[ 6. INVENTORY, STOCKS & SUPPLIES ]
+--------------------------------------------------------------------------------
+* Stock Status Indicators (Legend): OK / LOW / CRITICAL.
+* Tracking & Stock In/Out: log who adds stock and who dispenses it.
+* Reporting Cadence (NEW — confirmed in interview):
+  - Supply reports printed monthly.
+  - Medicines re-audited every 2-3 months.
+  - "Admin encodes inventory" — Admin owns data-entry/records side of stock,
+    Nurse owns day-to-day physical stock handling.
+
+
+[ 7. DASHBOARD & INSIGHTS (ANALYTICS) ]
+--------------------------------------------------------------------------------
+* Nurse Dashboard (Clinical/Operational):
+  - Today's Patients, quick Add Patient Record, inventory levels, own
+    recent activity.
+
+* Admin Dashboard (Oversight — DISTINCT from Nurse, confirmed not identical):
+  - Certificates awaiting Director co-signature (with overdue flagging).
+  - Inventory audit cycle status (2-3 month reminder).
+  - User account management shortcuts.
+  - Full reporting across all nurses (if system scales beyond one nurse).
+  - Backup/recovery and security settings shortcuts.
+
+* Shared Insights features:
+  - Dropdown selectors (Year/Month) with charts updating on selection.
+  - Top 5 Most Frequently Requested Medicines ("Gamot na madalas kunin"),
+    clickable per record.
+  - Alert/notification display for low/critical stock and overdue
+    certificates.
+
+
+[ 8. SYSTEM ADMINISTRATION & DATABASE MAINTENANCE ]
+--------------------------------------------------------------------------------
+* Soft Delete: preserve data integrity, no permanent removal.
+* Backup & Recovery: Automated + Manual backup, Database Recovery feature.
+* Database Export: export/dump functionality.
+
+
+[ 9. AUTHENTICATION, UI & SECURITY ]
+--------------------------------------------------------------------------------
+* Password Policy: min 8 characters, at least 1 symbol/special character.
+* Forgot password / reset flow.
+* Rate Limiting: track failed login attempts, trigger reset link or
+  temporary lockout after threshold.
+
+
+[ 10. OPEN QUESTIONS / STILL NEEDS CONFIRMATION ]
+--------------------------------------------------------------------------------
+  - Does the University Health Director need their own login/role in a
+    later phase, or does Admin permanently handle routing on their behalf?
+  - Final list of ledger fields to include from the physical logbook
+    (BP, Age, Sex, Faculty, Nasa, Course/Yr, Security, Signature) — confirm
+    which are mandatory vs. optional in the digital form.
+  - Confirm exact wording/categories for "History of Illness / Chronic
+    Condition" flag (open text vs. fixed category list).
+
+================================================================================

@@ -1,0 +1,73 @@
+================================================================================
+          INFIRMARY SYSTEM — FIGMA TO-DO CHECKLIST
+          (features to build/rebuild in Figma right now)
+================================================================================
+
+[ ARCHITECTURE & PROTOTYPING ]
+--------------------------------------------------------------------------------
+[ ] 1. Architecture & Prototyping
+[ ] 2. Build Figma wireframes/mockups
+[ ] 3. Set up cloud deployment (screen/flow reference only)
+[ ] 4. Set up LAN client-server config (screen/flow reference only)
+
+
+[ RECORDS MANAGEMENT ]
+--------------------------------------------------------------------------------
+[ ] 5. Records Management (non-interview parts)
+[ ] 6. Build user profile fields: First Name, Last Name, Middle Name (optional)
+[ ] 7. Add Faculty/Staff as a patient category (structurally, even before
+       naming conventions are settled)
+[ ] 8. Design year-level progression logic for students
+[ ] 9. Add created/modified timestamp fields (audit log)
+
+
+[ TABLE, FILTERING, SORTING & EXPORT ]
+--------------------------------------------------------------------------------
+[ ] 10. Table, Filtering, Sorting & Export
+[ ] 11. Search bar
+[ ] 12. Export to PDF/CSV
+[ ] 13. "Customize Print" feature
+[ ] 14. Pagination + page size selector
+[ ] 15. Clickable column sorting
+[ ] 16. Date range filter
+[ ] 17. Multi-attribute filters (Gender, Year Level, Program, Department)
+[ ] 18. Optimize search algorithm
+
+
+[ INVENTORY ]
+--------------------------------------------------------------------------------
+[ ] 19. Inventory
+[ ] 20. Build stock status indicators/legend (OK / LOW / CRITICAL)
+[ ] 21. Build stock in/out logging (who added, who dispensed) — schema
+        doesn't need interview, just needs the UI
+
+
+[ DASHBOARD ]
+--------------------------------------------------------------------------------
+[ ] 22. Dashboard
+[ ] 23. Insights dropdown selectors
+[ ] 24. Historical data view (filter by Year/Month)
+[ ] 25. Chart updates on filter change
+[ ] 26. Top 5 Most Requested Medicines widget
+[ ] 27. Alert/notification display for low/critical stock
+
+
+[ SYSTEM ADMIN ]
+--------------------------------------------------------------------------------
+[ ] 28. System Admin
+[ ] 29. Soft delete across records
+[ ] 30. Automated backup
+[ ] 31. Manual backup
+[ ] 32. Database recovery feature
+[ ] 33. Database export/dump
+
+
+[ AUTH & SECURITY ]
+--------------------------------------------------------------------------------
+[ ] 34. Auth & Security
+[ ] 35. Password policy (8 char min, 1 symbol)
+[ ] 36. Forgot password/reset flow
+[ ] 37. Failed login attempt tracking
+[ ] 38. Lockout after threshold
+
+================================================================================
