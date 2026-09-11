@@ -1,0 +1,61 @@
+[ 1. SYSTEM LOGIN & ROLE ROUTING ]
+  • Staff / Admin logs in with credentials -> System validates password hash & active status.
+  • System routes user to their role-specific dashboard (Nurse Portal or Admin Portal).
+                    │
+                    ▼
+[ 2. PATIENT ARRIVAL & SMART LOOKUP ]
+  • Search by ID Number / Name.
+  • PRE-RECORDED (Faculty / Teaching & Non-Teaching Staff): Profile & Department auto-load.
+  • NEW PATIENTS (New Students / Walk-ins): Registered on the spot (Type, Program, Dept). -> this also applies for Faculty / Teaching & Non-Teaching Staff if there are new ones
+                    │
+                    ▼
+[ 3. SPECIAL CASE FLAGGING ]
+  • Nurse records Time In, Chief Complaint (e.g., wound, fever), and Vitals (BP, Temp, Pulse).
+  • Auto-detects pre-existing priority flags (Senior Citizen, PWD) or Nurse tags custom Special like (Asthma, Anxiety, allergy, etc.).
+                    │
+                    ▼
+[ 4. TREATMENT DELIVERY: MEDICINES & SUPPLIES ]
+  • Nurse administers care using both categories:
+      - Prescribes Medicines (e.g., Paracetamol, Mefenamic Acid with dosage).
+      - Consumes Supplies (e.g., Sterile Gauze, Betadine, Micropore Tape, Gloves).
+                    │
+                    ▼
+[ 5. AUTOMATED DUAL DEDUCTION & AUDIT LOGGING ]
+  • On saving visit, system automatically:
+      1. Deducts quantity from `medicine_stock`.
+      2. Deducts quantity from `supply_stock`.
+      3. Writes audit entries into `inventory_transactions` (Type: 'released', Ref: Visit ID).
+                    │
+                    ▼
+[ 6. DISPOSITION & PATIENT SIGN OUT]
+  • Nurse sets patient outcome: Back to Class/Work, Sent Home, Observation, or Hospital Transfer.
+  • System captures Time Out and marks visit encounter as 'completed'.
+                    │
+                    ▼
+[ 7. LOW-STOCK TRIGGER & RESTOCK REQUISITION ]
+  • Depleted inventory drops below reorder level -> System flags item as 'LOW STOCK'.
+  • Nurse drafts a Restock Request ticket (`stock_requests`) listing needed medicines and supplies.
+  • Nurse submits ticket -> Status becomes 'pending'.
+                    │
+                    ▼
+[ 8. ADMIN REQUISITION REVIEW & APPROVAL ]
+  • Admin inspects pending ticket, checks budget/current counts, and sets approved quantities.
+  • Admin clicks 'Approve' -> Status changes to 'approved' (Clinic waits for supplier shipment).
+                    │
+                    ▼
+[ 9. PHYSICAL DELIVERY INTAKE & SHELF RESTOCKING ]
+  • Supplier delivers boxes directly to the infirmary clinic door.
+  • Clinic Staff inspects items and clicks "Confirm Delivery / Mark Completed".
+  • SYSTEM AUTOMATION:
+      1. Sets ticket status to 'completed'.
+      2. Increments `medicine_stock` and `supply_stock` quantities.
+      3. Resets status badges.
+      4. Logs audit trail in `inventory_transactions` (Type: 'restocked', Performed By: Staff ID).
+                    │
+                    ▼
+[ 10. CLINICAL TRENDS & HEALTH INSIGHTS ]->
+  • System processes visit, complaint, and dispensing data into staff-friendly insights:
+      - "Common Treatment Pairings" (e.g., Dysmenorrhea -> Mefenamic Acid 92%).
+      - "Frequent Health Trends" (e.g., Spike in Flu/Fever after exams).
+    	- "Most common complaints this pack week or month depends on the date" 
+	- "Departments that most frequently visits, its either a studen, faculties, what course, gender, what year level what age, tiss all can be sorted"
