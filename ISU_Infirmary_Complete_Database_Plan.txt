@@ -14,7 +14,9 @@ Stores all system accounts such as Admin, Nurse, Doctor, and Staff.
 
 Fields:
 - user_id - INT, PRIMARY KEY, AUTO_INCREMENT
-- full_name - VARCHAR(150), NOT NULL/ this has to be not full name. it has to be, First Name, Last Name Middle name all separated but combined
+- first_name - VARCHAR(100), NOT NULL
+- middle_name - VARCHAR(100)
+- last_name - VARCHAR(100), NOT NULL
 - username - VARCHAR(50), UNIQUE, NOT NULL
 - password_hash - VARCHAR(255), NOT NULL
 - role - ENUM('admin','nurse','doctor','staff'), NOT NULL
@@ -22,6 +24,11 @@ Fields:
 - status - ENUM('active','inactive'), DEFAULT 'active'
 - created_at - DATETIME
 - updated_at - DATETIME
+
+FIXED: full_name split into first_name / middle_name / last_name to match
+the same pattern used in PATIENTS, so both tables are consistent and the
+UI can display "Last, First M." formatting without string-parsing a
+combined name.
 
 Relationships:
 - One user can create many visit records.
@@ -42,7 +49,7 @@ Fields:
 Sample values:
 - Student
 - Faculty
-- None teaching staffs
+- Non-Teaching Staff (NASA)
 
 Relationships:
 - One patient type can belong to many patients.
@@ -62,7 +69,9 @@ Fields:
 - age - INT
 - contact_number - VARCHAR(30)
 - patient_type_id - INT, FOREIGN KEY -> patient_types.patient_type_id
-- department - VARCHAR(150)/only for Students and Teachings staffs or faculty member or when adding a new faculty member cause its already pre recorded if your a faculty member.
+- department - VARCHAR(150) — only for Students and Faculty/NASA (Non-Teaching
+  Staff); pre-filled automatically when a Faculty/NASA patient is already on
+  the roster, entered manually when adding a brand-new one.
 - program - VARCHAR(150)
 - year_level - VARCHAR(50)
 - created_at - DATETIME
@@ -148,20 +157,35 @@ Relationships:
 
 7. VISIT_SPECIAL_CASES
 Purpose:
-Connects a visit to one or more special-case types.
-This supports the PWD / Senior Citizen / Special Cases filters.
+Connects a patient to one or more special-case types. Originates from a
+visit (where the nurse first notices/flags it), but is looked up by
+patient so the flag shows on every future visit — not just the one
+where it was first recorded.
 
 Fields:
 - visit_special_case_id - INT, PRIMARY KEY, AUTO_INCREMENT
-- visit_id - INT, FOREIGN KEY -> visits.visit_id, NOT NULL
+- patient_id - INT, FOREIGN KEY -> patients.patient_id, NOT NULL
 - special_case_type_id - INT, FOREIGN KEY -> special_case_types.special_case_type_id, NOT NULL
+- origin_visit_id - INT, FOREIGN KEY -> visits.visit_id
 - notes - TEXT
 - flagged_by - INT, FOREIGN KEY -> users.user_id
 - flagged_at - DATETIME
+- active - BOOLEAN, DEFAULT TRUE
+
+FIXED: the original version linked this table to visit_id only, which
+means a PWD/Senior/Allergy flag would only be visible on the one visit
+where it was recorded — not on every future visit, which is what the
+UI (Flag Cases / PWD / Senior Citizen page, and the profile banner)
+requires. Linking to patient_id instead makes the flag a property of
+the patient, while origin_visit_id still records which visit it was
+first noticed on for audit purposes. The "active" flag lets a case be
+retired (e.g. an allergy later confirmed to be a false positive)
+without deleting history.
 
 Relationships:
-- Many visit-special-case records belong to one visit.
-- Many visit-special-case records can use one special-case type.
+- Many special-case records belong to one patient.
+- Many special-case records can use one special-case type.
+- Each special-case record optionally references the visit it originated from.
 
 Important:
 Do NOT create separate columns such as:
@@ -440,6 +464,7 @@ patient_types.patient_type_id
 
 patients.patient_id
     -> visits.patient_id
+    -> visit_special_cases.patient_id
 
 users.user_id
     -> visits.attending_user_id
@@ -449,7 +474,7 @@ dispositions.disposition_id
     -> visits.disposition_id
 
 visits.visit_id
-    -> visit_special_cases.visit_id
+    -> visit_special_cases.origin_visit_id
     -> visit_medicines.visit_id
 
 special_case_types.special_case_type_id
@@ -481,11 +506,13 @@ users.user_id
     -> visit_medicines.given_by
 
 
-MAIN DATABASE FLOW -> hindi ko pa ito na finalize
+MAIN DATABASE FLOW -> now finalized (special cases moved to patient-level, see fix note in table 7)
 
 PATIENT
   |
   +-- PATIENT TYPE
+  |
+  +-- SPECIAL CASES (PWD / Senior / Allergy / etc.) -- persists across all visits
   |
   +-- VISITS
         |
@@ -493,9 +520,7 @@ PATIENT
         |
         +-- ATTENDING MEDICAL PERSONNEL (USER)
         |
-        +-- SPECIAL CASES/complaint
-        |
-        +-- MEDICINES/TReatment GIVEN
+        +-- MEDICINES/Treatment GIVEN
                  |
                  +-- MEDICINE
                          |
