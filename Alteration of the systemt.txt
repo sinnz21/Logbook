@@ -1,5 +1,0 @@
-Alteration of the system: removing the point of sale feature, focusing on the infirmary here in our state university it still have the same features like the stocks but this time, it records the person who is going to the infirmary like the date, name, gender, age, contact num. if student put department name, program and year level, if professor/faculty member put department name.
-
--the computer science is time series and apiori cause we are predicting the most frequent department is sakitin, and goes for the year level and program too.
-- our infirmary also uses just a book to record the students or prof, when you go to infirmary and ask when did you last visited or you want to see the prescribe medicine for from the last time you visited, it's on a book so its really hard to find it you will look page by page, and lie by line, yes theres a date on the book but it is a hustle to find your name, our prof said its better if i can just sort it by date or just search the name and your name will pop out and see all your records if the name is clicked
--Find a eligible algorithm for the system
