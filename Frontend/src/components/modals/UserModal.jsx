@@ -59,8 +59,8 @@ export default function UserModal() {
 
   return (
     <Modal
-      title={editing ? `Edit User — ${user.username}` : 'Add User'}
-      subtitle={editing ? 'Update role, status, or reset the password' : 'Create a new account for the infirmary system'}
+      title={editing ? `Edit user — ${user.username}` : 'Add user'}
+      subtitle={editing ? 'Update role, status, or reset the password' : 'Only Admin and Nurse / Staff roles exist in this system.'}
       onClose={closeModal}
       actions={
         <>
@@ -82,7 +82,7 @@ export default function UserModal() {
         <div className="field">
           <label>Role</label>
           <select value={form.role} onChange={set('role')} disabled={isSelf}>
-            <option value="nurse">Nurse</option>
+            <option value="nurse">Nurse / Staff</option>
             <option value="admin">Admin</option>
           </select>
         </div>

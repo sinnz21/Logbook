@@ -1,136 +1,154 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useApp } from '../../context/useApp';
 import { useAsync } from '../../hooks/useAsync';
+import { useVisitsInRange } from '../../hooks/useVisits';
 import { listUsers } from '../../api/users';
-import { approveStockRequest, denyStockRequest, listStock, listStockRequests } from '../../api/stock';
-import { formatDate, formatTime, parseApiDate } from '../../lib/time';
-import { formatQty, STOCK_STATUS } from '../../lib/format';
+import { listStock, listStockRequests } from '../../api/stock';
+import { getSettings } from '../../api/settings';
+import { clinicDay, formatDate, presetRange } from '../../lib/time';
+import { topComplaintsFrom } from '../../lib/insights';
 import { notConnected } from '../../lib/notConnected';
+
+const today = clinicDay(new Date());
+
+const REPORTS = [
+  { name: 'Monthly Supply Report', cadence: 'Generated at the start of every month' },
+  { name: 'Medicine Restock Cycle Report', cadence: 'Audited every 1–2 months' },
+  { name: 'System & Account Activity Report', cadence: 'Generated at the start of every month' },
+];
 
 export default function AdminDashboard() {
   const { navigate } = useApp();
+  const [preset, setPreset] = useState('month');
+  const [range, setRange] = useState(() => presetRange('month', today));
+  const [draft, setDraft] = useState(range);
+
+  const applyPreset = (p) => {
+    const next = presetRange(p, today);
+    setPreset(p);
+    setRange(next);
+    setDraft(next);
+  };
+
   const users = useAsync(() => listUsers(), []);
-  const pending = useAsync(() => listStockRequests({ status: 'pending' }), []);
+  const requests = useAsync(() => listStockRequests({ perPage: 200 }), []);
   const stock = useAsync(() => listStock(), []);
-  const [busy, setBusy] = useState(null);
-  const [resolved, setResolved] = useState({}); // requestId → 'Approved' | 'Denied', shown briefly
+  const settings = useAsync(() => getSettings(), []);
+  const visits = useVisitsInRange(range.from, range.to);
 
   const userList = users.data?.items || [];
   const active = userList.filter((u) => u.status === 'active').length;
-  const requests = pending.data?.items || [];
-  const stockById = new Map((stock.data?.items || []).map((i) => [`${i.itemType}:${i.itemId}`, i]));
+  const pending = (requests.data?.items || []).filter((r) => r.status === 'pending');
+  const stockItems = stock.data?.items || [];
+  const needsAttention = stockItems.filter((i) => i.stockStatus !== 'high').length;
 
-  const resolve = async (req, action) => {
-    setBusy(req.requestId);
-    try {
-      if (action === 'Approved') await approveStockRequest(req.requestId);
-      else await denyStockRequest(req.requestId, { adminResponse: 'Denied from Admin Dashboard' });
-      setResolved((r) => ({ ...r, [req.requestId]: action }));
-      setTimeout(() => pending.reload(), 1200);
-    } catch (e) {
-      window.alert(`Couldn't update request: ${e.message}`);
-    } finally {
-      setBusy(null);
-    }
-  };
+  const complaints = useMemo(() => topComplaintsFrom(visits.visits, { limit: 5 }), [visits.visits]);
 
   return (
     <div className="view active">
-      <div className="page-head"><div><h1>Admin Dashboard</h1><div className="sub">Executive &amp; IT Oversight</div></div></div>
+      <div className="page-head">
+        <div>
+          <h1>Admin Dashboard</h1>
+          <div className="sub">
+            ISU Infirmary · {formatDate(new Date(`${today}T00:00:00Z`))} · system oversight
+          </div>
+        </div>
+      </div>
+
+      <div className="range-bar no-print">
+        <div className="presets">
+          <button className={preset === 'today' ? 'active' : ''} onClick={() => applyPreset('today')}>Today</button>
+          <button className={preset === 'week' ? 'active' : ''} onClick={() => applyPreset('week')}>This Week</button>
+          <button className={preset === 'month' ? 'active' : ''} onClick={() => applyPreset('month')}>This Month</button>
+        </div>
+        <span style={{ fontSize: '12px', color: 'var(--muted)' }}>From</span>
+        <input type="date" value={draft.from} onChange={(e) => { setPreset('custom'); setDraft({ ...draft, from: e.target.value }); }} style={{ maxWidth: '150px' }} />
+        <span style={{ fontSize: '12px', color: 'var(--muted)' }}>to</span>
+        <input type="date" value={draft.to} onChange={(e) => { setPreset('custom'); setDraft({ ...draft, to: e.target.value }); }} style={{ maxWidth: '150px' }} />
+        <button className="btn btn-primary btn-sm" onClick={() => setRange(draft)}>Apply</button>
+      </div>
 
       <div className="kpi-row">
-        <div className="kpi" onClick={() => navigate('users')}>
-          <div className="ic-badge">👥</div><div className="label">Active Accounts</div>
-          <div className="value">{users.loading ? '…' : users.error ? '—' : active}</div>
-          <div className="foot">{users.error ? 'Unavailable' : `${active} Active · ${userList.length - active} Inactive`}</div>
-        </div>
-        <div className="kpi warn">
-          <div className="ic-badge">🔔</div><div className="label">Restock Requests</div>
-          <div className="value">{pending.loading ? '…' : pending.error ? '—' : requests.length}</div>
-          <div className="foot">From Duty Nurses</div>
-        </div>
-        <div className="kpi">
-          <div className="ic-badge">🧪</div><div className="label">Low / Out of Stock</div>
-          <div className="value">{stock.loading ? '…' : stock.error ? '—' : (stock.data?.items || []).filter((i) => i.stockStatus !== 'high').length}</div>
-          <div className="foot">Across medicines &amp; supplies</div>
-        </div>
         <div className="kpi" onClick={() => navigate('settings')}>
-          <div className="ic-badge">💾</div><div className="label">Backups</div>
-          <div className="value" style={{ fontSize: '16px' }}>Settings</div>
-          <div className="foot">Backup &amp; retention options</div>
+          <div className="label">Automated Backups</div>
+          <div className="value" style={{ fontSize: '19px' }}>
+            {settings.loading ? '…' : settings.error ? '—' : settings.data?.autoBackupEnabled ? 'On' : 'Off'}
+          </div>
+          <div className="foot">Manage in Settings</div>
+        </div>
+        <div className="kpi" onClick={() => navigate('users')}>
+          <div className="label">Active Accounts</div>
+          <div className="value">{users.loading ? '…' : users.error ? '—' : active}</div>
+          <div className="foot">
+            {users.error ? 'Unavailable' : `${active} active · ${userList.length - active} inactive`}
+          </div>
+        </div>
+        <div className="kpi warn" onClick={() => navigate('stock-requests')}>
+          <div className="label">Stock Needing Attention</div>
+          <div className="value">{stock.loading ? '…' : stock.error ? '—' : needsAttention}</div>
+          <div className="foot">Low or out of stock</div>
+        </div>
+        <div className="kpi pending" onClick={() => navigate('stock-requests')}>
+          <div className="label">Pending Requisitions</div>
+          <div className="value">{requests.loading ? '…' : requests.error ? '—' : pending.length}</div>
+          <div className="foot">Waiting for your approval</div>
+        </div>
+      </div>
+
+      <div className="chart-row">
+        <div className="card">
+          <h3>Sign-in Activity</h3>
+          <div className="sub" style={{ marginTop: '-8px', marginBottom: '12px' }}>Successful sign-ins per day this week</div>
+          <div className="info-note">
+            This chart needs a sign-in audit endpoint, which the backend doesn&rsquo;t expose yet —
+            see the &ldquo;System &amp; Account Activity&rdquo; section of BACKEND_REQUIREMENTS.md.
+          </div>
+          <div className="sub" style={{ marginTop: '10px' }}>
+            Accounts lock for {settings.data?.lockoutMinutes ?? 15} minutes after{' '}
+            {settings.data?.failedLoginLimit ?? 5} failed attempts.
+          </div>
+        </div>
+
+        <div className="card">
+          <h3>Campus Complaint Summary</h3>
+          <div className="sub" style={{ marginTop: '-8px', marginBottom: '12px' }}>Read-only — recorded by the nurses</div>
+          {visits.error && <div className="login-error">{visits.error}</div>}
+          {complaints.length === 0 ? (
+            <div className="sub">{visits.loading ? 'Loading…' : 'No visits recorded in this range.'}</div>
+          ) : (
+            <div className="hbar-list">
+              {complaints.map((c) => (
+                <div className="hbar" key={c.name}>
+                  <span className="name">{c.name}</span>
+                  <span className="track"><span className="fill" style={{ width: `${c.pct}%`, background: c.color }} /></span>
+                  <span className="pct">{c.pct}%</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       <div className="card">
-        <div className="card-head">
-          <h3>Nurse Restock Requests (Out of Stock / Low Supplies)</h3>
-          <span className="sub">Action required to approve procurement</span>
+        <h3>Reports</h3>
+        <div className="cadence-note">
+          Supply reports generate monthly. Medicine stock is audited every 1–2 months — when the due
+          date arrives, a restock is needed.
         </div>
-        {pending.error && <div className="login-error">{pending.error}</div>}
-        <table>
-          <thead>
-            <tr><th>Requested Item</th><th>Category</th><th>Requested Qty</th><th>Urgency</th><th>Requested By</th><th>Action</th></tr>
-          </thead>
-          <tbody>
-            {pending.loading ? (
-              <tr><td colSpan={6} className="sub empty-cell">Loading…</td></tr>
-            ) : requests.length === 0 ? (
-              <tr><td colSpan={6} className="sub empty-cell">No pending requests.</td></tr>
-            ) : (
-              requests.map((r) => {
-                if (resolved[r.requestId]) {
-                  return (
-                    <tr key={r.requestId} style={{ opacity: 0.5 }}>
-                      <td colSpan={6} style={{ textAlign: 'center', color: 'var(--teal-700)', fontWeight: 700 }}>Request has been {resolved[r.requestId]}</td>
-                    </tr>
-                  );
-                }
-                const first = r.items[0] || {};
-                const live = stockById.get(`${first.itemType}:${first.itemId}`);
-                const status = live && STOCK_STATUS[live.stockStatus];
-                const at = parseApiDate(r.requestDate);
-                return (
-                  <tr key={r.requestId}>
-                    <td className="nm">
-                      {r.items.map((i) => i.itemName).join(', ')}
-                      {r.remarks && <div className="sub">{r.remarks}</div>}
-                    </td>
-                    <td>{first.categoryName || '—'}</td>
-                    <td>{r.items.map((i) => `${formatQty(i.requestedQuantity)} ${i.unit}`).join(', ')}</td>
-                    <td>
-                      {status ? <span className={`pill ${status.pill}`}>{status.label}</span> : <span className="sub">{first.reason || '—'}</span>}
-                    </td>
-                    <td className="sub">{r.requestedByName} ({formatDate(at)} {formatTime(at)})</td>
-                    <td className="nowrap">
-                      <button className="btn btn-primary btn-sm" disabled={busy === r.requestId} onClick={() => resolve(r, 'Approved')}>✓ Accept</button>{' '}
-                      <button className="btn btn-ghost btn-sm" disabled={busy === r.requestId} onClick={() => resolve(r, 'Denied')}>✕ Deny</button>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-        <div className="modal-note" style={{ marginTop: '10px' }}>
-          Accepted requests appear on the nurse's Stock &amp; Supplies screen; stock is added when they confirm the delivery arrived.
-        </div>
-      </div>
-
-      <div className="card">
-        <h3>Monthly Reporting Cadence</h3>
-        <div className="cadence-note">Supply reports generate monthly · Medicine stock is audited every 2–3 months.</div>
-        <table>
-          <tbody>
-            <tr>
-              <td><div className="nm">Monthly Supply Report</div><div className="sub">Due the 1st of every month</div></td>
-              <td style={{ textAlign: 'right' }}><button className="btn btn-outline btn-sm" onClick={() => notConnected('Monthly Supply Report', 'the report template isn\'t built yet')}>Generate</button></td>
-            </tr>
-            <tr>
-              <td><div className="nm">Medicine Release Cycle Report</div><div className="sub">Every 2–3 months</div></td>
-              <td style={{ textAlign: 'right' }}><button className="btn btn-outline btn-sm" onClick={() => notConnected('Medicine Release Cycle Report', 'the report template isn\'t built yet')}>Generate</button></td>
-            </tr>
-          </tbody>
-        </table>
+        {REPORTS.map((r) => (
+          <div className="settings-row" key={r.name}>
+            <div>
+              <div className="t">{r.name}</div>
+              <div className="d">{r.cadence}</div>
+            </div>
+            <button
+              className="btn btn-outline btn-sm no-print"
+              onClick={() => notConnected(r.name, 'the report template isn\'t built yet')}
+            >
+              Generate
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );

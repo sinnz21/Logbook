@@ -22,61 +22,69 @@ export default function LoginScreen() {
 
   return (
     <div id="loginScreen">
-      <div className="login-brand">
-        <div className="seal">ISU</div>
-        <h1>ISU Infirmary</h1>
-        <div className="s1">Infirmary Log Book System</div>
-        <div className="s2">Isabela State University</div>
-      </div>
       <form className="login-card" onSubmit={handleSubmit}>
+        <div className="login-brand">
+          <div className="seal" aria-hidden="true" />
+          <h1>ISU Infirmary</h1>
+          <div className="s1">Infirmary Log Book System</div>
+          <div className="s1">Isabela State University</div>
+        </div>
+
         <div className="lbl-top">Sign in as</div>
         <div className="role-pick">
-          <button
-            type="button"
-            className={selectedRole === 'nurse' ? 'sel' : ''}
-            onClick={() => pickRole('nurse')}
-          >
-            🛡 Nurse / Staff
-          </button>
           <button
             type="button"
             className={selectedRole === 'admin' ? 'sel' : ''}
             onClick={() => pickRole('admin')}
           >
-            👥 Admin
+            Admin
+          </button>
+          <button
+            type="button"
+            className={selectedRole === 'nurse' ? 'sel' : ''}
+            onClick={() => pickRole('nurse')}
+          >
+            Nurse / Staff
           </button>
         </div>
 
         {authError && <div className="login-error">{authError}</div>}
 
-        <label>Username</label>
+        <label htmlFor="login-username">Username</label>
         <input
+          id="login-username"
           type="text"
           placeholder="e.g. nsantos"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           autoComplete="username"
         />
-        <label>Password</label>
+
+        <label htmlFor="login-password">Password</label>
         <input
+          id="login-password"
           type="password"
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
         />
-        <div className="login-hint">Minimum 8 characters, at least 1 symbol.</div>
-        <div className="login-forgot" onClick={() => setShowForgot((s) => !s)}>Forgot Password?</div>
+
+        <button type="button" className="login-forgot" onClick={() => setShowForgot((s) => !s)}>
+          Forgot password?
+        </button>
         {showForgot && (
-          <div className="login-hint" style={{ marginBottom: '8px' }}>
+          <div className="login-hint">
             Ask the system Admin to reset your password from User Management.
           </div>
         )}
+
         <button className="go" type="submit" disabled={authLoading}>
           {authLoading ? 'Signing in…' : 'Sign In'}
         </button>
+
+        <div className="login-foot">Locks for 15 minutes after 5 failed attempts</div>
       </form>
-      <div className="login-foot">ISU Infirmary Log Book System</div>
     </div>
   );
 }

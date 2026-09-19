@@ -1,6 +1,8 @@
 // Display helpers shared across screens.
 
-export const ROLE_LABELS = { nurse: 'Nurse', admin: 'Admin' };
+// The sidebar lowercases these and the User Management pill uppercases them,
+// both in CSS — so one spelling serves the Figma's "nurse / staff" and "NURSE / STAFF".
+export const ROLE_LABELS = { nurse: 'Nurse / Staff', admin: 'Admin' };
 
 /** "Santos, Maria R." → "MS", "Nurse Santos" → "NS". */
 export function initialsOf(fullName = '') {
@@ -88,6 +90,13 @@ export const SPECIAL_CASE_CLASS = {
   senior: 'pill senior-badge',
   medical: 'flag-tag-red',
 };
+
+/** "15" → "15th", "22" → "22nd" — for the certificate's "Issued this __ day of __". */
+export function ordinal(n) {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  return `${n}${{ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'}`;
+}
 
 /** Whole-years age from a YYYY-MM-DD date of birth, or null. */
 export function ageFrom(dateOfBirth) {
