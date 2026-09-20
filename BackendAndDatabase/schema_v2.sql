@@ -246,9 +246,12 @@ CREATE TABLE patient_special_cases (
   CONSTRAINT fk_psc_patient
     FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
     ON UPDATE CASCADE ON DELETE CASCADE,
+  -- ON UPDATE RESTRICT (not CASCADE): special_case_type_id feeds the generated
+  -- column active_type_key, and MariaDB 10.5+ / MySQL 8 refuse a generated
+  -- column built on a cascading FK (ERROR 1901). Lookup PKs never change.
   CONSTRAINT fk_psc_type
     FOREIGN KEY (special_case_type_id) REFERENCES special_case_types(special_case_type_id)
-    ON UPDATE CASCADE ON DELETE RESTRICT,
+    ON UPDATE RESTRICT ON DELETE RESTRICT,
   CONSTRAINT fk_psc_origin_visit
     FOREIGN KEY (origin_visit_id) REFERENCES visits(visit_id)
     ON UPDATE CASCADE ON DELETE SET NULL,

@@ -47,6 +47,7 @@ class Visit(Base, TimestampMixin, SoftDeleteMixin):
 
     patient = relationship("Patient", back_populates="visits", lazy="joined")
     disposition = relationship("Disposition", lazy="joined")
+    attending = relationship("User", foreign_keys=[attending_user_id], lazy="joined")
     complaints = relationship(
         "VisitComplaint", cascade="all, delete-orphan", lazy="selectin"
     )

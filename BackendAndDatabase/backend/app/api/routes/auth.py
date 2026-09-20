@@ -21,8 +21,10 @@ def _setting(db: Session, name: str, default):
 
 @router.post("/login", response_model=TokenResponse)
 def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
-    limit = _setting(db, "failed_login_limit", 5)
-    window = _setting(db, "lockout_minutes", 15)
+    # int(): rows seeded without value_type come back as strings, and
+    # `count >= "5"` raises TypeError on every login attempt.
+    limit = int(_setting(db, "failed_login_limit", 5))
+    window = int(_setting(db, "lockout_minutes", 15))
     since = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(minutes=window)
 
     recent_failures = db.execute(
