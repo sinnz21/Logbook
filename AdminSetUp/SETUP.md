@@ -1,29 +1,23 @@
-# ISU Infirmary Log Book — Backend Setup Guide
+# ISU Infirmary Log Book — Full Setup Guide
 
-How to get the backend running on a Windows laptop, step by step.
-Written while actually doing it on 18 September 2026.
+Backend + frontend + nurse laptop, step by step, on Windows.
+Tested end to end on 21 September 2026.
 
-Follow the steps in order. Do one command at a time: paste it, press Enter,
-read what it says, then move to the next one.
-
-Working setup this was tested on: Windows 11, Python 3.13.14,
-MariaDB 10.4.32 (from XAMPP), FastAPI 0.115.6.
+Do one command at a time: paste it, press Enter, read what it says, then the next.
 
 ---
 
-## ALREADY SET UP? Just run the server
+## ALREADY SET UP? Just run it
 
-Steps 1–6 are one-time only. Once they're done, this is all you do from then on
-— every day, every time.
+Parts A–C below are one-time only. Once done, this is all you do every time.
 
-**1. Start the database.** Open the **XAMPP Control Panel**, find the **MySQL**
-row, click **Start**. Wait for it to turn green. (XAMPP does not start by
-itself when you turn on the laptop. If MySQL isn't green, every page errors.)
+You need **two PowerShell windows** open at the same time — one for the backend,
+one for the frontend. Both stay open the whole time the system is in use.
 
-**2. Open PowerShell.** Windows key → type `powershell` → Enter.
+**1. Start the database.** XAMPP Control Panel → **MySQL** row → **Start**.
+Wait for green.
 
-**3. Run these three, one at a time** (replace the path with your own — see
-"Your two folders" below):
+**2. Backend — PowerShell window #1:**
 
 ```powershell
 cd "C:\Users\com sci\Logbook-git\BackendAndDatabase\backend"
@@ -35,29 +29,42 @@ cd "C:\Users\com sci\Logbook-git\BackendAndDatabase\backend"
 uvicorn app.main:app --reload
 ```
 
-After the second command your prompt starts with `(.venv)`. After the third you
-see `Uvicorn running on http://127.0.0.1:8000`.
+Wait for `Application startup complete`. Leave this window open.
 
-**4. Open the browser:** http://localhost:8000/docs
-
-**To stop:** click the PowerShell window, press **Ctrl + C**.
-**Leave the window open** while you're working — closing it stops the server.
-
-If you want the nurse laptop to reach it too, use this instead of the third
-command, and see Step 8:
+**3. Frontend — PowerShell window #2** (Windows key → `powershell` → Enter again):
 
 ```powershell
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+cd "C:\Users\com sci\Logbook-git\Frontend"
 ```
+```powershell
+npm run dev -- --host
+```
+
+It prints two addresses:
+
+```
+➜  Local:   http://localhost:5173/
+➜  Network: http://192.168.8.34:5173/
+```
+
+**4. Open it.**
+
+- On this laptop (admin): **http://localhost:5173**
+- On the nurse laptop: the **Network** address from step 3, e.g. **http://192.168.8.34:5173**
+
+**To stop:** click each PowerShell window and press **Ctrl + C**.
 
 ### If it doesn't start
 
 | What you see | Fix |
 |---|---|
-| `Can't connect to MySQL server` | XAMPP MySQL isn't green — go back to 1 |
-| `uvicorn is not recognized` | You skipped the `Activate.ps1` line |
-| No `(.venv)` in the prompt | Same — run `.\.venv\Scripts\Activate.ps1` |
-| `Address already in use` | The server is already running in another window |
+| Login page says "Cannot reach the server" | Backend window (#1) isn't running, or XAMPP MySQL isn't green |
+| `Can't connect to MySQL server` in window #1 | Start MySQL in XAMPP |
+| `uvicorn is not recognized` | You skipped `Activate.ps1` |
+| `npm is not recognized` | Node.js isn't installed — Part B |
+| No `Network:` line in window #2 | You forgot `-- --host` at the end |
+| Nurse laptop can't open the page | See Part C troubleshooting |
+| `Address already in use` / `Port 5173 is in use` | It's already running in another window |
 
 ---
 
@@ -65,489 +72,370 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 ### Use PowerShell, not Command Prompt
 
-Press the **Windows key**, type `powershell`, press **Enter**. A blue window
-opens. Use this window for every command in this guide.
+Windows key → type `powershell` → Enter. A **blue** window. Use it for every
+command here. The black "Command Prompt" doesn't understand these commands and
+gives `The filename, directory name, or volume label syntax is incorrect.`
 
-Do **not** use "Command Prompt" (the black window). It does not understand
-these commands and you will get:
+Paste with **Ctrl + V** or **right-click**.
 
-```
-The filename, directory name, or volume label syntax is incorrect.
-```
+### Your folders
 
-To paste into PowerShell: **Ctrl + V**, or just **right-click**.
-
-### Your two folders
-
-Commands below say things like `cd "your backend folder"`. Replace that with
-your real path. There are only two you need:
-
-| The guide says | What it means | Example |
-|---|---|---|
-| **your repo folder** | where you cloned the project | `C:\Users\com sci\Logbook-git` |
-| **your backend folder** | the `BackendAndDatabase\backend` folder inside it | `C:\Users\com sci\Logbook-git\BackendAndDatabase\backend` |
-
-**How to get your own path:** open the folder in File Explorer, click once on
-the address bar at the top, press **Ctrl + C**. That copies the path.
-
-So when the guide says:
-
-```powershell
-cd "your backend folder"
-```
-
-you actually type (keep the quotes — the path has a space in it):
-
-```powershell
-cd "C:\Users\com sci\Logbook-git\BackendAndDatabase\backend"
-```
-
-### One command at a time
-
-If you paste several lines at once, PowerShell shows `>>` and waits instead of
-running them. Paste one line, press Enter, then the next.
-
----
-
-## What you need installed
-
-| Thing | Notes |
+| The guide says | Example |
 |---|---|
-| **Python 3.13** | Not 3.14. See Step 3 — 3.14 fails and cannot be fixed easily |
-| **XAMPP** | For the database. Or MySQL Server 8.0 — but never both, they fight over port 3306 |
-| **Git** | To clone the project |
+| **repo folder** | `C:\Users\com sci\Logbook-git` |
+| **backend folder** | `C:\Users\com sci\Logbook-git\BackendAndDatabase\backend` |
+| **frontend folder** | `C:\Users\com sci\Logbook-git\Frontend` |
 
-The nurse/staff laptop needs **none** of this. Only the server laptop. The
-nurse laptop just opens a browser. See Step 8.
+To get yours: open the folder in File Explorer, click the address bar, **Ctrl + C**.
+Keep the quotes around paths — they contain a space.
+
+### One line at a time
+
+Pasting several lines at once makes PowerShell show `>>` and wait. If that
+happens, press **Ctrl + C** and paste one line.
 
 ---
 
-## Step 1 — Load the database (FIRST INSTALL ONLY)
+## How the pieces fit
 
-> ### STOP — read this before running anything in this step
+```
+ Nurse laptop                     Server laptop (this one)
+ ────────────                     ───────────────────────────────────────────
+ browser  ──── Wi-Fi ────►  :5173  Frontend (Vite)
+                                     │  forwards every /api/... request
+                                     ▼
+                            :8000  Backend (FastAPI)  ──►  :3306  MariaDB (XAMPP)
+```
+
+- **Only the server laptop has anything installed.** The nurse laptop just opens
+  a browser. No Python, no XAMPP, no Node, no project files.
+- The nurse laptop only ever talks to port **5173**. The frontend forwards API
+  calls to the backend on the same machine, so the backend never needs to be
+  exposed to the network and there is **no CORS configuration** to do.
+- **Admin and Nurse are accounts, not laptops.** The role lives in the `users`
+  table. Either account can log in from either laptop; what it can see is decided
+  by the account.
+- `localhost` means "this machine only." The nurse laptop must use the server's
+  network address (e.g. `192.168.8.34`), never `localhost`.
+
+---
+
+# PART A — Backend (one time)
+
+## A1. Load the database — FIRST INSTALL ONLY
+
+> **STOP — check before running anything here.**
+> `schema_v2.sql` starts with `DROP DATABASE IF EXISTS isu_infirmary`. Running it
+> on a machine that already has the database **deletes every patient, visit and
+> account**, with no undo.
 >
-> The file `schema_v2.sql` starts with `DROP DATABASE IF EXISTS isu_infirmary`.
-> If you run it on a laptop where the database already exists, **it deletes
-> every table, every patient record, and every user account.** There is no
-> undo.
->
-> **Check first.** Open SQLyog or phpMyAdmin and run:
+> Open SQLyog or phpMyAdmin and run:
 >
 > ```sql
 > SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'isu_infirmary';
 > ```
 >
-> - Returns **22** → the database is already loaded. **Skip to Step 2.**
-> - Returns **0** or an error → continue with this step.
+> **22** → already loaded, **skip to A2.** **0** → continue.
 
-**1a.** Open the **XAMPP Control Panel**. Find the row that says **MySQL** and
-click its **Start** button. Wait until the name turns green. If it is already
-green, leave it.
+1. XAMPP Control Panel → **MySQL** → **Start**. Wait for green.
+2. Open **SQLyog**, connect as `root@localhost` (password blank on XAMPP).
+3. **File → Execute SQL Script** → pick `repo folder\BackendAndDatabase\schema_v2.sql` → run.
+4. Run the check query above. It must say **22**.
 
-**1b.** Open **SQLyog** (or phpMyAdmin). Connect as `root@localhost`. The
-password is blank by default in XAMPP — just click Connect.
+The schema loads on MariaDB 10.4+ (XAMPP) and MySQL 8. You don't need to install
+MySQL Server separately.
 
-**1c.** In SQLyog: **File → Execute SQL Script**, pick `schema_v2.sql` from your
-repo folder (it's inside `BackendAndDatabase`), and run it. Wait for it to
-finish.
+## A2. Create the backend `.env`
 
-**1d.** Check it worked. Open a Query tab and run:
-
-```sql
-SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'isu_infirmary';
-```
-
-It must say **22**. Anything less means it stopped partway on an error.
-
-### Note: we use MariaDB, not MySQL
-
-The top of `schema_v2.sql` says it targets MySQL 8.0.16+. XAMPP gives you
-MariaDB 10.4 instead. That is fine — the two features the schema needs
-(`GENERATED ALWAYS AS (...) STORED` columns and `CHECK` constraints) have both
-worked in MariaDB since version 10.2.1. Nothing needs changing. Do not install
-MySQL Server just because the header says so.
-
----
-
-## Step 2 — Create the `.env` file
-
-This file holds the database password and the secret key. It is **not** in the
-repo on purpose (it's in `.gitignore`), so **every teammate must create their
-own**. Cloning the project is not enough to run it.
-
-**2a.** Generate a secret key. In PowerShell:
+Holds the database login and secret key. It's gitignored, so **every teammate
+makes their own** — cloning isn't enough.
 
 ```powershell
-cd "your backend folder"
+cd "C:\Users\com sci\Logbook-git\BackendAndDatabase\backend"
 ```
+
+Generate a secret key, then select and copy (Ctrl + C) what it prints:
 
 ```powershell
 python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 
-It prints a random string like `-CJbHRBC6C92jxH01M2dKhftZEvkThakyEPlCo7u0Co`.
-Select it with your mouse and press **Ctrl + C** to copy it.
-
-**2b.** Create the file. Do **not** try to make it in File Explorer — Windows
-will not let you name a file with no name before the dot, and editors often
-save it empty or as `.env.txt`. Use this command instead.
-
-Copy the whole block below into Notepad first, replace `PASTE_YOUR_KEY_HERE`
-with the key you just copied, then paste the finished line into PowerShell:
+Paste this into Notepad, replace `PASTE_YOUR_KEY_HERE`, then paste the finished
+line into PowerShell:
 
 ```powershell
-Set-Content -Path .env -Encoding utf8 -Value @("DB_USER=root","DB_PASSWORD=","DB_HOST=localhost","DB_PORT=3306","DB_NAME=isu_infirmary","SECRET_KEY=PASTE_YOUR_KEY_HERE","ALGORITHM=HS256","ACCESS_TOKEN_EXPIRE_MINUTES=480","CLINIC_TIMEZONE=Asia/Manila","CORS_ORIGINS=http://localhost:5173,http://localhost:3000")
+Set-Content -Path .env -Encoding utf8 -Value @("DB_USER=root","DB_PASSWORD=","DB_HOST=localhost","DB_PORT=3306","DB_NAME=isu_infirmary","SECRET_KEY=PASTE_YOUR_KEY_HERE","ALGORITHM=HS256","ACCESS_TOKEN_EXPIRE_MINUTES=480","CLINIC_TIMEZONE=Asia/Manila","CORS_ORIGINS=http://localhost:5173")
 ```
 
-`DB_PASSWORD=` is left empty on purpose. XAMPP's root user has no password, and
-the code checks for that and builds the connection without one.
-
-**2c.** Check it:
+Check it — exactly 10 lines:
 
 ```powershell
 Get-Content .env
 ```
 
-You should see exactly **10 lines**. If you see `@'` or the words `Set-Content`
-inside the file, something went wrong — delete the file and redo 2b.
+`DB_PASSWORD=` stays empty — XAMPP's root user has no password.
 
----
+Don't create `.env` in File Explorer. Windows won't allow a name starting with a
+dot, and editors tend to save it empty or as `.env.txt`.
 
-## Step 3 — Create the virtual environment
+## A3. Create the virtual environment
 
-> ### Use Python 3.13. Python 3.14 does NOT work.
->
-> On 3.14 the install fails with:
->
-> ```
-> error: linker `link.exe` not found
-> ```
->
-> Reason: one of the packages (`pydantic-core`) has no ready-made file for 3.14,
-> so pip tries to build it from source, which needs a C++ compiler from Visual
-> Studio. Do **not** install Visual Studio Build Tools to fix this — that's 6 GB
-> for nothing. Use 3.13, which has a ready-made file.
-
-**3a.** See which Python versions you have:
+> **Use Python 3.13. Python 3.14 does not work** — one package has no ready-made
+> build for 3.14 and fails with ``linker `link.exe` not found``. Don't install
+> Visual Studio Build Tools to fix it; just use 3.13.
 
 ```powershell
 py -0p
 ```
 
-You want a line starting `-V:3.13`. If there isn't one, download Python 3.13
-from python.org and tick **"Add python.exe to PATH"** during install.
+You need a `-V:3.13` line. If missing, install Python 3.13 from python.org and
+tick **Add python.exe to PATH**.
 
-**3b.** Go to your backend folder:
-
-```powershell
-cd "your backend folder"
-```
-
-**3c.** If a `.venv` folder already exists and is broken, delete it first:
-
-```powershell
-Remove-Item -Recurse -Force .venv
-```
-
-**3d.** Create it with 3.13:
+Still in the backend folder:
 
 ```powershell
 py -3.13 -m venv .venv
 ```
-
-**3e.** Turn it on:
-
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-Your prompt should now start with `(.venv)`. That's how you know it's on.
-
-If you get a red error about scripts being disabled, run this once, answer `Y`,
-then repeat 3e:
+Your prompt now starts with `(.venv)`. If you get a red "scripts are disabled"
+error, run this once, answer `Y`, then repeat the line above:
 
 ```powershell
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ```
 
-**3f.** Confirm the version:
-
 ```powershell
 python --version
 ```
 
-It must say `3.13.x`. If it says 3.14, stop — 3d didn't work.
+Must say `3.13.x`.
 
----
-
-## Step 4 — Install the packages
-
-With `(.venv)` showing in your prompt:
+## A4. Install the backend packages
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-This downloads about 36 packages. Give it a minute. It ends with
-`Successfully installed ...` and a long list.
+Ends with `Successfully installed ...`. `requirements.txt` already pins
+`bcrypt==4.0.1` (newer bcrypt breaks password hashing) and includes `tzdata`
+(Windows needs it for the Asia/Manila date filters).
 
-> **If you're using an older copy of `requirements.txt`** that doesn't pin
-> bcrypt, also run:
->
-> ```powershell
-> pip install "bcrypt==4.0.1"
-> ```
->
-> Why: `passlib 1.7.4` reads an attribute that was removed in bcrypt 4.1, so
-> newer bcrypt breaks account creation with
-> `AttributeError: module 'bcrypt' has no attribute '__about__'`.
-> The current `requirements.txt` in this repo already pins it.
+**Run this again whenever you pull new code** — it only installs what changed.
 
----
-
-## Step 5 — Test the database connection
-
-Do this before anything else. If something's wrong with `.env`, this tells you
-plainly instead of burying it in a long error later.
-
-**5a.** Create a small test file:
-
-```powershell
-Set-Content -Path dbtest.py -Encoding utf8 -Value @("from sqlalchemy import text","from app.db.session import engine","","with engine.connect() as c:","    print('version:', c.execute(text('SELECT VERSION()')).scalar())","    print('db:', c.execute(text('SELECT DATABASE()')).scalar())","    print('tables:', c.execute(text(\"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'isu_infirmary'\")).scalar())")
-```
-
-**5b.** Run it:
-
-```powershell
-python dbtest.py
-```
-
-You should see:
-
-```
-version: 10.4.32-MariaDB
-db: isu_infirmary
-tables: 22
-```
-
-If you get `Can't connect to MySQL server`, XAMPP's MySQL isn't running — go
-back to Step 1a.
-
-**5c.** Delete the test file:
-
-```powershell
-Remove-Item dbtest.py
-```
-
----
-
-## Step 6 — Create the login accounts
-
-Passwords are scrambled (hashed) by Python before being saved. The database has
-no column that could hold a plain password, so **you can never create an
-account through SQL**. Always use these scripts.
-
-**6a.** The admin account:
+## A5. Create the first admin account
 
 ```powershell
 python create_admin.py
 ```
 
-It asks for: Username, First name, Last name, Email (can be left blank), then
-Password twice.
+Asks for username, first name, last name, email (can be blank), password twice.
+**Nothing shows while typing the password** — that's deliberate. Min 8 characters.
 
-**Nothing appears while you type the password.** That's on purpose, not a frozen
-window. Type it and press Enter. Minimum 8 characters.
+You only do this once. **Every other account — including nurses — is created
+from inside the app** (Part C4).
 
-It finishes with `Admin 'yourname' created.`
+Passwords are hashed before storage. The database has no column for a plain
+password, so accounts can never be made through SQL.
 
-**6b.** The nurse account.
-
-`create_admin.py` only makes admins. There's no admin screen for adding users
-yet either. So make a copy of the script with the role changed:
-
-```powershell
-Copy-Item create_admin.py create_nurse.py
-```
-
-Open `create_nurse.py` in VS Code, find the line containing `role="admin"`,
-change it to `role="nurse"`, and save. Then:
-
-```powershell
-python create_nurse.py
-```
-
-**You need both accounts.** The code deliberately blocks admins from the nurse
-screens — an admin login gets "403 Nurse access required" on clinical pages,
-because Admin has no clinical role in this system.
-
----
-
-## Step 7 — Run the server
+## A6. Test the backend
 
 ```powershell
 uvicorn app.main:app --reload
 ```
 
-You should see:
+Wait for `Application startup complete`, then open **http://localhost:8000/docs**.
+You should see about 31 endpoints grouped as auth, lookups, patients, visits,
+stock, users, settings, insights.
 
-```
-INFO:     Uvicorn running on http://127.0.0.1:8000
-INFO:     Application startup complete.
-```
-
-**Leave this window open.** Closing it stops the server.
-
-Open your browser and go to:
-
-```
-http://localhost:8000/docs
-```
-
-You'll see the list of API endpoints.
-
-**Test the login properly:**
-
-1. Click **POST /api/auth/login** to expand it
-2. Click the **Try it out** button on the right
-3. Type your username and password into the boxes
-4. Click the blue **Execute** button
-5. Scroll down — you want **Code 200** and a long `access_token` string
-
-That proves the database, the password hashing, and the login token all work
-together.
-
-To stop the server: click the PowerShell window and press **Ctrl + C**.
-
-### Starting it again on any later day
-
-1. XAMPP Control Panel → **Start** MySQL
-2. PowerShell: `cd "your backend folder"`
-3. `.\.venv\Scripts\Activate.ps1`
-4. `uvicorn app.main:app --reload`
-
-XAMPP does **not** start by itself when you turn the laptop on. If MySQL isn't
-green, every page will error.
+Press **Ctrl + C** to stop it before moving on, or leave it running and open a
+second PowerShell window for Part B.
 
 ---
 
-## Step 8 — Connecting the second laptop (nurse/staff)
+# PART B — Frontend (one time)
 
-### How this actually works
+## B1. Install Node.js
 
-One laptop runs everything: the database and the server. Every other laptop is
-just a browser pointed at it. Nothing gets installed on the nurse laptop — no
-Python, no XAMPP, no project files.
+Check whether you have it:
 
-**Admin and Nurse are not laptops.** They are roles stored in the `users` table
-in the database. An admin can log in from the nurse laptop and vice versa; what
-they're allowed to see is decided by their account, not by which machine they're
-sitting at.
+```powershell
+node --version
+```
 
-**`localhost` means "this laptop only."** The nurse laptop can never reach the
-server's `localhost`. It has to use the server's network address instead.
+You need **v22.12 or newer** (or v20.19+). The frontend uses Vite 8, which
+refuses older versions.
 
-### On the server laptop
+If it's missing or too old: go to **nodejs.org**, download the **LTS** Windows
+installer, run it with all defaults. Then **close PowerShell and open a new
+one** — the old window won't see Node until you do.
 
-**8a.** Find your address:
+## B2. Install the frontend packages
+
+```powershell
+cd "C:\Users\com sci\Logbook-git\Frontend"
+```
+```powershell
+npm install
+```
+
+Takes a minute. Creates a `node_modules` folder (gitignored — never commit it).
+
+**Run `npm install` again whenever you pull new code.**
+
+## B3. Frontend `.env` — leave it alone
+
+The frontend works with **no `.env` at all**. Its API address is left empty on
+purpose, so every request goes through the built-in forwarding to the backend
+on the same machine.
+
+Only create `Frontend\.env` if you ever split the frontend and backend onto
+different computers. Don't do that for this setup.
+
+## B4. Test it
+
+Backend running in one window (A6), then in this window:
+
+```powershell
+npm run dev
+```
+
+Open **http://localhost:5173** → log in with your admin account.
+
+---
+
+# PART C — Nurse laptop over the network (one time)
+
+## C1. Find the server's address
+
+On the server laptop:
 
 ```powershell
 ipconfig
 ```
 
-Look for **IPv4 Address** under your Wi-Fi adapter. It looks like
-`192.168.1.15`. Write it down. If it starts with `169.254`, you are not
-properly connected to the network.
+Under your Wi-Fi adapter, find **IPv4 Address**, e.g. `192.168.8.34`. Write it
+down. If it starts with `169.254`, you're not connected to the network properly.
 
-**8b.** Open the port in the firewall. This one needs an **Administrator**
-window: press Windows key, type `powershell`, **right-click** "Windows
-PowerShell", choose **Run as administrator**, then:
+## C2. Open port 5173 in the firewall
 
-```powershell
-New-NetFirewallRule -DisplayName "ISU Infirmary API" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow
-```
-
-**8c.** Start the server so other machines can reach it (note the extra part at
-the end):
+Needs an **Administrator** window: Windows key → `powershell` → **right-click**
+"Windows PowerShell" → **Run as administrator** → Yes.
 
 ```powershell
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+New-NetFirewallRule -DisplayName "ISU Infirmary Frontend" -Direction Inbound -Protocol TCP -LocalPort 5173 -Action Allow
 ```
 
-`0.0.0.0` is what makes it visible on the network. The normal command only
-listens to itself.
+Ends with `Enabled : True`. Close that admin window. Once per laptop, never again.
 
-**8d.** Add the nurse laptop's address to `CORS_ORIGINS` in your `.env`, using
-your real IP, then restart the server:
+Port **5173 only**. The backend (8000) and database (3306) stay closed to the
+network — the nurse laptop never needs them.
 
-```
-CORS_ORIGINS=http://localhost:5173,http://192.168.1.15:5173,http://192.168.1.15:8000
-```
+## C3. Start the frontend on the network
 
-### On the nurse laptop
+In the frontend window, add `-- --host`:
 
-Connect it to the **same Wi-Fi**. Open a browser. Go to:
-
-```
-http://192.168.1.15:8000/docs
+```powershell
+npm run dev -- --host
 ```
 
-(using the real IP from 8a). If the page loads, the connection works. Log in
-there with the nurse account to prove the roles work.
+It now prints a `Network:` line. That's the address the nurse laptop uses.
 
-### Three things that will catch you out
+## C4. Create the nurse account
 
-1. **The IP address can change.** Routers hand out addresses automatically and
-   may give your laptop a different one tomorrow, which breaks the nurse
-   laptop's link. Before your defense, set a static IP or reserve it in the
-   router.
-2. **School and public Wi-Fi often block devices from seeing each other.** If
-   the nurse laptop can't connect, test with a phone hotspot. If it works on the
-   hotspot, it's the network, not your setup.
-3. **Two buildings 2 km apart will not work over Wi-Fi.** The infirmary and the
-   admin building need either the campus network routing between them, or the
-   system hosted online.
+On the server laptop, log in as **admin** at http://localhost:5173 →
+**User Management** → **Add User** → fill in the details → Role: **Nurse** →
+Save.
+
+The password must be at least 8 characters and include a symbol.
+
+## C5. Log in from the nurse laptop
+
+1. Connect the nurse laptop to the **same Wi-Fi** as the server.
+2. Open any browser.
+3. Go to the `Network:` address from C3, e.g. **http://192.168.8.34:5173**
+4. Log in with the nurse account.
+
+Admins are deliberately blocked from nurse screens and vice versa — the server
+enforces that, not just the menus.
+
+## C6. If the nurse laptop can't connect
+
+| Check | How |
+|---|---|
+| Same network? | Compare the Wi-Fi name on both laptops |
+| Did you use `-- --host`? | Window #2 must show a `Network:` line |
+| Can it reach the server at all? | On the nurse laptop: `ping 192.168.8.34` |
+| Ping works, page doesn't load | Firewall — redo C2 as administrator |
+| Ping fails | Network blocks device-to-device traffic (common on school and public Wi-Fi). Test with a phone hotspot — if it works there, it's the network, not your setup |
+| Page loads, but login says "Cannot reach the server" | Backend window #1 isn't running on the server |
+
+### Before your defense
+
+1. **Your IP can change.** Routers hand out addresses automatically, so
+   `192.168.8.34` may be different tomorrow and the nurse laptop's link breaks.
+   Either re-check `ipconfig` each time, or set a static IP / DHCP reservation
+   on the router.
+2. **Bring your own network.** Don't rely on campus Wi-Fi — a phone hotspot or
+   pocket router both laptops join is predictable.
+3. **XAMPP doesn't auto-start.** Start MySQL first, every time.
+4. **The two buildings are ~2 km apart.** Wi-Fi won't span that. Real deployment
+   needs the campus network routing between the buildings, or cloud hosting.
+
+### Faster, more stable option for demos (optional)
+
+`npm run dev` is a development server. For the defense you can serve a built,
+optimized copy instead — same address, same port, same forwarding to the backend:
+
+```powershell
+npm run build
+```
+```powershell
+npm run preview -- --host --port 5173
+```
+
+Rebuild (`npm run build`) after any frontend code change, or you'll be showing
+the old version.
 
 ---
 
-## Step 9 — When something goes wrong
+## Troubleshooting — every error we've actually hit
 
-| What you see | What it means | What to do |
+| What you see | Meaning | Fix |
 |---|---|---|
-| `'mysql' is not recognized` | Windows doesn't know where mysql is | `$env:Path += ";C:\xampp\mysql\bin"` |
-| `The '<' operator is reserved for future use` | PowerShell can't do `<` | Use `cmd /c "mysql -u root < file.sql"` |
-| `The filename, directory name, or volume label syntax is incorrect` | You're in Command Prompt | Open PowerShell instead |
-| ``linker `link.exe` not found`` | You're on Python 3.14 | Redo Step 3 with 3.13 |
-| `module 'bcrypt' has no attribute '__about__'` | bcrypt too new for passlib | `pip install "bcrypt==4.0.1"` |
-| `python-dotenv could not parse statement` | Junk line inside `.env` | Redo Step 2b |
-| `Can't connect to MySQL server` | XAMPP MySQL is off | Start it in XAMPP Control Panel |
-| `Get-Service *mysql*` shows nothing | Normal for XAMPP | Not an error — XAMPP isn't a Windows service |
-| Prompt shows `>>` and nothing runs | You pasted several lines at once | Press Ctrl + C, paste one line at a time |
-| No `(.venv)` in your prompt | Virtual environment is off | `.\.venv\Scripts\Activate.ps1` |
-| Nurse laptop can't open the page | Server on `127.0.0.1`, or firewall | Redo Steps 8b and 8c |
+| `The filename, directory name, or volume label syntax is incorrect` | You're in Command Prompt | Use PowerShell |
+| `The '<' operator is reserved for future use` | PowerShell can't do `<` | `cmd /c "mysql -u root < file.sql"` |
+| `'mysql' is not recognized` | mysql isn't on PATH | `$env:Path += ";C:\xampp\mysql\bin"` |
+| ``linker `link.exe` not found`` | Python 3.14 | Redo A3 with 3.13 |
+| `module 'bcrypt' has no attribute '__about__'` | Old requirements, bcrypt too new | `pip install -r requirements.txt` |
+| `python-dotenv could not parse statement` | Junk line in `.env` | Redo A2 |
+| `Can't connect to MySQL server` | XAMPP MySQL is off | Start it |
+| `Get-Service *mysql*` shows nothing | Normal for XAMPP | Not an error |
+| `>>` prompt, nothing runs | Pasted several lines at once | Ctrl + C, one line at a time |
+| No `(.venv)` in prompt | venv not active | `.\.venv\Scripts\Activate.ps1` |
+| `Vite requires Node.js version 20.19+ or 22.12+` | Node too old | Install Node LTS, reopen PowerShell |
+| Frontend shows "needs a backend endpoint that isn't available yet" | Backend is outdated | `git pull`, then `pip install -r requirements.txt`, restart backend |
+| `ERROR 1901 ... GENERATED ALWAYS AS` when loading schema | Old copy of `schema_v2.sql` | `git pull` — fixed in the current version |
 
 ---
 
-## Step 10 — What's built and what isn't
+## What's built
 
-**Working now:** login/authentication, and visits.
+**Working:** login and lockout, patients and special-case flags, visits with
+automatic stock deduction, stock and restock requests (request → approve →
+receive), user management, system settings, clinical insights. 31 endpoints,
+verified with 60 end-to-end checks against MariaDB.
 
-**Not built yet** — listed as TODO in `app/api/router.py`:
+**Not built yet:** printable Medical Certificate and Parental Notification with
+the Director co-signature workflow; Backup Now / Restore / Export SQL.
 
-- `patients.py` — add, edit, search patients, view their visit history
-- `stock.py` — inventory, restock requests, approve/deny/receive
-- `users.py` — admin screen for managing accounts (would replace Step 6's scripts)
-- `insights.py` — most common complaints, treatment pairings, stock forecasts
-- `lookups.py` — patient types, complaint list, dispositions, categories
+### Rules when changing the backend
 
-This is why the frontend's Add Patient, Restock, stock and admin screens still
-show fake data — there is nothing real to connect them to yet.
-
-### Rules when adding new endpoints
-
-- Stock changes go through `services/stock_service.py`. Never set
-  `stock.quantity` directly from an endpoint — the service locks the row and
-  writes the history entry in the same transaction.
-- `stock_status` is calculated by the database. Read it, never write it.
-- Saving a visit is one single transaction. See `services/visit_service.py`.
-- Save times in UTC. Convert to Asia/Manila in the React frontend.
+- Stock quantities only change through `services/stock_service.py` — it locks
+  the row and writes the audit ledger in the same transaction.
+- `stock_status` is computed by the database. Read it, never write it.
+- Saving a visit is one transaction: if any medicine is short, nothing is saved.
+- Times are stored in UTC and shown in Asia/Manila by the frontend.
+- Never commit `.env`, `.venv`, `node_modules`, or any file containing passwords.
