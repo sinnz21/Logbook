@@ -1,0 +1,1651 @@
+diff --git a/isu_infirmary_backend/backend/app/api/router.py b/isu_infirmary_backend/backend/app/api/router.py
+index e9f4001..8079ff8 100644
+--- a/isu_infirmary_backend/backend/app/api/router.py
++++ b/isu_infirmary_backend/backend/app/api/router.py
+@@ -1,14 +1,13 @@
+ from fastapi import APIRouter
+ 
+-from app.api.routes import auth, visits
++from app.api.routes import auth, insights, lookups, patients, settings, stock, users, visits
+ 
+ api_router = APIRouter(prefix="/api")
+ api_router.include_router(auth.router)
++api_router.include_router(lookups.router)
++api_router.include_router(patients.router)
+ api_router.include_router(visits.router)
+-
+-# TODO for whoever picks this up next — same pattern as visits.py:
+-#   patients.py  list / create / update / profile with visit history
+-#   stock.py     inventory list, restock requisitions, approve / deny / receive
+-#   users.py     admin-only account management
+-#   insights.py  complaint frequency, treatment pairings, depletion forecast
+-#   lookups.py   patient types, complaints, dispositions, case types, categories
++api_router.include_router(stock.router)
++api_router.include_router(users.router)
++api_router.include_router(settings.router)
++api_router.include_router(insights.router)
+diff --git a/isu_infirmary_backend/backend/app/api/routes/auth.py b/isu_infirmary_backend/backend/app/api/routes/auth.py
+index a4cc5e5..0eba086 100644
+--- a/isu_infirmary_backend/backend/app/api/routes/auth.py
++++ b/isu_infirmary_backend/backend/app/api/routes/auth.py
+@@ -21,8 +21,10 @@ def _setting(db: Session, name: str, default):
+ 
+ @router.post("/login", response_model=TokenResponse)
+ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
+-    limit = _setting(db, "failed_login_limit", 5)
+-    window = _setting(db, "lockout_minutes", 15)
++    # int(): rows seeded without value_type come back as strings, and
++    # `count >= "5"` raises TypeError on every login attempt.
++    limit = int(_setting(db, "failed_login_limit", 5))
++    window = int(_setting(db, "lockout_minutes", 15))
+     since = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(minutes=window)
+ 
+     recent_failures = db.execute(
+diff --git a/isu_infirmary_backend/backend/app/api/routes/insights.py b/isu_infirmary_backend/backend/app/api/routes/insights.py
+new file mode 100644
+index 0000000..71cfbb5
+--- /dev/null
++++ b/isu_infirmary_backend/backend/app/api/routes/insights.py
+@@ -0,0 +1,67 @@
++"""Reports & Insights — "when a patient has X, they usually also have / get Y".
++
++Simple association rules over one date range:
++  match_rate(X → Y) = visits with both X and Y / visits with X
++X is a tagged complaint (visit_complaints); Y is another complaint or a
++medicine actually dispensed (visit_medicines). Only complaints that appear in
++at least MIN_SUPPORT visits are considered, so one-off coincidences don't show.
++"""
++from collections import Counter
++from datetime import date
++from itertools import permutations
++
++from fastapi import APIRouter, Depends, Query
++from sqlalchemy import select
++from sqlalchemy.orm import Session
++
++from app.core.deps import get_current_user
++from app.core.timeutil import clinic_day_range_utc
++from app.db.session import get_db
++from app.models.user import User
++from app.models.visit import Visit
++from app.schemas.common import APIModel
++
++router = APIRouter(prefix="/insights", tags=["insights"])
++
++MIN_SUPPORT = 3        # co-occurrences needed before a pattern is reported
++MIN_RATE = 0.5
++
++
++class PatternOut(APIModel):
++    trigger: str
++    associated_with: str
++    match_rate: float       # 0–1
++    support: int            # visits where both occurred
++
++
++@router.get("/patterns", response_model=list[PatternOut])
++def patterns(
++    db: Session = Depends(get_db),
++    _: User = Depends(get_current_user),
++    date_from: date | None = None,
++    date_to: date | None = None,
++    limit: int = Query(10, ge=1, le=50),
++):
++    stmt = select(Visit).where(Visit.deleted_at.is_(None))
++    start, end = clinic_day_range_utc(date_from, date_to)
++    if start:
++        stmt = stmt.where(Visit.started_at >= start)
++    if end:
++        stmt = stmt.where(Visit.started_at < end)
++
++    trigger_count: Counter[str] = Counter()
++    pair_count: Counter[tuple[str, str]] = Counter()
++    for v in db.execute(stmt).unique().scalars():
++        complaints = {c.complaint.complaint_name for c in v.complaints}
++        medicines = {f"{m.medicine.medicine_name} given" for m in v.medicines}
++        trigger_count.update(complaints)
++        pair_count.update(permutations(complaints, 2))
++        pair_count.update((c, m) for c in complaints for m in medicines)
++
++    out = []
++    for (x, y), both in pair_count.items():
++        rate = both / trigger_count[x]
++        if both >= MIN_SUPPORT and rate >= MIN_RATE:
++            out.append(PatternOut(trigger=x, associated_with=y, match_rate=round(rate, 3), support=both))
++    out.sort(key=lambda p: (-p.match_rate, -p.support, p.trigger))
++    return out[:limit]
+diff --git a/isu_infirmary_backend/backend/app/api/routes/lookups.py b/isu_infirmary_backend/backend/app/api/routes/lookups.py
+new file mode 100644
+index 0000000..060fcc2
+--- /dev/null
++++ b/isu_infirmary_backend/backend/app/api/routes/lookups.py
+@@ -0,0 +1,26 @@
++from fastapi import APIRouter, Depends
++from sqlalchemy import select
++from sqlalchemy.orm import Session
++
++from app.core.deps import get_current_user
++from app.db.session import get_db
++from app.models.lookups import Complaint, Disposition, ItemCategory, PatientType, SpecialCaseType
++from app.models.user import User
++from app.schemas.lookups import LookupsOut
++
++router = APIRouter(prefix="/lookups", tags=["lookups"])
++
++
++def _active(db: Session, model, order_col):
++    return db.execute(select(model).where(model.active.is_(True)).order_by(order_col)).scalars().all()
++
++
++@router.get("", response_model=LookupsOut)
++def get_lookups(db: Session = Depends(get_db), _: User = Depends(get_current_user)):
++    return LookupsOut(
++        patient_types=_active(db, PatientType, PatientType.patient_type_id),
++        dispositions=_active(db, Disposition, Disposition.disposition_id),
++        complaints=_active(db, Complaint, Complaint.complaint_name),
++        special_case_types=_active(db, SpecialCaseType, SpecialCaseType.special_case_type_id),
++        item_categories=_active(db, ItemCategory, ItemCategory.category_name),
++    )
+diff --git a/isu_infirmary_backend/backend/app/api/routes/patients.py b/isu_infirmary_backend/backend/app/api/routes/patients.py
+new file mode 100644
+index 0000000..65e4dc2
+--- /dev/null
++++ b/isu_infirmary_backend/backend/app/api/routes/patients.py
+@@ -0,0 +1,218 @@
++from datetime import datetime, timezone
++
++from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
++from sqlalchemy import func, or_, select
++from sqlalchemy.exc import IntegrityError
++from sqlalchemy.orm import Session
++
++from app.core.deps import get_current_user, require_nurse
++from app.db.session import get_db
++from app.models.lookups import PatientType, SpecialCaseType
++from app.models.patient import Patient, PatientSpecialCase
++from app.models.user import User
++from app.models.visit import Visit
++from app.schemas.common import Page
++from app.schemas.patient import (
++    PatientCreate, PatientOut, PatientUpdate, SpecialCaseCreate, SpecialCaseListOut,
++    SpecialCaseOut, SpecialCaseUpdate,
++)
++
++router = APIRouter(prefix="/patients", tags=["patients"])
++
++
++def _utcnow() -> datetime:
++    return datetime.now(timezone.utc).replace(tzinfo=None)
++
++
++def _case_out(c: PatientSpecialCase) -> SpecialCaseOut:
++    return SpecialCaseOut(
++        patient_special_case_id=c.patient_special_case_id,
++        special_case_type_id=c.special_case_type_id,
++        case_name=c.case_type.case_name,
++        notes=c.notes,
++        flagged_at=c.flagged_at,
++        active=c.active,
++    )
++
++
++def _to_out(db: Session, p: Patient) -> PatientOut:
++    count, last = db.execute(
++        select(func.count(Visit.visit_id), func.max(Visit.started_at))
++        .where(Visit.patient_id == p.patient_id, Visit.deleted_at.is_(None))
++    ).one()
++    return PatientOut(
++        patient_id=p.patient_id,
++        patient_number=p.patient_number,
++        first_name=p.first_name,
++        middle_name=p.middle_name,
++        last_name=p.last_name,
++        sex=p.sex,
++        date_of_birth=p.date_of_birth,
++        civil_status=p.civil_status,
++        contact_number=p.contact_number,
++        patient_type_id=p.patient_type_id,
++        department=p.department,
++        program=p.program,
++        year_level=p.year_level,
++        full_name=p.full_name,
++        age=p.age,
++        patient_type_name=p.patient_type.type_name if p.patient_type else None,
++        last_visit_at=last,
++        visit_count=count,
++        special_cases=[_case_out(c) for c in p.special_cases],
++    )
++
++
++def _get_patient(db: Session, patient_id: int) -> Patient:
++    p = db.get(Patient, patient_id)
++    if p is None or p.deleted_at is not None:
++        raise HTTPException(status.HTTP_404_NOT_FOUND, "Patient not found")
++    return p
++
++
++def _check_type(db: Session, patient_type_id: int | None) -> None:
++    if patient_type_id is not None and db.get(PatientType, patient_type_id) is None:
++        raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Unknown patient type {patient_type_id}")
++
++
++def _commit_or_conflict(db: Session) -> None:
++    try:
++        db.commit()
++    except IntegrityError:
++        db.rollback()
++        raise HTTPException(status.HTTP_409_CONFLICT, "That ID number is already registered to another patient")
++
++
++# NOTE: declared before "/{patient_id}" so "special-cases" isn't parsed as an id.
++@router.get("/special-cases", response_model=list[SpecialCaseListOut])
++def list_special_cases(
++    db: Session = Depends(get_db),
++    _: User = Depends(get_current_user),
++    active: bool | None = True,
++):
++    stmt = (
++        select(PatientSpecialCase)
++        .join(PatientSpecialCase.patient)
++        .where(Patient.deleted_at.is_(None))
++        .order_by(PatientSpecialCase.flagged_at.desc())
++    )
++    if active is not None:
++        stmt = stmt.where(PatientSpecialCase.active.is_(active))
++    rows = db.execute(stmt).scalars().all()
++    return [
++        SpecialCaseListOut(
++            **_case_out(c).model_dump(),
++            patient_id=c.patient_id,
++            patient_name=c.patient.full_name,
++            patient_number=c.patient.patient_number,
++            patient_type_name=c.patient.patient_type.type_name if c.patient.patient_type else None,
++        )
++        for c in rows
++    ]
++
++
++@router.get("", response_model=Page[PatientOut])
++def list_patients(
++    db: Session = Depends(get_db),
++    _: User = Depends(get_current_user),
++    search: str | None = None,
++    patient_type_id: int | None = None,
++    page: int = Query(1, ge=1),
++    per_page: int = Query(20, ge=1, le=200),
++):
++    stmt = select(Patient).where(Patient.deleted_at.is_(None))
++    if search:
++        like = f"%{search.strip()}%"
++        stmt = stmt.where(or_(
++            Patient.first_name.ilike(like),
++            Patient.last_name.ilike(like),
++            Patient.patient_number.ilike(like),
++            (Patient.last_name + ", " + Patient.first_name).ilike(like),
++            (Patient.first_name + " " + Patient.last_name).ilike(like),
++        ))
++    if patient_type_id is not None:
++        stmt = stmt.where(Patient.patient_type_id == patient_type_id)
++    stmt = stmt.order_by(Patient.last_name, Patient.first_name)
++
++    total = db.execute(select(func.count()).select_from(stmt.subquery())).scalar_one()
++    rows = db.execute(stmt.offset((page - 1) * per_page).limit(per_page)).unique().scalars().all()
++    return Page(items=[_to_out(db, p) for p in rows], total=total, page=page, per_page=per_page)
++
++
++@router.post("", response_model=PatientOut, status_code=status.HTTP_201_CREATED)
++def create_patient(body: PatientCreate, db: Session = Depends(get_db), _: User = Depends(require_nurse)):
++    _check_type(db, body.patient_type_id)
++    p = Patient(**body.model_dump())
++    db.add(p)
++    _commit_or_conflict(db)
++    db.refresh(p)
++    return _to_out(db, p)
++
++
++@router.get("/{patient_id}", response_model=PatientOut)
++def get_patient(patient_id: int, db: Session = Depends(get_db), _: User = Depends(get_current_user)):
++    return _to_out(db, _get_patient(db, patient_id))
++
++
++@router.patch("/{patient_id}", response_model=PatientOut)
++def update_patient(
++    patient_id: int, body: PatientUpdate, db: Session = Depends(get_db), _: User = Depends(require_nurse),
++):
++    p = _get_patient(db, patient_id)
++    data = body.model_dump(exclude_unset=True)
++    _check_type(db, data.get("patient_type_id"))
++    for field, value in data.items():
++        if field in ("first_name", "last_name") and not value:
++            continue  # required columns — ignore an explicit null
++        setattr(p, field, value)
++    _commit_or_conflict(db)
++    db.refresh(p)
++    return _to_out(db, p)
++
++
++@router.delete("/{patient_id}", status_code=status.HTTP_204_NO_CONTENT)
++def delete_patient(patient_id: int, db: Session = Depends(get_db), _: User = Depends(require_nurse)):
++    p = _get_patient(db, patient_id)
++    p.deleted_at = _utcnow()
++    db.commit()
++    return Response(status_code=status.HTTP_204_NO_CONTENT)
++
++
++@router.post("/{patient_id}/special-cases", response_model=SpecialCaseOut, status_code=status.HTTP_201_CREATED)
++def flag_special_case(
++    patient_id: int, body: SpecialCaseCreate, db: Session = Depends(get_db), user: User = Depends(require_nurse),
++):
++    p = _get_patient(db, patient_id)
++    case_type = db.get(SpecialCaseType, body.special_case_type_id)
++    if case_type is None or not case_type.active:
++        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Unknown special case type")
++    if any(c.active and c.special_case_type_id == case_type.special_case_type_id for c in p.special_cases):
++        raise HTTPException(status.HTTP_409_CONFLICT, f"{p.full_name} is already flagged as {case_type.case_name}")
++
++    c = PatientSpecialCase(
++        patient_id=patient_id,
++        special_case_type_id=case_type.special_case_type_id,
++        origin_visit_id=body.origin_visit_id,
++        notes=body.notes,
++        flagged_by=user.user_id,
++        active=True,
++    )
++    db.add(c)
++    db.commit()
++    db.refresh(c)
++    return _case_out(c)
++
++
++@router.patch("/{patient_id}/special-cases/{case_id}", response_model=SpecialCaseOut)
++def update_special_case(
++    patient_id: int, case_id: int, body: SpecialCaseUpdate,
++    db: Session = Depends(get_db), _: User = Depends(require_nurse),
++):
++    c = db.get(PatientSpecialCase, case_id)
++    if c is None or c.patient_id != patient_id:
++        raise HTTPException(status.HTTP_404_NOT_FOUND, "Flag not found")
++    for field, value in body.model_dump(exclude_unset=True).items():
++        setattr(c, field, value)
++    db.commit()
++    db.refresh(c)
++    return _case_out(c)
+diff --git a/isu_infirmary_backend/backend/app/api/routes/settings.py b/isu_infirmary_backend/backend/app/api/routes/settings.py
+new file mode 100644
+index 0000000..25f678a
+--- /dev/null
++++ b/isu_infirmary_backend/backend/app/api/routes/settings.py
+@@ -0,0 +1,80 @@
++"""GET/PATCH /api/settings — the System Settings screen, backed by system_settings."""
++from fastapi import APIRouter, Depends
++from pydantic import Field
++from sqlalchemy import select
++from sqlalchemy.orm import Session
++
++from app.core.deps import require_admin
++from app.db.session import get_db
++from app.models.user import SystemSetting, User
++from app.schemas.common import APIModel
++
++router = APIRouter(prefix="/settings", tags=["settings"])
++
++# API field → (setting_name, value_type, default). Parsed defensively, because
++# rows seeded without value_type come back as strings.
++FIELDS = {
++    "soft_delete_days": ("soft_delete_days", "int", 90),
++    "failed_login_limit": ("failed_login_limit", "int", 5),
++    "lockout_minutes": ("lockout_minutes", "int", 15),
++    "password_symbol_required": ("password_symbol_required", "bool", True),
++    "auto_backup_enabled": ("auto_backup_enabled", "bool", True),
++}
++
++
++class SettingsOut(APIModel):
++    soft_delete_days: int
++    failed_login_limit: int
++    lockout_minutes: int
++    password_symbol_required: bool
++    auto_backup_enabled: bool
++
++
++class SettingsUpdate(APIModel):
++    soft_delete_days: int | None = Field(default=None, ge=1, le=3650)
++    failed_login_limit: int | None = Field(default=None, ge=1, le=20)
++    lockout_minutes: int | None = Field(default=None, ge=1, le=1440)
++    password_symbol_required: bool | None = None
++    auto_backup_enabled: bool | None = None
++
++
++def _parse(raw: str | None, kind: str, default):
++    if raw is None:
++        return default
++    if kind == "bool":
++        return str(raw).lower() in ("1", "true", "yes", "on")
++    try:
++        return int(raw)
++    except ValueError:
++        return default
++
++
++def _read(db: Session) -> SettingsOut:
++    rows = {s.setting_name: s for s in db.execute(select(SystemSetting)).scalars()}
++    values = {}
++    for field, (name, kind, default) in FIELDS.items():
++        row = rows.get(name)
++        values[field] = _parse(row.setting_value if row else None, kind, default)
++    return SettingsOut(**values)
++
++
++@router.get("", response_model=SettingsOut)
++def get_settings(db: Session = Depends(get_db), _: User = Depends(require_admin)):
++    return _read(db)
++
++
++@router.patch("", response_model=SettingsOut)
++def update_settings(body: SettingsUpdate, db: Session = Depends(get_db), me: User = Depends(require_admin)):
++    rows = {s.setting_name: s for s in db.execute(select(SystemSetting)).scalars()}
++    for field, value in body.model_dump(exclude_unset=True, exclude_none=True).items():
++        name, kind, _default = FIELDS[field]
++        text = ("1" if value else "0") if kind == "bool" else str(value)
++        row = rows.get(name)
++        if row is None:
++            db.add(SystemSetting(setting_name=name, setting_value=text, value_type=kind, updated_by=me.user_id))
++        else:
++            row.setting_value = text
++            row.value_type = kind
++            row.updated_by = me.user_id
++    db.commit()
++    return _read(db)
+diff --git a/isu_infirmary_backend/backend/app/api/routes/stock.py b/isu_infirmary_backend/backend/app/api/routes/stock.py
+new file mode 100644
+index 0000000..b1e6058
+--- /dev/null
++++ b/isu_infirmary_backend/backend/app/api/routes/stock.py
+@@ -0,0 +1,360 @@
++"""Stock & Supplies + restock requisitions.
++
++Every quantity change goes through app/services/stock_service.py (row lock +
++ledger row). This module never assigns stock.quantity directly.
++"""
++from datetime import datetime, timezone
++from decimal import Decimal
++from typing import Literal
++
++from fastapi import APIRouter, Depends, HTTPException, Query, status
++from sqlalchemy import select
++from sqlalchemy.exc import IntegrityError
++from sqlalchemy.orm import Session
++
++from app.core.deps import get_current_user, require_admin, require_nurse
++from app.db.session import get_db
++from app.models.inventory import (
++    Medicine, MedicineStock, StockRequest, StockRequestItem, Supply, SupplyStock,
++)
++from app.models.lookups import ItemCategory
++from app.models.user import User
++from app.schemas.common import Page
++from app.schemas.stock import (
++    AdjustIn, ApproveIn, DenyIn, RestockIn, StockItemCreate, StockItemOut, StockItemUpdate,
++    StockRequestCreate, StockRequestItemOut, StockRequestOut,
++)
++from app.services import stock_service
++from app.services.stock_service import InsufficientStock
++
++router = APIRouter(prefix="/stock", tags=["stock"])
++
++ItemType = Literal["medicine", "supply"]
++
++
++def _utcnow() -> datetime:
++    return datetime.now(timezone.utc).replace(tzinfo=None)
++
++
++def _status(quantity: Decimal, reorder_level: Decimal) -> str:
++    """Same rule as the stock_status generated column (DB plan v2 §14). Computed
++    here too so a response right after an update is never stale."""
++    if quantity <= 0:
++        return "out_of_stock"
++    if quantity <= reorder_level:
++        return "low"
++    return "high"
++
++
++def _user_names(db: Session, ids) -> dict[int, str]:
++    ids = {i for i in ids if i is not None}
++    if not ids:
++        return {}
++    return {u.user_id: u.full_name for u in db.execute(select(User).where(User.user_id.in_(ids))).scalars()}
++
++
++def _item_out(item, item_type: str, names: dict[int, str]) -> StockItemOut:
++    stock = item.stock
++    qty = stock.quantity if stock else Decimal(0)
++    reorder = stock.reorder_level if stock else Decimal(0)
++    return StockItemOut(
++        item_type=item_type,
++        item_id=item.medicine_id if item_type == "medicine" else item.supply_id,
++        name=item.medicine_name if item_type == "medicine" else item.supply_name,
++        category_id=item.category_id,
++        category_name=item.category.category_name if item.category else None,
++        unit=item.unit,
++        description=item.description,
++        quantity=qty,
++        reorder_level=reorder,
++        expiry_date=stock.expiry_date if stock else None,
++        stock_status=_status(qty, reorder),
++        updated_by_name=names.get(stock.updated_by) if stock else None,
++        updated_at=stock.updated_at if stock else None,
++    )
++
++
++def _get_item(db: Session, item_type: str, item_id: int):
++    model = Medicine if item_type == "medicine" else Supply
++    item = db.get(model, item_id)
++    if item is None or item.deleted_at is not None:
++        raise HTTPException(status.HTTP_404_NOT_FOUND, f"{item_type.capitalize()} not found")
++    return item
++
++
++def _single_item_out(db: Session, item_type: str, item) -> StockItemOut:
++    db.refresh(item)
++    if item.stock:
++        db.refresh(item.stock)
++    return _item_out(item, item_type, _user_names(db, [item.stock.updated_by if item.stock else None]))
++
++
++def _check_category(db: Session, category_id: int | None, item_type: str) -> None:
++    if category_id is None:
++        return
++    cat = db.get(ItemCategory, category_id)
++    if cat is None or cat.applies_to not in (item_type, "both"):
++        raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Category {category_id} doesn't apply to {item_type}s")
++
++
++# ------------------------------------------------------------------ requests
++# Declared before "/{item_type}/{item_id}" routes so "requests" isn't read as an item type.
++
++def _request_out(db: Session, r: StockRequest) -> StockRequestOut:
++    names = _user_names(db, [r.requested_by, r.approved_by, r.received_by])
++    items = []
++    for i in r.items:
++        thing = i.medicine if i.item_type == "medicine" else i.supply
++        items.append(StockRequestItemOut(
++            request_item_id=i.request_item_id,
++            item_type=i.item_type,
++            item_id=i.medicine_id if i.item_type == "medicine" else i.supply_id,
++            item_name=thing.medicine_name if i.item_type == "medicine" else thing.supply_name,
++            unit=thing.unit,
++            category_name=thing.category.category_name if thing.category else None,
++            requested_quantity=i.requested_quantity,
++            approved_quantity=i.approved_quantity,
++            reason=i.reason,
++        ))
++    return StockRequestOut(
++        request_id=r.request_id,
++        status=r.status,
++        request_date=r.request_date,
++        requested_by=r.requested_by,
++        requested_by_name=names.get(r.requested_by),
++        approved_by_name=names.get(r.approved_by),
++        approved_at=r.approved_at,
++        received_by_name=names.get(r.received_by),
++        received_at=r.received_at,
++        admin_response=r.admin_response,
++        remarks=r.remarks,
++        items=items,
++    )
++
++
++def _get_request(db: Session, request_id: int, expected_status: str) -> StockRequest:
++    r = db.get(StockRequest, request_id)
++    if r is None:
++        raise HTTPException(status.HTTP_404_NOT_FOUND, "Request not found")
++    if r.status != expected_status:
++        raise HTTPException(status.HTTP_409_CONFLICT, f"Request is {r.status}, not {expected_status}")
++    return r
++
++
++@router.get("/requests", response_model=Page[StockRequestOut])
++def list_requests(
++    db: Session = Depends(get_db),
++    _: User = Depends(get_current_user),
++    status_filter: str | None = Query(None, alias="status"),
++    page: int = Query(1, ge=1),
++    per_page: int = Query(100, ge=1, le=200),
++):
++    stmt = select(StockRequest).order_by(StockRequest.request_date.desc(), StockRequest.request_id.desc())
++    if status_filter:
++        stmt = stmt.where(StockRequest.status == status_filter)
++    rows = db.execute(stmt).scalars().all()
++    chunk = rows[(page - 1) * per_page: page * per_page]
++    return Page(items=[_request_out(db, r) for r in chunk], total=len(rows), page=page, per_page=per_page)
++
++
++@router.post("/requests", response_model=StockRequestOut, status_code=status.HTTP_201_CREATED)
++def create_request(body: StockRequestCreate, db: Session = Depends(get_db), user: User = Depends(require_nurse)):
++    for i in body.items:
++        _get_item(db, i.item_type, i.medicine_id if i.item_type == "medicine" else i.supply_id)
++    r = StockRequest(requested_by=user.user_id, status="pending", remarks=body.remarks)
++    r.items = [
++        StockRequestItem(
++            item_type=i.item_type, medicine_id=i.medicine_id, supply_id=i.supply_id,
++            requested_quantity=i.requested_quantity, reason=i.reason,
++        )
++        for i in body.items
++    ]
++    db.add(r)
++    db.commit()
++    db.refresh(r)
++    return _request_out(db, r)
++
++
++@router.post("/requests/{request_id}/approve", response_model=StockRequestOut)
++def approve_request(request_id: int, body: ApproveIn, db: Session = Depends(get_db), user: User = Depends(require_admin)):
++    r = _get_request(db, request_id, "pending")
++    overrides = {i.request_item_id: i.approved_quantity for i in body.items}
++    for item in r.items:
++        item.approved_quantity = overrides.get(item.request_item_id, item.requested_quantity)
++    r.status = "approved"
++    r.approved_by = user.user_id
++    r.approved_at = _utcnow()
++    r.admin_response = body.admin_response
++    db.commit()
++    db.refresh(r)
++    return _request_out(db, r)
++
++
++@router.post("/requests/{request_id}/deny", response_model=StockRequestOut)
++def deny_request(request_id: int, body: DenyIn, db: Session = Depends(get_db), user: User = Depends(require_admin)):
++    r = _get_request(db, request_id, "pending")
++    r.status = "denied"
++    r.approved_by = user.user_id      # who decided
++    r.approved_at = _utcnow()
++    r.admin_response = body.admin_response
++    db.commit()
++    db.refresh(r)
++    return _request_out(db, r)
++
++
++@router.post("/requests/{request_id}/receive", response_model=StockRequestOut)
++def receive_request(request_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
++    """Delivery arrived: one transaction increments stock for every approved line,
++    writes 'restocked' ledger rows, and closes the ticket."""
++    r = _get_request(db, request_id, "approved")
++    try:
++        for item in r.items:
++            qty = item.approved_quantity or item.requested_quantity
++            if item.item_type == "medicine":
++                stock_service.restock_medicine(db, item.medicine_id, qty, r.request_id, user.user_id)
++            else:
++                stock_service.restock_supply(db, item.supply_id, qty, r.request_id, user.user_id)
++        r.status = "completed"
++        r.received_by = user.user_id
++        r.received_at = _utcnow()
++        db.commit()
++    except Exception:
++        db.rollback()
++        raise
++    db.refresh(r)
++    return _request_out(db, r)
++
++
++# ------------------------------------------------------------------ items
++
++@router.get("", response_model=Page[StockItemOut])
++def list_stock(
++    db: Session = Depends(get_db),
++    _: User = Depends(get_current_user),
++    item_type: ItemType | None = None,
++    status_filter: Literal["high", "low", "out_of_stock"] | None = Query(None, alias="status"),
++    category_id: int | None = None,
++    search: str | None = None,
++    page: int = Query(1, ge=1),
++    per_page: int = Query(200, ge=1, le=500),
++):
++    items: list[StockItemOut] = []
++    sources = [("medicine", Medicine, Medicine.medicine_name), ("supply", Supply, Supply.supply_name)]
++    raw = []
++    for kind, model, name_col in sources:
++        if item_type and item_type != kind:
++            continue
++        stmt = select(model).where(model.deleted_at.is_(None), model.active.is_(True))
++        if category_id is not None:
++            stmt = stmt.where(model.category_id == category_id)
++        if search:
++            stmt = stmt.where(name_col.ilike(f"%{search.strip()}%"))
++        raw += [(kind, m) for m in db.execute(stmt).unique().scalars()]
++
++    names = _user_names(db, [m.stock.updated_by for _, m in raw if m.stock])
++    items = [_item_out(m, kind, names) for kind, m in raw]
++    if status_filter:
++        items = [i for i in items if i.stock_status == status_filter]
++    items.sort(key=lambda i: i.name.lower())
++
++    chunk = items[(page - 1) * per_page: page * per_page]
++    return Page(items=chunk, total=len(items), page=page, per_page=per_page)
++
++
++@router.post("", response_model=StockItemOut, status_code=status.HTTP_201_CREATED)
++def create_item(body: StockItemCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
++    """New catalog item + its stock row. Opening quantity goes through the
++    ledger like any other restock."""
++    _check_category(db, body.category_id, body.item_type)
++    try:
++        if body.item_type == "medicine":
++            item = Medicine(medicine_name=body.name, category_id=body.category_id, unit=body.unit, description=body.description)
++            db.add(item)
++            db.flush()
++            db.add(MedicineStock(medicine_id=item.medicine_id, quantity=0, reorder_level=body.reorder_level,
++                                 expiry_date=body.expiry_date, updated_by=user.user_id))
++            db.flush()
++            if body.quantity > 0:
++                stock_service.restock_medicine(db, item.medicine_id, body.quantity, None, user.user_id)
++        else:
++            item = Supply(supply_name=body.name, category_id=body.category_id, unit=body.unit, description=body.description)
++            db.add(item)
++            db.flush()
++            db.add(SupplyStock(supply_id=item.supply_id, quantity=0, reorder_level=body.reorder_level,
++                               expiry_date=body.expiry_date, updated_by=user.user_id))
++            db.flush()
++            if body.quantity > 0:
++                stock_service.restock_supply(db, item.supply_id, body.quantity, None, user.user_id)
++        db.commit()
++    except IntegrityError:
++        db.rollback()
++        raise HTTPException(status.HTTP_409_CONFLICT, f'"{body.name}" already exists')
++    return _single_item_out(db, body.item_type, item)
++
++
++@router.patch("/{item_type}/{item_id}", response_model=StockItemOut)
++def update_item(
++    item_type: ItemType, item_id: int, body: StockItemUpdate,
++    db: Session = Depends(get_db), user: User = Depends(get_current_user),
++):
++    item = _get_item(db, item_type, item_id)
++    data = body.model_dump(exclude_unset=True)
++    if "category_id" in data:
++        _check_category(db, data["category_id"], item_type)
++    for field in ("category_id", "description"):      # nullable — an explicit null clears them
++        if field in data:
++            setattr(item, field, data[field])
++    if data.get("unit"):
++        item.unit = data["unit"]
++    if data.get("name"):
++        setattr(item, "medicine_name" if item_type == "medicine" else "supply_name", data["name"])
++    if item.stock and ("reorder_level" in data or "expiry_date" in data):
++        if data.get("reorder_level") is not None:
++            item.stock.reorder_level = data["reorder_level"]
++        if "expiry_date" in data:
++            item.stock.expiry_date = data["expiry_date"]
++        item.stock.updated_by = user.user_id
++    try:
++        db.commit()
++    except IntegrityError:
++        db.rollback()
++        raise HTTPException(status.HTTP_409_CONFLICT, f'"{data.get("name")}" already exists')
++    return _single_item_out(db, item_type, item)
++
++
++@router.post("/{item_type}/{item_id}/restock", response_model=StockItemOut)
++def restock_item(
++    item_type: ItemType, item_id: int, body: RestockIn,
++    db: Session = Depends(get_db), user: User = Depends(get_current_user),
++):
++    item = _get_item(db, item_type, item_id)
++    try:
++        if item_type == "medicine":
++            stock_service.restock_medicine(db, item_id, body.quantity, None, user.user_id)
++        else:
++            stock_service.restock_supply(db, item_id, body.quantity, None, user.user_id)
++        if body.expiry_date is not None:
++            item.stock.expiry_date = body.expiry_date
++        db.commit()
++    except ValueError as e:
++        db.rollback()
++        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(e))
++    return _single_item_out(db, item_type, item)
++
++
++@router.post("/{item_type}/{item_id}/adjust", response_model=StockItemOut)
++def adjust_item(
++    item_type: ItemType, item_id: int, body: AdjustIn,
++    db: Session = Depends(get_db), user: User = Depends(get_current_user),
++):
++    item = _get_item(db, item_type, item_id)
++    try:
++        stock_service.adjust(
++            db, item_type=item_type, item_id=item_id, delta=body.delta,
++            reason=body.reason, transaction_type=body.transaction_type, user_id=user.user_id,
++        )
++        db.commit()
++    except InsufficientStock as e:
++        db.rollback()
++        raise HTTPException(status.HTTP_409_CONFLICT, str(e))
++    return _single_item_out(db, item_type, item)
+diff --git a/isu_infirmary_backend/backend/app/api/routes/users.py b/isu_infirmary_backend/backend/app/api/routes/users.py
+new file mode 100644
+index 0000000..db863a5
+--- /dev/null
++++ b/isu_infirmary_backend/backend/app/api/routes/users.py
+@@ -0,0 +1,84 @@
++"""Admin-only account management. Passwords are hashed here and never returned."""
++import re
++
++from fastapi import APIRouter, Depends, HTTPException, Query, status
++from sqlalchemy import func, select
++from sqlalchemy.exc import IntegrityError
++from sqlalchemy.orm import Session
++
++from app.core.deps import require_admin
++from app.core.security import hash_password
++from app.db.session import get_db
++from app.models.user import SystemSetting, User
++from app.schemas.common import Page
++from app.schemas.user import UserCreate, UserOut, UserUpdate
++
++router = APIRouter(prefix="/users", tags=["users"])
++
++
++def _check_password(db: Session, password: str) -> None:
++    row = db.execute(
++        select(SystemSetting).where(SystemSetting.setting_name == "password_symbol_required")
++    ).scalar_one_or_none()
++    symbol_required = row is None or str(row.setting_value).lower() in ("1", "true")
++    if symbol_required and not re.search(r"[^A-Za-z0-9]", password):
++        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Password needs at least 1 symbol")
++
++
++def _commit_or_conflict(db: Session) -> None:
++    try:
++        db.commit()
++    except IntegrityError:
++        db.rollback()
++        raise HTTPException(status.HTTP_409_CONFLICT, "Username or email is already in use")
++
++
++@router.get("", response_model=Page[UserOut])
++def list_users(
++    db: Session = Depends(get_db),
++    _: User = Depends(require_admin),
++    page: int = Query(1, ge=1),
++    per_page: int = Query(100, ge=1, le=200),
++):
++    stmt = select(User).where(User.deleted_at.is_(None)).order_by(User.role, User.last_name, User.first_name)
++    total = db.execute(select(func.count()).select_from(stmt.subquery())).scalar_one()
++    rows = db.execute(stmt.offset((page - 1) * per_page).limit(per_page)).scalars().all()
++    return Page(items=[UserOut.model_validate(u) for u in rows], total=total, page=page, per_page=per_page)
++
++
++@router.post("", response_model=UserOut, status_code=status.HTTP_201_CREATED)
++def create_user(body: UserCreate, db: Session = Depends(get_db), _: User = Depends(require_admin)):
++    _check_password(db, body.password)
++    u = User(
++        first_name=body.first_name, middle_name=body.middle_name, last_name=body.last_name,
++        username=body.username, email=body.email, role=body.role, status=body.status,
++        password_hash=hash_password(body.password),
++    )
++    db.add(u)
++    _commit_or_conflict(db)
++    db.refresh(u)
++    return UserOut.model_validate(u)
++
++
++@router.patch("/{user_id}", response_model=UserOut)
++def update_user(user_id: int, body: UserUpdate, db: Session = Depends(get_db), me: User = Depends(require_admin)):
++    u = db.get(User, user_id)
++    if u is None or u.deleted_at is not None:
++        raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found")
++
++    data = body.model_dump(exclude_unset=True)
++    if u.user_id == me.user_id and (data.get("role", u.role) != u.role or data.get("status", u.status) != u.status):
++        # otherwise the last admin can lock everyone out
++        raise HTTPException(status.HTTP_400_BAD_REQUEST, "You can't change your own role or status")
++
++    password = data.pop("password", None)
++    if password:
++        _check_password(db, password)
++        u.password_hash = hash_password(password)
++    for field, value in data.items():
++        if field in ("first_name", "last_name") and not value:
++            continue
++        setattr(u, field, value)
++    _commit_or_conflict(db)
++    db.refresh(u)
++    return UserOut.model_validate(u)
+diff --git a/isu_infirmary_backend/backend/app/api/routes/visits.py b/isu_infirmary_backend/backend/app/api/routes/visits.py
+index 027de8b..714c380 100644
+--- a/isu_infirmary_backend/backend/app/api/routes/visits.py
++++ b/isu_infirmary_backend/backend/app/api/routes/visits.py
+@@ -1,13 +1,20 @@
+-from fastapi import APIRouter, Depends, HTTPException, Query, status
+-from sqlalchemy import func, select
++from datetime import date, datetime, timezone
++
++from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
++from sqlalchemy import func, or_, select
+ from sqlalchemy.orm import Session
+ 
+ from app.core.deps import get_current_user, require_nurse
++from app.core.timeutil import clinic_day_range_utc
+ from app.db.session import get_db
++from app.models.patient import Patient
+ from app.models.user import User
+ from app.models.visit import Visit
+ from app.schemas.common import Page
+-from app.schemas.visit import VisitCreate, VisitOut, VisitSignOut
++from app.schemas.visit import (
++    MedicineGivenOut, SupplyUsedOut, VisitCreate, VisitOut, VisitSignOut,
++    VisitSpecialCase, VisitUpdate,
++)
+ from app.services import visit_service
+ from app.services.stock_service import InsufficientStock
+ 
+@@ -15,10 +22,21 @@ router = APIRouter(prefix="/visits", tags=["visits"])
+ 
+ 
+ def _to_out(v: Visit) -> VisitOut:
++    p = v.patient
+     return VisitOut(
+         visit_id=v.visit_id,
+         patient_id=v.patient_id,
+-        patient_name=v.patient.full_name,
++        patient_name=p.full_name,
++        patient_number=p.patient_number,
++        patient_type_name=p.patient_type.type_name if p.patient_type else None,
++        sex=p.sex,
++        year_level=p.year_level,
++        program=p.program,
++        department=p.department,
++        special_cases=[
++            VisitSpecialCase(case_name=c.case_type.case_name, notes=c.notes)
++            for c in p.special_cases if c.active
++        ],
+         chief_complaint=v.chief_complaint,
+         complaints=[c.complaint.complaint_name for c in v.complaints],
+         management=v.management,
+@@ -30,11 +48,36 @@ def _to_out(v: Visit) -> VisitOut:
+         ended_at=v.ended_at,
+         duration_minutes=v.duration_minutes,
+         status=v.status,
++        created_at=v.created_at,
++        updated_at=v.updated_at,
++        disposition_id=v.disposition_id,
+         disposition_name=v.disposition.disposition_name if v.disposition else None,
+-        medicines=[], supplies=[],
++        attending_name=v.attending.full_name if v.attending else None,
++        medicines=[
++            MedicineGivenOut(
++                medicine_id=m.medicine_id, quantity_given=m.quantity_given,
++                dosage=m.dosage, instructions=m.instructions,
++                medicine_name=m.medicine.medicine_name, unit=m.medicine.unit,
++            )
++            for m in v.medicines
++        ],
++        supplies=[
++            SupplyUsedOut(
++                supply_id=s.supply_id, quantity_used=s.quantity_used, remarks=s.remarks,
++                supply_name=s.supply.supply_name, unit=s.supply.unit,
++            )
++            for s in v.supplies
++        ],
+     )
+ 
+ 
++def _get_visit(db: Session, visit_id: int) -> Visit:
++    v = db.get(Visit, visit_id)
++    if v is None or v.deleted_at is not None:
++        raise HTTPException(status.HTTP_404_NOT_FOUND, "Visit not found")
++    return v
++
++
+ @router.get("", response_model=Page[VisitOut])
+ def list_visits(
+     db: Session = Depends(get_db),
+@@ -42,30 +85,63 @@ def list_visits(
+     page: int = Query(1, ge=1),
+     per_page: int = Query(50, ge=1, le=200),
+     status_filter: str | None = Query(None, alias="status"),
++    patient_id: int | None = None,
++    search: str | None = None,
++    sex: str | None = None,
++    year_level: str | None = None,
++    program: str | None = None,
++    department: str | None = None,
++    date_from: date | None = Query(None, description="Clinic day (Asia/Manila), inclusive"),
++    date_to: date | None = Query(None, description="Clinic day (Asia/Manila), inclusive"),
+     sort_by: str = Query("started_at"),
+     order: str = Query("desc", pattern="^(asc|desc)$"),
+ ):
+-    stmt = select(Visit).where(Visit.deleted_at.is_(None))
++    stmt = (
++        select(Visit)
++        .join(Visit.patient)
++        .where(Visit.deleted_at.is_(None), Patient.deleted_at.is_(None))
++    )
+     if status_filter:
+         stmt = stmt.where(Visit.status == status_filter)
++    if patient_id is not None:
++        stmt = stmt.where(Visit.patient_id == patient_id)
++    if search:
++        like = f"%{search.strip()}%"
++        stmt = stmt.where(or_(
++            Patient.first_name.ilike(like),
++            Patient.last_name.ilike(like),
++            Patient.patient_number.ilike(like),
++            (Patient.last_name + ", " + Patient.first_name).ilike(like),
++            (Patient.first_name + " " + Patient.last_name).ilike(like),
++            Visit.chief_complaint.ilike(like),
++        ))
++    if sex:
++        stmt = stmt.where(func.lower(Patient.sex) == sex.lower())
++    if year_level:
++        stmt = stmt.where(Patient.year_level == year_level)
++    if program:
++        stmt = stmt.where(Patient.program == program)
++    if department:
++        stmt = stmt.where(Patient.department == department)
++    start, end = clinic_day_range_utc(date_from, date_to)
++    if start:
++        stmt = stmt.where(Visit.started_at >= start)
++    if end:
++        stmt = stmt.where(Visit.started_at < end)
+ 
+     sortable = {
+-        "started_at": Visit.started_at,
+-        "status": Visit.status,
+-        "visit_id": Visit.visit_id,
++        "started_at": [Visit.started_at],
++        "status": [Visit.status],
++        "visit_id": [Visit.visit_id],
++        "patient_name": [Patient.last_name, Patient.first_name],
+     }
+-    col = sortable.get(sort_by, Visit.started_at)
+-    stmt = stmt.order_by(col.desc() if order == "desc" else col.asc())
++    cols = sortable.get(sort_by, sortable["started_at"])
++    stmt = stmt.order_by(*[c.desc() if order == "desc" else c.asc() for c in cols], Visit.visit_id.desc())
+ 
+-    total = db.execute(
+-        select(func.count()).select_from(stmt.subquery())
+-    ).scalar_one()
+-    rows = db.execute(
+-        stmt.offset((page - 1) * per_page).limit(per_page)
+-    ).scalars().all()
++    total = db.execute(select(func.count()).select_from(stmt.subquery())).scalar_one()
++    rows = db.execute(stmt.offset((page - 1) * per_page).limit(per_page)).unique().scalars().all()
+ 
+-    return Page(items=[_to_out(v) for v in rows], total=total,
+-                page=page, per_page=per_page)
++    return Page(items=[_to_out(v) for v in rows], total=total, page=page, per_page=per_page)
+ 
+ 
+ @router.post("", response_model=VisitOut, status_code=status.HTTP_201_CREATED)
+@@ -83,6 +159,33 @@ def create_visit(
+     return _to_out(visit)
+ 
+ 
++@router.patch("/{visit_id}", response_model=VisitOut)
++def update_visit(
++    visit_id: int,
++    body: VisitUpdate,
++    db: Session = Depends(get_db),
++    user: User = Depends(require_nurse),
++):
++    try:
++        visit = visit_service.update_visit(db, visit_id, body, user.user_id)
++    except LookupError as e:
++        raise HTTPException(status.HTTP_404_NOT_FOUND, str(e))
++    return _to_out(visit)
++
++
++@router.delete("/{visit_id}", status_code=status.HTTP_204_NO_CONTENT)
++def delete_visit(
++    visit_id: int,
++    db: Session = Depends(get_db),
++    user: User = Depends(require_nurse),
++):
++    visit = _get_visit(db, visit_id)
++    visit.deleted_at = datetime.now(timezone.utc).replace(tzinfo=None)
++    visit.updated_by = user.user_id
++    db.commit()
++    return Response(status_code=status.HTTP_204_NO_CONTENT)
++
++
+ @router.post("/{visit_id}/sign-out", response_model=VisitOut)
+ def sign_out(
+     visit_id: int,
+diff --git a/isu_infirmary_backend/backend/app/core/timeutil.py b/isu_infirmary_backend/backend/app/core/timeutil.py
+new file mode 100644
+index 0000000..943d832
+--- /dev/null
++++ b/isu_infirmary_backend/backend/app/core/timeutil.py
+@@ -0,0 +1,27 @@
++"""Clinic-day ↔ UTC conversion.
++
++The database stores naive UTC. Date filters from the frontend are clinic
++calendar days (Asia/Manila), so "2026-09-18" means 2026-09-17 16:00 UTC up to
++(not including) 2026-09-18 16:00 UTC.
++
++On Windows, zoneinfo needs the `tzdata` package (added to requirements.txt).
++"""
++from datetime import date, datetime, time, timedelta, timezone
++from zoneinfo import ZoneInfo
++
++from app.core.config import settings
++
++CLINIC_TZ = ZoneInfo(settings.CLINIC_TIMEZONE)
++
++
++def clinic_day_start_utc(day: date) -> datetime:
++    """Naive-UTC instant a clinic calendar day begins."""
++    local = datetime.combine(day, time.min, tzinfo=CLINIC_TZ)
++    return local.astimezone(timezone.utc).replace(tzinfo=None)
++
++
++def clinic_day_range_utc(date_from: date | None, date_to: date | None):
++    """[start, end) naive-UTC bounds for an inclusive clinic-day range; either side may be None."""
++    start = clinic_day_start_utc(date_from) if date_from else None
++    end = clinic_day_start_utc(date_to + timedelta(days=1)) if date_to else None
++    return start, end
+diff --git a/isu_infirmary_backend/backend/app/models/visit.py b/isu_infirmary_backend/backend/app/models/visit.py
+index 1e744d1..4ebd8da 100644
+--- a/isu_infirmary_backend/backend/app/models/visit.py
++++ b/isu_infirmary_backend/backend/app/models/visit.py
+@@ -47,6 +47,7 @@ class Visit(Base, TimestampMixin, SoftDeleteMixin):
+ 
+     patient = relationship("Patient", back_populates="visits", lazy="joined")
+     disposition = relationship("Disposition", lazy="joined")
++    attending = relationship("User", foreign_keys=[attending_user_id], lazy="joined")
+     complaints = relationship(
+         "VisitComplaint", cascade="all, delete-orphan", lazy="selectin"
+     )
+diff --git a/isu_infirmary_backend/backend/app/schemas/lookups.py b/isu_infirmary_backend/backend/app/schemas/lookups.py
+new file mode 100644
+index 0000000..b78f064
+--- /dev/null
++++ b/isu_infirmary_backend/backend/app/schemas/lookups.py
+@@ -0,0 +1,36 @@
++from app.schemas.common import APIModel
++
++
++class PatientTypeOut(APIModel):
++    patient_type_id: int
++    type_name: str
++
++
++class DispositionOut(APIModel):
++    disposition_id: int
++    disposition_name: str
++
++
++class ComplaintOut(APIModel):
++    complaint_id: int
++    complaint_name: str
++
++
++class SpecialCaseTypeOut(APIModel):
++    special_case_type_id: int
++    case_name: str
++
++
++class ItemCategoryOut(APIModel):
++    category_id: int
++    category_name: str
++    applies_to: str
++
++
++class LookupsOut(APIModel):
++    """Every dropdown's reference data in one request — the frontend loads it once."""
++    patient_types: list[PatientTypeOut]
++    dispositions: list[DispositionOut]
++    complaints: list[ComplaintOut]
++    special_case_types: list[SpecialCaseTypeOut]
++    item_categories: list[ItemCategoryOut]
+diff --git a/isu_infirmary_backend/backend/app/schemas/patient.py b/isu_infirmary_backend/backend/app/schemas/patient.py
+index 643c7dc..e8d69b3 100644
+--- a/isu_infirmary_backend/backend/app/schemas/patient.py
++++ b/isu_infirmary_backend/backend/app/schemas/patient.py
+@@ -1,21 +1,43 @@
+ from datetime import date, datetime
+ 
++from pydantic import Field
++
+ from app.schemas.common import APIModel
+ 
+ 
+ class SpecialCaseOut(APIModel):
+     patient_special_case_id: int
++    special_case_type_id: int
+     case_name: str
+     notes: str | None = None
+     flagged_at: datetime
+     active: bool
+ 
+ 
++class SpecialCaseCreate(APIModel):
++    special_case_type_id: int
++    notes: str | None = None
++    origin_visit_id: int | None = None
++
++
++class SpecialCaseUpdate(APIModel):
++    active: bool | None = None
++    notes: str | None = None
++
++
++class SpecialCaseListOut(SpecialCaseOut):
++    """One row of the Priority & Special Cases hub — the flag plus who it's on."""
++    patient_id: int
++    patient_name: str
++    patient_number: str | None = None
++    patient_type_name: str | None = None
++
++
+ class PatientBase(APIModel):
+     patient_number: str | None = None
+-    first_name: str
++    first_name: str = Field(min_length=1)
+     middle_name: str | None = None
+-    last_name: str
++    last_name: str = Field(min_length=1)
+     sex: str | None = None
+     date_of_birth: date | None = None
+     civil_status: str | None = None
+@@ -31,9 +53,11 @@ class PatientCreate(PatientBase):
+ 
+ 
+ class PatientUpdate(APIModel):
+-    first_name: str | None = None
++    patient_number: str | None = None
++    patient_type_id: int | None = None
++    first_name: str | None = Field(default=None, min_length=1)
+     middle_name: str | None = None
+-    last_name: str | None = None
++    last_name: str | None = Field(default=None, min_length=1)
+     sex: str | None = None
+     date_of_birth: date | None = None
+     civil_status: str | None = None
+diff --git a/isu_infirmary_backend/backend/app/schemas/stock.py b/isu_infirmary_backend/backend/app/schemas/stock.py
+new file mode 100644
+index 0000000..a81bd24
+--- /dev/null
++++ b/isu_infirmary_backend/backend/app/schemas/stock.py
+@@ -0,0 +1,126 @@
++from datetime import date, datetime
++from decimal import Decimal
++from typing import Literal
++
++from pydantic import Field, model_validator
++
++from app.schemas.common import APIModel
++
++ItemType = Literal["medicine", "supply"]
++
++
++class StockItemOut(APIModel):
++    """A medicine or supply plus its live stock row. Both tables share one
++    screen, so the API addresses them as (item_type, item_id)."""
++    item_type: ItemType
++    item_id: int
++    name: str
++    category_id: int | None = None
++    category_name: str | None = None
++    unit: str
++    description: str | None = None
++    quantity: Decimal
++    reorder_level: Decimal
++    expiry_date: date | None = None
++    stock_status: Literal["high", "low", "out_of_stock"]
++    updated_by_name: str | None = None
++    updated_at: datetime | None = None
++
++
++class StockItemCreate(APIModel):
++    item_type: ItemType
++    name: str = Field(min_length=1, max_length=150)
++    category_id: int | None = None
++    unit: str = Field(min_length=1, max_length=50)
++    description: str | None = None
++    quantity: Decimal = Field(default=Decimal(0), ge=0)       # opening stock
++    reorder_level: Decimal = Field(default=Decimal(0), ge=0)
++    expiry_date: date | None = None
++
++
++class StockItemUpdate(APIModel):
++    name: str | None = Field(default=None, min_length=1, max_length=150)
++    category_id: int | None = None
++    unit: str | None = Field(default=None, min_length=1, max_length=50)
++    description: str | None = None
++    reorder_level: Decimal | None = Field(default=None, ge=0)
++    expiry_date: date | None = None
++
++
++class RestockIn(APIModel):
++    quantity: Decimal = Field(gt=0)
++    expiry_date: date | None = None     # new batch expiry, if it changed
++
++
++class AdjustIn(APIModel):
++    delta: Decimal                       # signed: negative removes stock
++    transaction_type: Literal["adjustment", "expired", "damaged"] = "adjustment"
++    reason: str = Field(min_length=1)
++
++    @model_validator(mode="after")
++    def _nonzero(self):
++        if self.delta == 0:
++            raise ValueError("delta must not be 0")
++        return self
++
++
++class StockRequestItemIn(APIModel):
++    item_type: ItemType
++    medicine_id: int | None = None
++    supply_id: int | None = None
++    requested_quantity: Decimal = Field(gt=0)
++    reason: str | None = Field(default=None, max_length=255)
++
++    @model_validator(mode="after")
++    def _one_item(self):
++        # mirrors the CHECK constraint on stock_request_items
++        if (self.item_type == "medicine") != (self.medicine_id is not None and self.supply_id is None):
++            raise ValueError("medicine items need medicine_id only; supply items need supply_id only")
++        return self
++
++
++class StockRequestCreate(APIModel):
++    items: list[StockRequestItemIn] = Field(min_length=1)
++    remarks: str | None = None
++
++
++class StockRequestItemOut(APIModel):
++    request_item_id: int
++    item_type: ItemType
++    item_id: int
++    item_name: str
++    unit: str
++    category_name: str | None = None
++    requested_quantity: Decimal
++    approved_quantity: Decimal | None = None
++    reason: str | None = None
++
++
++class StockRequestOut(APIModel):
++    request_id: int
++    status: str
++    request_date: datetime
++    requested_by: int
++    requested_by_name: str | None = None
++    approved_by_name: str | None = None
++    approved_at: datetime | None = None
++    received_by_name: str | None = None
++    received_at: datetime | None = None
++    admin_response: str | None = None
++    remarks: str | None = None
++    items: list[StockRequestItemOut]
++
++
++class ApproveItemIn(APIModel):
++    request_item_id: int
++    approved_quantity: Decimal = Field(gt=0)
++
++
++class ApproveIn(APIModel):
++    """Omit `items` to approve every line at its requested quantity."""
++    items: list[ApproveItemIn] = []
++    admin_response: str | None = None
++
++
++class DenyIn(APIModel):
++    admin_response: str | None = None
+diff --git a/isu_infirmary_backend/backend/app/schemas/user.py b/isu_infirmary_backend/backend/app/schemas/user.py
+new file mode 100644
+index 0000000..cfe2731
+--- /dev/null
++++ b/isu_infirmary_backend/backend/app/schemas/user.py
+@@ -0,0 +1,44 @@
++from datetime import datetime
++from typing import Literal
++
++from pydantic import EmailStr, Field
++
++from app.schemas.common import APIModel
++
++Role = Literal["admin", "nurse"]
++Status = Literal["active", "inactive"]
++
++
++class UserOut(APIModel):
++    user_id: int
++    first_name: str
++    middle_name: str | None = None
++    last_name: str
++    full_name: str
++    username: str
++    email: str | None = None
++    role: Role
++    status: Status
++    last_login_at: datetime | None = None
++    created_at: datetime | None = None
++
++
++class UserCreate(APIModel):
++    first_name: str = Field(min_length=1, max_length=100)
++    middle_name: str | None = Field(default=None, max_length=100)
++    last_name: str = Field(min_length=1, max_length=100)
++    username: str = Field(min_length=3, max_length=50, pattern=r"^[A-Za-z0-9._-]+$")
++    email: EmailStr | None = None
++    role: Role
++    status: Status = "active"
++    password: str = Field(min_length=8, max_length=72)    # bcrypt reads at most 72 bytes
++
++
++class UserUpdate(APIModel):
++    first_name: str | None = Field(default=None, min_length=1, max_length=100)
++    middle_name: str | None = Field(default=None, max_length=100)
++    last_name: str | None = Field(default=None, min_length=1, max_length=100)
++    email: EmailStr | None = None
++    role: Role | None = None
++    status: Status | None = None
++    password: str | None = Field(default=None, min_length=8, max_length=72)   # set = reset it
+diff --git a/isu_infirmary_backend/backend/app/schemas/visit.py b/isu_infirmary_backend/backend/app/schemas/visit.py
+index 373bccd..932c32c 100644
+--- a/isu_infirmary_backend/backend/app/schemas/visit.py
++++ b/isu_infirmary_backend/backend/app/schemas/visit.py
+@@ -21,7 +21,7 @@ class SupplyUsed(APIModel):
+ 
+ class VisitCreate(APIModel):
+     patient_id: int
+-    chief_complaint: str
++    chief_complaint: str = Field(min_length=1)
+     complaint_ids: list[int] = []        # structured tags for Insights
+     primary_complaint_id: int | None = None
+     management: str | None = None
+@@ -34,6 +34,18 @@ class VisitCreate(APIModel):
+     supplies: list[SupplyUsed] = []
+ 
+ 
++class VisitUpdate(APIModel):
++    """PATCH /visits/{id} — every field optional; only sent fields change."""
++    chief_complaint: str | None = Field(default=None, min_length=1)
++    complaint_ids: list[int] | None = None
++    primary_complaint_id: int | None = None
++    management: str | None = None
++    treatment_notes: str | None = None
++    blood_pressure: str | None = None
++    temperature: Decimal | None = None
++    pulse_rate: int | None = None
++
++
+ class VisitSignOut(APIModel):
+     disposition_id: int
+     treatment_notes: str | None = None
+@@ -49,10 +61,24 @@ class SupplyUsedOut(SupplyUsed):
+     unit: str
+ 
+ 
++class VisitSpecialCase(APIModel):
++    case_name: str
++    notes: str | None = None
++
++
+ class VisitOut(APIModel):
+     visit_id: int
+     patient_id: int
+     patient_name: str
++    # Patient demographics, so Visit Records can show/filter them without a
++    # second request per row (the Figma table has these columns).
++    patient_number: str | None = None
++    patient_type_name: str | None = None
++    sex: str | None = None
++    year_level: str | None = None
++    program: str | None = None
++    department: str | None = None
++    special_cases: list[VisitSpecialCase] = []   # the patient's ACTIVE flags
+     chief_complaint: str
+     complaints: list[str] = []
+     management: str | None = None
+@@ -64,6 +90,9 @@ class VisitOut(APIModel):
+     ended_at: datetime | None = None
+     duration_minutes: int | None = None
+     status: str
++    created_at: datetime | None = None     # Figma "Created" column
++    updated_at: datetime | None = None     # Figma "Modified" column
++    disposition_id: int | None = None
+     disposition_name: str | None = None
+     attending_name: str | None = None
+     medicines: list[MedicineGivenOut] = []
+diff --git a/isu_infirmary_backend/backend/app/services/visit_service.py b/isu_infirmary_backend/backend/app/services/visit_service.py
+index 1b24e76..864c526 100644
+--- a/isu_infirmary_backend/backend/app/services/visit_service.py
++++ b/isu_infirmary_backend/backend/app/services/visit_service.py
+@@ -5,19 +5,30 @@ both stock tables, write the ledger rows. All of it commits, or none of it does.
+ 
+ The failure this prevents: a visit saved with medicine recorded but stock never
+ decremented, or stock decremented for a visit that was never saved.
++
++Why commit()/rollback() and not `with db.begin():` — the session FastAPI hands
++the route is the same one get_current_user already read the User row with
++(Depends(get_db) is cached per request), so SQLAlchemy has already auto-begun
++a transaction and a second begin() raises "A transaction is already begun on
++this Session". Everything below still runs inside that one transaction.
+ """
+ from datetime import datetime, timezone
+ 
++from sqlalchemy import delete
+ from sqlalchemy.orm import Session
+ 
+ from app.models.patient import Patient
+ from app.models.visit import Visit, VisitComplaint, VisitMedicine, VisitSupply
+-from app.schemas.visit import VisitCreate
++from app.schemas.visit import VisitCreate, VisitUpdate
+ from app.services import stock_service
+ 
+ 
++def _utcnow() -> datetime:
++    return datetime.now(timezone.utc).replace(tzinfo=None)
++
++
+ def create_visit(db: Session, payload: VisitCreate, user_id: int) -> Visit:
+-    with db.begin():                      # one transaction for everything below
++    try:
+         patient = db.get(Patient, payload.patient_id)
+         if patient is None or patient.deleted_at is not None:
+             raise ValueError(f"Patient {payload.patient_id} not found")
+@@ -31,14 +42,14 @@ def create_visit(db: Session, payload: VisitCreate, user_id: int) -> Visit:
+             blood_pressure=payload.blood_pressure,
+             temperature=payload.temperature,
+             pulse_rate=payload.pulse_rate,
+-            started_at=datetime.now(timezone.utc).replace(tzinfo=None),
++            started_at=_utcnow(),
+             status="in_care",
+             created_by=user_id,
+         )
+         db.add(visit)
+         db.flush()                        # need visit_id for the ledger rows
+ 
+-        for cid in payload.complaint_ids:
++        for cid in dict.fromkeys(payload.complaint_ids):   # de-dupe, keep order
+             db.add(VisitComplaint(
+                 visit_id=visit.visit_id,
+                 complaint_id=cid,
+@@ -70,6 +81,41 @@ def create_visit(db: Session, payload: VisitCreate, user_id: int) -> Visit:
+                 db, s.supply_id, s.quantity_used, visit.visit_id, user_id
+             )
+ 
++        db.commit()
++    except Exception:
++        db.rollback()
++        raise
++
++    db.refresh(visit)
++    return visit
++
++
++def update_visit(db: Session, visit_id: int, payload: VisitUpdate, user_id: int) -> Visit:
++    """Correct the clinical notes of a visit. Dispensed medicines/supplies are
++    deliberately not editable here — the stock ledger is append-only."""
++    try:
++        visit = db.get(Visit, visit_id)
++        if visit is None or visit.deleted_at is not None:
++            raise LookupError(f"Visit {visit_id} not found")
++
++        data = payload.model_dump(exclude_unset=True)
++        complaint_ids = data.pop("complaint_ids", None)
++        primary_id = data.pop("primary_complaint_id", None)
++        for field, value in data.items():
++            setattr(visit, field, value)
++
++        if complaint_ids is not None:
++            db.execute(delete(VisitComplaint).where(VisitComplaint.visit_id == visit_id))
++            for cid in dict.fromkeys(complaint_ids):
++                db.add(VisitComplaint(visit_id=visit_id, complaint_id=cid, is_primary=(cid == primary_id)))
++
++        visit.updated_by = user_id
++        db.commit()
++    except Exception:
++        db.rollback()
++        raise
++
++    db.expire(visit)
+     db.refresh(visit)
+     return visit
+ 
+@@ -77,19 +123,23 @@ def create_visit(db: Session, payload: VisitCreate, user_id: int) -> Visit:
+ def sign_out(db: Session, visit_id: int, disposition_id: int,
+              notes: str | None, user_id: int) -> Visit:
+     """Stamps ended_at and closes the visit."""
+-    with db.begin():
++    try:
+         visit = db.get(Visit, visit_id)
+         if visit is None or visit.deleted_at is not None:
+             raise ValueError(f"Visit {visit_id} not found")
+         if visit.status == "completed":
+             raise ValueError("Visit is already signed out")
+ 
+-        visit.ended_at = datetime.now(timezone.utc).replace(tzinfo=None)
++        visit.ended_at = _utcnow()
+         visit.disposition_id = disposition_id
+         visit.status = "completed"
+         visit.updated_by = user_id
+         if notes:
+             visit.treatment_notes = notes
++        db.commit()
++    except Exception:
++        db.rollback()
++        raise
+ 
+     db.refresh(visit)
+     return visit
+diff --git a/isu_infirmary_backend/backend/requirements.txt b/isu_infirmary_backend/backend/requirements.txt
+index 5ee94e3..a1bc4bc 100644
+--- a/isu_infirmary_backend/backend/requirements.txt
++++ b/isu_infirmary_backend/backend/requirements.txt
+@@ -8,5 +8,9 @@ pydantic==2.10.4
+ pydantic-settings==2.7.0
+ python-jose[cryptography]==3.3.0
+ passlib[bcrypt]==1.7.4
++# passlib 1.7.4 crashes with bcrypt >= 4.1 ("password cannot be longer than 72 bytes")
++bcrypt==4.0.1
+ python-multipart==0.0.20
+ email-validator==2.2.0
++# zoneinfo needs this on Windows (no system tz database)
++tzdata
