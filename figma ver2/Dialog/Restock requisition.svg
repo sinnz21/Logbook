@@ -1,0 +1,182 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Dialog / Restock requisition">
+<rect width="1440" height="900" fill="#516663"/>
+<g id="Dialog" filter="url(#filter0_d_8_791)">
+<rect x="380" y="153.5" width="680" height="593" rx="20" fill="white"/>
+<g id="Dialog header" clip-path="url(#clip0_8_791)">
+<g id="Group" clip-path="url(#clip1_8_791)">
+<g id="Group_2" clip-path="url(#clip2_8_791)">
+<text id="Restock requisition, REQ-0042" fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="19" font-weight="800" letter-spacing="0em"><tspan x="408" y="199.252">Restock requisition, REQ-0042</tspan></text>
+<g id="Badge/Pending">
+<rect x="712" y="181.5" width="75" height="20" rx="10" fill="#FDF3E2"/>
+<circle id="Ellipse" cx="724" cy="191.5" r="3" fill="#C98A1E"/>
+<text id="Pending" fill="#8A5C0A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="733" y="195.988">Pending</tspan></text>
+</g>
+</g>
+<text id="Raised by Nurse Santos on September 14, 2026. Awaiting admin approval." fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="408" y="219.804">Raised by Nurse Santos on September 14, 2026. Awaiting admin approval.</tspan></text>
+</g>
+<g id="link:BACK">
+<rect x="998" y="179.5" width="34" height="34" rx="9" fill="#F2F6F5"/>
+<g id="icon/x">
+<path id="Vector" d="M1019 192.5L1011 200.5M1011 192.5L1019 200.5" stroke="#3E4E4B" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+<g id="Header row">
+<g clip-path="url(#clip3_8_791)">
+<rect x="408" y="238.5" width="624" height="37" rx="10" fill="#F2F8F6"/>
+<g id="Group_3">
+<text id="Item" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="418" y="261.896">Item</tspan></text>
+</g>
+<g id="Group_4">
+<text id="On hand" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="662" y="261.896">On hand</tspan></text>
+</g>
+<g id="Group_5">
+<text id="Requested" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="762" y="261.896">Requested</tspan></text>
+</g>
+<g id="Group_6">
+<text id="Unit" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="862" y="261.896">Unit</tspan></text>
+</g>
+</g>
+</g>
+<g id="Row">
+<g clip-path="url(#clip4_8_791)">
+<g id="td">
+<text id="Antacid (Kremil-S)" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="418" y="326.804">Antacid (Kremil-S)</tspan></text>
+</g>
+<g id="td_2">
+<text id="0 tablets" fill="#B0332B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="662" y="326.804">0 tablets</tspan></text>
+</g>
+<g id="td_3">
+<g id="Group_7">
+<rect x="762.5" y="304" width="75" height="35" rx="8.5" stroke="#DCE5E2"/>
+<text id="100" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="773" y="327.008">100</tspan></text>
+</g>
+</g>
+<g id="td_4">
+<text id="Box" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="862" y="326.804">Box</tspan></text>
+</g>
+<g id="td_5">
+<g id="Button/Remove">
+<rect x="952.5" y="306" width="71" height="31" rx="10.5" fill="white"/>
+<rect x="952.5" y="306" width="71" height="31" rx="10.5" stroke="#F0C4C0"/>
+<text id="Remove" fill="#B0332B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="bold" letter-spacing="0em"><tspan x="963" y="326.6">Remove</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<g id="Row_2">
+<g clip-path="url(#clip5_8_791)">
+<g id="td_6">
+<text id="Surgical Gloves (M)" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="418" y="403.804">Surgical Gloves (M)</tspan></text>
+</g>
+<g id="td_7">
+<text id="0 pairs" fill="#B0332B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="662" y="403.804">0 pairs</tspan></text>
+</g>
+<g id="td_8">
+<g id="Group_8">
+<rect x="762.5" y="381" width="75" height="35" rx="8.5" stroke="#DCE5E2"/>
+<text id="50" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="773" y="404.008">50</tspan></text>
+</g>
+</g>
+<g id="td_9">
+<text id="Box_2" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="862" y="403.804">Box</tspan></text>
+</g>
+<g id="td_10">
+<g id="Button/Remove_2">
+<rect x="952.5" y="383" width="71" height="31" rx="10.5" fill="white"/>
+<rect x="952.5" y="383" width="71" height="31" rx="10.5" stroke="#F0C4C0"/>
+<text id="Remove_2" fill="#B0332B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="bold" letter-spacing="0em"><tspan x="963" y="403.6">Remove</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<g id="Group_9" clip-path="url(#clip6_8_791)">
+<g id="Group_10">
+<rect x="408.5" y="446" width="553" height="41" rx="10.5" fill="#F7FBFA"/>
+<rect x="408.5" y="446" width="553" height="41" rx="10.5" stroke="#A9CFC7"/>
+<text id="Add another item" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="423" y="472.008">Add another item</tspan></text>
+<g id="icon/chev">
+<path id="Vector_2" d="M935.75 464.625L939.5 468.375L943.25 464.625" stroke="#0F5E56" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<g id="Button/Add">
+<rect x="972" y="445.5" width="60" height="42" rx="11" fill="#E3F3EF"/>
+<text id="Add" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="988" y="472.008">Add</tspan></text>
+</g>
+</g>
+<g id="Group_11" clip-path="url(#clip7_8_791)">
+<text id="Reason or justification" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="408" y="516.6">Reason or justification</tspan></text>
+<g id="Group_12">
+<rect x="408.5" y="527" width="623" height="63" rx="10.5" stroke="#DCE5E2"/>
+<text id="Out of stock since Sep 12, used daily" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="423" y="554.212">Out of stock since Sep 12, used daily</tspan></text>
+</g>
+</g>
+<g id="Group_13">
+<rect x="408" y="606.5" width="624" height="54" rx="11" fill="#FDF3E2"/>
+<text id="While the status is pending you can still edit or cancel this requisition. Once the admin approves it, only delivery confirmation is left." fill="#8A5C0A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="500" letter-spacing="0em"><tspan x="422" y="630.6">While the status is pending you can still edit or cancel this requisition. Once the admin approves it, </tspan><tspan x="422" y="646.6">only delivery confirmation is left.</tspan></text>
+</g>
+<g id="Group_14" clip-path="url(#clip8_8_791)">
+<g id="Button/Cancel requisition">
+<rect x="408.5" y="677" width="152" height="43" rx="10.5" fill="white"/>
+<rect x="408.5" y="677" width="152" height="43" rx="10.5" stroke="#F0C4C0"/>
+<text id="Cancel requisition" fill="#B0332B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="425" y="704.008">Cancel requisition</tspan></text>
+</g>
+<g id="link:BACK_2">
+<text id="Close" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="845" y="704.008">Close</tspan></text>
+</g>
+<g id="link:Nurse / Stock &#38; supplies" filter="url(#filter1_d_8_791)">
+<rect x="909" y="676.5" width="123" height="44" rx="11" fill="#137A6D"/>
+<text id="Save changes" fill="white" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="925" y="704.008">Save changes</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_d_8_791" x="320" y="117.5" width="800" height="713" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="24"/>
+<feGaussianBlur stdDeviation="30"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_8_791"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_8_791" result="shape"/>
+</filter>
+<filter id="filter1_d_8_791" x="893" y="666.5" width="155" height="76" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="6"/>
+<feGaussianBlur stdDeviation="8"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.075 0 0 0 0 0.478 0 0 0 0 0.427 0 0 0 0.24 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_8_791"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_8_791" result="shape"/>
+</filter>
+<clipPath id="clip0_8_791">
+<rect width="624" height="43" fill="white" transform="translate(408 179.5)"/>
+</clipPath>
+<clipPath id="clip1_8_791">
+<rect width="590" height="43" fill="white" transform="translate(408 179.5)"/>
+</clipPath>
+<clipPath id="clip2_8_791">
+<rect width="379" height="24" fill="white" transform="translate(408 179.5)"/>
+</clipPath>
+<clipPath id="clip3_8_791">
+<rect x="408" y="238.5" width="624" height="37" rx="10" fill="white"/>
+</clipPath>
+<clipPath id="clip4_8_791">
+<path d="M408 291.5H1032V352.5H408V291.5Z" fill="white"/>
+</clipPath>
+<clipPath id="clip5_8_791">
+<path d="M408 368.5H1032V429.5H408V368.5Z" fill="white"/>
+</clipPath>
+<clipPath id="clip6_8_791">
+<rect width="624" height="42" fill="white" transform="translate(408 445.5)"/>
+</clipPath>
+<clipPath id="clip7_8_791">
+<rect width="624" height="87" fill="white" transform="translate(408 503.5)"/>
+</clipPath>
+<clipPath id="clip8_8_791">
+<rect width="624" height="44" fill="white" transform="translate(408 676.5)"/>
+</clipPath>
+</defs>
+</svg>

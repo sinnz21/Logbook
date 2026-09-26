@@ -1,0 +1,619 @@
+<svg width="1440" height="1031" viewBox="0 0 1440 1031" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="Admin / Dashboard" clip-path="url(#clip0_9_410)">
+<rect width="1440" height="1031" fill="#F2F6F5"/>
+<g id="Sidebar" filter="url(#filter0_dd_9_410)">
+<rect x="16" y="16" width="244" height="999" rx="18" fill="white"/>
+<g id="Brand">
+<circle id="ISU seal" cx="58" cy="58" r="20" fill="url(#pattern0_9_410)"/>
+<g id="Group" clip-path="url(#clip1_9_410)">
+<text id="ISU Infirmary" fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="16" font-weight="800" letter-spacing="0em"><tspan x="90" y="56.528">ISU Infirmary</tspan></text>
+<text id="Log Book System" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="90" y="73.396">Log Book System</tspan></text>
+</g>
+</g>
+<g id="User">
+<rect x="30" y="100" width="216" height="54" rx="12" fill="#EEF2F8"/>
+<g id="Group_2">
+<rect x="40" y="110" width="34" height="34" rx="17" fill="#D6E4F2"/>
+<text id="AC" fill="#1D5F8E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="48" y="131.896">AC</tspan></text>
+</g>
+<g id="Group_3" clip-path="url(#clip2_9_410)">
+<text id="Admin Cruz" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="84" y="124.508">Admin Cruz</tspan></text>
+<text id="Admin" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="84" y="140.896">Admin</tspan></text>
+</g>
+</g>
+<g id="Section label">
+<text id="Overview" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="42" y="184.396">Overview</tspan></text>
+</g>
+<g id="link:Admin / Dashboard">
+<rect x="30" y="197" width="216" height="38" rx="10" fill="#E3F3EF"/>
+<g id="icon/grid">
+<path id="Vector" d="M48.375 209.25H45.375C44.7537 209.25 44.25 209.754 44.25 210.375V213.375C44.25 213.996 44.7537 214.5 45.375 214.5H48.375C48.9963 214.5 49.5 213.996 49.5 213.375V210.375C49.5 209.754 48.9963 209.25 48.375 209.25Z" stroke="#0F5E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_2" d="M56.625 209.25H53.625C53.0037 209.25 52.5 209.754 52.5 210.375V213.375C52.5 213.996 53.0037 214.5 53.625 214.5H56.625C57.2463 214.5 57.75 213.996 57.75 213.375V210.375C57.75 209.754 57.2463 209.25 56.625 209.25Z" stroke="#0F5E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M56.625 217.5H53.625C53.0037 217.5 52.5 218.004 52.5 218.625V221.625C52.5 222.246 53.0037 222.75 53.625 222.75H56.625C57.2463 222.75 57.75 222.246 57.75 221.625V218.625C57.75 218.004 57.2463 217.5 56.625 217.5Z" stroke="#0F5E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_4" d="M48.375 217.5H45.375C44.7537 217.5 44.25 218.004 44.25 218.625V221.625C44.25 222.246 44.7537 222.75 45.375 222.75H48.375C48.9963 222.75 49.5 222.246 49.5 221.625V218.625C49.5 218.004 48.9963 217.5 48.375 217.5Z" stroke="#0F5E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Dashboard" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="72" y="221.712">Dashboard</tspan></text>
+</g>
+<g id="Section label_2">
+<text id="Management" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="42" y="265.396">Management</tspan></text>
+</g>
+<g id="link:Admin / Stock requests">
+<g id="icon/check">
+<path id="Vector_5" d="M53.25 291.5H48.75C48.3358 291.5 48 291.836 48 292.25V293.75C48 294.164 48.3358 294.5 48.75 294.5H53.25C53.6642 294.5 54 294.164 54 293.75V292.25C54 291.836 53.6642 291.5 53.25 291.5Z" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_6" d="M54 293H55.5C55.8978 293 56.2794 293.158 56.5607 293.439C56.842 293.721 57 294.102 57 294.5V305C57 305.398 56.842 305.779 56.5607 306.061C56.2794 306.342 55.8978 306.5 55.5 306.5H46.5C46.1022 306.5 45.7206 306.342 45.4393 306.061C45.158 305.779 45 305.398 45 305V294.5C45 294.102 45.158 293.721 45.4393 293.439C45.7206 293.158 46.1022 293 46.5 293H48M48.75 300.5L50.25 302L53.25 299" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Stock requests" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="500" letter-spacing="0em"><tspan x="72" y="304.712">Stock requests</tspan></text>
+<g id="Group_4">
+<rect x="212" y="288" width="22" height="22" rx="11" fill="#FDF3E2"/>
+<text id="1" fill="#8A5C0A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="220.5" y="303.488">1</tspan></text>
+</g>
+</g>
+<g id="link:Admin / User management">
+<g id="icon/users">
+<path id="Vector_7" d="M54 349.75V348.25C54 347.454 53.6839 346.691 53.1213 346.129C52.5587 345.566 51.7956 345.25 51 345.25H46.5C45.7044 345.25 44.9413 345.566 44.3787 346.129C43.8161 346.691 43.5 347.454 43.5 348.25V349.75" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_8" d="M48.75 342.25C50.4069 342.25 51.75 340.907 51.75 339.25C51.75 337.593 50.4069 336.25 48.75 336.25C47.0931 336.25 45.75 337.593 45.75 339.25C45.75 340.907 47.0931 342.25 48.75 342.25Z" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_9" d="M58.5 349.75V348.25C58.4995 347.585 58.2783 346.94 57.871 346.414C57.4638 345.889 56.8936 345.514 56.25 345.348M54 336.348C54.6453 336.513 55.2173 336.888 55.6257 337.414C56.0342 337.941 56.2559 338.588 56.2559 339.254C56.2559 339.92 56.0342 340.567 55.6257 341.093C55.2173 341.62 54.6453 341.995 54 342.16" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="User management" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="500" letter-spacing="0em"><tspan x="72" y="348.712">User management</tspan></text>
+</g>
+<g id="Section label_3">
+<text id="System" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="42" y="392.396">System</tspan></text>
+</g>
+<g id="link:Admin / Settings">
+<g id="icon/gear" clip-path="url(#clip3_9_410)">
+<path id="Vector_10" d="M51 426.25C52.2426 426.25 53.25 425.243 53.25 424C53.25 422.757 52.2426 421.75 51 421.75C49.7574 421.75 48.75 422.757 48.75 424C48.75 425.243 49.7574 426.25 51 426.25Z" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_11" d="M51 416.5V418.75M51 429.25V431.5M45.15 418.15L46.725 419.725M55.275 428.275L56.85 429.85M43.5 424H45.75M56.25 424H58.5M45.15 429.85L46.725 428.275M55.275 419.725L56.85 418.15" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Settings" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="500" letter-spacing="0em"><tspan x="72" y="429.712">Settings</tspan></text>
+</g>
+<g id="link:Sign in">
+<g id="icon/out">
+<path id="Vector_12" d="M48.75 984.75H45.75C45.3522 984.75 44.9706 984.592 44.6893 984.311C44.408 984.029 44.25 983.648 44.25 983.25V972.75C44.25 972.352 44.408 971.971 44.6893 971.689C44.9706 971.408 45.3522 971.25 45.75 971.25H48.75M54 974.25L57.75 978L54 981.75M57.75 978H48.75" stroke="#5B6B68" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Sign out" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="500" letter-spacing="0em"><tspan x="72" y="983.712">Sign out</tspan></text>
+</g>
+</g>
+<g id="Main" clip-path="url(#clip4_9_410)">
+<g id="Topbar" filter="url(#filter1_dd_9_410)">
+<rect x="280" y="16" width="1144" height="64" rx="16" fill="white"/>
+<g id="Menu">
+<g id="icon/menu">
+<path id="Vector_13" d="M305.333 43H318.667M305.333 48H318.667M305.333 53H318.667" stroke="#3E4E4B" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<text id="Dashboard_2" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="600" letter-spacing="0em"><tspan x="344" y="53.712">Dashboard</tspan></text>
+<g id="link:Admin / Stock requests_2">
+<rect x="1218" y="27" width="42" height="42" rx="11" fill="#F2F6F5"/>
+<g id="icon/bell">
+<path id="Vector_14" d="M1237.65 55.1252C1237.79 55.3662 1237.98 55.5672 1238.22 55.7072C1238.45 55.8472 1238.72 55.9211 1239 55.9211C1239.28 55.9211 1239.55 55.8472 1239.78 55.7072C1240.02 55.5672 1240.21 55.3662 1240.35 55.1252M1234.25 44.8335C1234.25 43.5737 1234.75 42.3655 1235.64 41.4747C1236.53 40.5839 1237.74 40.0835 1239 40.0835C1240.26 40.0835 1241.47 40.5839 1242.36 41.4747C1243.25 42.3655 1243.75 43.5737 1243.75 44.8335C1243.75 50.3752 1246.13 51.9585 1246.13 51.9585H1231.88C1231.88 51.9585 1234.25 50.3752 1234.25 44.8335Z" stroke="#3E4E4B" stroke-width="1.58333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="Count">
+<rect x="1240" y="32" width="16" height="16" rx="8" fill="#B0332B"/>
+<text id="1_2" fill="white" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="1245.5" y="44.08">1</tspan></text>
+</g>
+</g>
+<rect id="Rectangle" x="1272" y="34" width="1" height="28" fill="#E3EAE8"/>
+<g id="Group_5" clip-path="url(#clip5_9_410)">
+<g id="Group_6">
+<rect x="1285" y="29" width="38" height="38" rx="19" fill="#D6E4F2"/>
+<text id="AC_2" fill="#1D5F8E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1294.5" y="53.304">AC</tspan></text>
+</g>
+<g id="Group_7" clip-path="url(#clip6_9_410)">
+<text id="Admin Cruz_2" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="1333" y="45.508">Admin Cruz</tspan></text>
+<text id="Admin_2" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="1333" y="61.896">Admin</tspan></text>
+</g>
+</g>
+</g>
+<g id="Page header" clip-path="url(#clip7_9_410)">
+<g id="Group_8" clip-path="url(#clip8_9_410)">
+<text id="Admin dashboard" fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="26" font-weight="800" letter-spacing="0em"><tspan x="280" y="127.108">Admin dashboard</tspan></text>
+<text id="ISU Infirmary, September 15, 2026, system oversight" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" letter-spacing="0em"><tspan x="280" y="151.008">ISU Infirmary, September 15, 2026, system oversight</tspan></text>
+</g>
+<g id="Group_9" clip-path="url(#clip9_9_410)">
+<g id="Presets" filter="url(#filter2_d_9_410)">
+<rect x="893" y="110" width="267" height="44" rx="12" fill="white"/>
+<g id="Tab/Today">
+<text id="Today" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="911" y="137.304">Today</tspan></text>
+</g>
+<g id="Tab/This week">
+<rect x="967" y="114" width="90" height="36" rx="9" fill="#137A6D"/>
+<text id="This week" fill="white" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="981" y="137.304">This week</tspan></text>
+</g>
+<g id="Tab/This month">
+<text id="This month" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="1074" y="137.304">This month</tspan></text>
+</g>
+</g>
+<g id="Group_10" filter="url(#filter3_d_9_410)">
+<rect x="1170" y="110" width="172" height="44" rx="12" fill="white"/>
+<g id="icon/cal">
+<path id="Vector_15" d="M1196.67 126.667H1187.33C1186.6 126.667 1186 127.263 1186 128V137.333C1186 138.07 1186.6 138.667 1187.33 138.667H1196.67C1197.4 138.667 1198 138.07 1198 137.333V128C1198 127.263 1197.4 126.667 1196.67 126.667Z" stroke="#137A6D" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_16" d="M1194.67 125.333V128M1189.33 125.333V128M1186 130.667H1198" stroke="#137A6D" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Jan 1 &#226;&#128;&#147; Sep 15, 2026" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="1208" y="137.304">Jan 1 &#x2013; Sep 15, 2026</tspan></text>
+</g>
+<g id="Button/Apply">
+<rect x="1352" y="110" width="72" height="44" rx="11" fill="#E3F3EF"/>
+<text id="Apply" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="1368" y="137.508">Apply</tspan></text>
+</g>
+</g>
+</g>
+<g id="Group_11" clip-path="url(#clip10_9_410)">
+<g id="link:Admin / Settings_2" filter="url(#filter4_dd_9_410)">
+<rect x="280" y="174" width="272.5" height="99" rx="16" fill="white"/>
+<g id="Group_12">
+<rect x="300" y="197.5" width="52" height="52" rx="26" fill="#E3F3EF"/>
+<g id="icon/cloud">
+<path id="Vector_17" d="M318 226.4C317.254 225.642 316.69 224.724 316.352 223.715C316.014 222.707 315.91 221.635 316.048 220.58C316.186 219.526 316.563 218.516 317.149 217.629C317.736 216.742 318.517 216 319.433 215.46C320.349 214.919 321.376 214.595 322.436 214.511C323.497 214.427 324.562 214.586 325.552 214.975C326.542 215.365 327.43 215.975 328.148 216.759C328.867 217.543 329.398 218.48 329.7 219.5H331.5C332.454 219.513 333.379 219.828 334.142 220.401C334.905 220.974 335.466 221.775 335.744 222.687C336.022 223.6 336.003 224.577 335.69 225.478C335.376 226.379 334.784 227.157 334 227.7M326 223.5V232.5M322 227.5L326 223.5L330 227.5" stroke="#137A6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<g id="Group_13" clip-path="url(#clip11_9_410)">
+<text id="Today_2" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="22" font-weight="800" letter-spacing="0em"><tspan x="368" y="214.976">Today</tspan></text>
+<text id="Last backup checked" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="368" y="235.304">Last backup checked</tspan></text>
+<text id="Automated at 12:00 AM, 41.3 MB" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="368" y="252.396">Automated at 12:00 AM, 41.3 MB</tspan></text>
+</g>
+</g>
+<g id="link:Admin / User management_2" filter="url(#filter5_dd_9_410)">
+<rect x="570.5" y="174" width="272.5" height="99" rx="16" fill="white"/>
+<g id="Group_14">
+<rect x="590.5" y="197.5" width="52" height="52" rx="26" fill="#E6EFF8"/>
+<g id="icon/users_2">
+<path id="Vector_18" d="M620.5 232.5V230.5C620.5 229.439 620.079 228.422 619.328 227.672C618.578 226.921 617.561 226.5 616.5 226.5H610.5C609.439 226.5 608.422 226.921 607.672 227.672C606.921 228.422 606.5 229.439 606.5 230.5V232.5" stroke="#1D6FA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_19" d="M613.5 222.5C615.709 222.5 617.5 220.709 617.5 218.5C617.5 216.291 615.709 214.5 613.5 214.5C611.291 214.5 609.5 216.291 609.5 218.5C609.5 220.709 611.291 222.5 613.5 222.5Z" stroke="#1D6FA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_20" d="M626.5 232.5V230.5C626.499 229.614 626.204 228.753 625.661 228.052C625.118 227.352 624.358 226.851 623.5 226.63M620.5 214.63C621.36 214.85 622.123 215.351 622.668 216.052C623.212 216.754 623.508 217.617 623.508 218.505C623.508 219.393 623.212 220.256 622.668 220.958C622.123 221.659 621.36 222.16 620.5 222.38" stroke="#1D6FA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<g id="Group_15" clip-path="url(#clip12_9_410)">
+<text id="5" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="22" font-weight="800" letter-spacing="0em"><tspan x="658.5" y="214.976">5</tspan></text>
+<text id="Active accounts" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="658.5" y="235.304">Active accounts</tspan></text>
+<text id="4 active, 1 inactive" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="658.5" y="252.396">4 active, 1 inactive</tspan></text>
+</g>
+</g>
+<g id="link:Admin / Settings_3" filter="url(#filter6_dd_9_410)">
+<rect x="861" y="174" width="272.5" height="99" rx="16" fill="white"/>
+<g id="Group_16">
+<rect x="881" y="197.5" width="52" height="52" rx="26" fill="#EFEAF8"/>
+<g id="icon/db">
+<path id="Vector_21" d="M907 219.5C911.971 219.5 916 218.157 916 216.5C916 214.843 911.971 213.5 907 213.5C902.029 213.5 898 214.843 898 216.5C898 218.157 902.029 219.5 907 219.5Z" stroke="#6B4FA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_22" d="M898 216.5V230.5C898 232.2 902 233.5 907 233.5C912 233.5 916 232.2 916 230.5V216.5M898 223.5C898 225.2 902 226.5 907 226.5C912 226.5 916 225.2 916 223.5" stroke="#6B4FA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<g id="Group_17" clip-path="url(#clip13_9_410)">
+<text id="Healthy" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="22" font-weight="800" letter-spacing="0em"><tspan x="949" y="214.976">Healthy</tspan></text>
+<text id="Database status" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="949" y="235.304">Database status</tspan></text>
+<text id="412 MB, 1,247 records" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="949" y="252.396">412 MB, 1,247 records</tspan></text>
+</g>
+</g>
+<g id="link:Admin / Stock requests_3" filter="url(#filter7_dd_9_410)">
+<rect x="1151.5" y="174" width="272.5" height="99" rx="16" fill="white"/>
+<g id="Group_18">
+<rect x="1171.5" y="197.5" width="52" height="52" rx="26" fill="#FDF3E2"/>
+<g id="icon/check_2">
+<path id="Vector_23" d="M1200.5 213.5H1194.5C1193.95 213.5 1193.5 213.948 1193.5 214.5V216.5C1193.5 217.052 1193.95 217.5 1194.5 217.5H1200.5C1201.05 217.5 1201.5 217.052 1201.5 216.5V214.5C1201.5 213.948 1201.05 213.5 1200.5 213.5Z" stroke="#C98A1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_24" d="M1201.5 215.5H1203.5C1204.03 215.5 1204.54 215.711 1204.91 216.086C1205.29 216.461 1205.5 216.97 1205.5 217.5V231.5C1205.5 232.03 1205.29 232.539 1204.91 232.914C1204.54 233.289 1204.03 233.5 1203.5 233.5H1191.5C1190.97 233.5 1190.46 233.289 1190.09 232.914C1189.71 232.539 1189.5 232.03 1189.5 231.5V217.5C1189.5 216.97 1189.71 216.461 1190.09 216.086C1190.46 215.711 1190.97 215.5 1191.5 215.5H1193.5M1194.5 225.5L1196.5 227.5L1200.5 223.5" stroke="#C98A1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<g id="Group_19" clip-path="url(#clip14_9_410)">
+<text id="1_3" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="22" font-weight="800" letter-spacing="0em"><tspan x="1239.5" y="214.976">1</tspan></text>
+<text id="Pending requisitions" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="1239.5" y="235.304">Pending requisitions</tspan></text>
+<text id="Waiting for your approval" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="1239.5" y="252.396">Waiting for your approval</tspan></text>
+</g>
+</g>
+</g>
+<g id="Group_20" clip-path="url(#clip15_9_410)">
+<g id="Card" filter="url(#filter8_dd_9_410)">
+<rect x="280" y="293" width="640" height="362" rx="16" fill="white"/>
+<g id="Group_21">
+<g id="Group_22" clip-path="url(#clip16_9_410)">
+<text id="Sign-in activity" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="16" font-weight="bold" letter-spacing="0em"><tspan x="302" y="329.528">Sign-in activity</tspan></text>
+<text id="Successful sign-ins per day this week" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="302" y="348.1">Successful sign-ins per day this week</tspan></text>
+</g>
+</g>
+<g id="Bar chart" clip-path="url(#clip17_9_410)">
+<g id="Frame">
+<g id="Vector_25">
+<path d="M338 555H890H338Z" fill="black"/>
+<path d="M338 555H890" stroke="#D5E0DD"/>
+</g>
+<g id="Vector_26">
+<path d="M338 511.5H890H338Z" fill="black"/>
+<path d="M338 511.5H890" stroke="#E9EFED"/>
+</g>
+<g id="Vector_27">
+<path d="M338 468H890H338Z" fill="black"/>
+<path d="M338 468H890" stroke="#E9EFED"/>
+</g>
+<g id="Vector_28">
+<path d="M338 424.5H890H338Z" fill="black"/>
+<path d="M338 424.5H890" stroke="#E9EFED"/>
+</g>
+<g id="Vector_29">
+<path d="M338 381H890H338Z" fill="black"/>
+<path d="M338 381H890" stroke="#E9EFED"/>
+</g>
+<path id="Vector_30" d="M391.1 402.8H363.7C359.282 402.8 355.7 406.382 355.7 410.8V547.1C355.7 551.518 359.282 555.1 363.7 555.1H391.1C395.518 555.1 399.1 551.518 399.1 547.1V410.8C399.1 406.382 395.518 402.8 391.1 402.8Z" fill="#A9D3CB"/>
+<path id="Vector_31" d="M470 381H442.6C438.182 381 434.6 384.582 434.6 389V547C434.6 551.418 438.182 555 442.6 555H470C474.418 555 478 551.418 478 547V389C478 384.582 474.418 381 470 381Z" fill="#137A6D"/>
+<path id="Vector_32" d="M548.9 424.5H521.5C517.082 424.5 513.5 428.082 513.5 432.5V547C513.5 551.418 517.082 555 521.5 555H548.9C553.318 555 556.9 551.418 556.9 547V432.5C556.9 428.082 553.318 424.5 548.9 424.5Z" fill="#A9D3CB"/>
+<path id="Vector_33" d="M627.7 446.3H600.3C595.882 446.3 592.3 449.882 592.3 454.3V547.1C592.3 551.518 595.882 555.1 600.3 555.1H627.7C632.118 555.1 635.7 551.518 635.7 547.1V454.3C635.7 449.882 632.118 446.3 627.7 446.3Z" fill="#A9D3CB"/>
+<path id="Vector_34" d="M706.6 468H679.2C674.782 468 671.2 471.582 671.2 476V547C671.2 551.418 674.782 555 679.2 555H706.6C711.018 555 714.6 551.418 714.6 547V476C714.6 471.582 711.018 468 706.6 468Z" fill="#A9D3CB"/>
+<path id="Vector_35" d="M785.4 555H758C753.582 555 750 555.022 750 555.05C750 555.078 753.582 555.1 758 555.1H785.4C789.818 555.1 793.4 555.078 793.4 555.05C793.4 555.022 789.818 555 785.4 555Z" fill="#A9D3CB"/>
+<path id="Vector_36" d="M864.3 555H836.9C832.482 555 828.9 555.022 828.9 555.05C828.9 555.078 832.482 555.1 836.9 555.1H864.3C868.718 555.1 872.3 555.078 872.3 555.05C872.3 555.022 868.718 555 864.3 555Z" fill="#A9D3CB"/>
+</g>
+<text id="0" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" letter-spacing="0em"><tspan x="321" y="558.488">0</tspan></text>
+<text id="2" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" letter-spacing="0em"><tspan x="323" y="514.988">2</tspan></text>
+<text id="4" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" letter-spacing="0em"><tspan x="323" y="471.488">4</tspan></text>
+<text id="6" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" letter-spacing="0em"><tspan x="323" y="427.988">6</tspan></text>
+<text id="8" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" letter-spacing="0em"><tspan x="323" y="384.488">8</tspan></text>
+<text id="Mon" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" letter-spacing="0em"><tspan x="365.929" y="576.488">Mon</tspan></text>
+<text id="7" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="373.929" y="396.238">7</tspan></text>
+<text id="Tue" fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="446.786" y="576.488">Tue</tspan></text>
+<text id="8_2" fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="452.786" y="374.488">8</tspan></text>
+<text id="Wed" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" letter-spacing="0em"><tspan x="522.643" y="576.488">Wed</tspan></text>
+<text id="6_2" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="531.643" y="417.988">6</tspan></text>
+<text id="Thu" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" letter-spacing="0em"><tspan x="604.5" y="576.488">Thu</tspan></text>
+<text id="5_2" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="610.5" y="439.738">5</tspan></text>
+<text id="Fri" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" letter-spacing="0em"><tspan x="686.357" y="576.488">Fri</tspan></text>
+<text id="4_2" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="688.857" y="461.488">4</tspan></text>
+<text id="Sat" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" letter-spacing="0em"><tspan x="762.714" y="576.488">Sat</tspan></text>
+<text id="Sun" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" letter-spacing="0em"><tspan x="840.571" y="576.488">Sun</tspan></text>
+</g>
+<g id="Group_23">
+<rect x="302" y="599" width="596" height="36" rx="11" fill="#FDF3E2"/>
+<g id="icon/alert">
+<path id="Vector_37" d="M324 615V617.667M324 620.334H324.007M330.467 621L325.133 611.667C325.018 611.458 324.849 611.285 324.644 611.164C324.439 611.043 324.205 610.979 323.967 610.979C323.728 610.979 323.495 611.043 323.289 611.164C323.084 611.285 322.915 611.458 322.8 611.667L317.467 621C317.348 621.206 317.286 621.44 317.288 621.678C317.29 621.916 317.355 622.15 317.478 622.354C317.6 622.558 317.775 622.725 317.984 622.839C318.193 622.953 318.429 623.008 318.667 623H329.333C329.566 622.996 329.793 622.932 329.993 622.814C330.192 622.695 330.358 622.526 330.472 622.324C330.587 622.122 330.646 621.894 330.645 621.662C330.644 621.429 330.583 621.201 330.467 621Z" stroke="#8A5C0A" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="2 failed attempts in the last 24 hours. Accounts lock at 5." fill="#8A5C0A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="342" y="622.304">2 failed attempts in the last 24 hours. Accounts lock at 5.</tspan></text>
+</g>
+</g>
+<g id="Card_2" filter="url(#filter9_dd_9_410)">
+<rect x="938" y="293" width="486" height="308" rx="16" fill="white"/>
+<g id="Group_24">
+<g id="Group_25" clip-path="url(#clip18_9_410)">
+<text id="Campus complaint summary" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="16" font-weight="bold" letter-spacing="0em"><tspan x="960" y="329.528">Campus complaint summary</tspan></text>
+<text id="Read-only, recorded by the nurses" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="960" y="348.1">Read-only, recorded by the nurses</tspan></text>
+</g>
+</g>
+<g id="Group_26" clip-path="url(#clip19_9_410)">
+<g id="Group_27" clip-path="url(#clip20_9_410)">
+<text id="Tension headache" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="960" y="378.304">Tension headache</tspan></text>
+<text id="38.7%" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1360" y="378.304">38.7%</tspan></text>
+</g>
+<g id="Group_28">
+<g clip-path="url(#clip21_9_410)">
+<rect x="960" y="387" width="442" height="10" rx="5" fill="#EEF3F2"/>
+<rect id="Rectangle_2" x="960" y="387" width="445" height="10" rx="5" fill="#137A6D"/>
+</g>
+</g>
+</g>
+<g id="Group_29" clip-path="url(#clip22_9_410)">
+<g id="Group_30" clip-path="url(#clip23_9_410)">
+<text id="Dysmenorrhea" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="960" y="424.304">Dysmenorrhea</tspan></text>
+<text id="22.6%" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1360" y="424.304">22.6%</tspan></text>
+</g>
+<g id="Group_31">
+<rect x="960" y="433" width="442" height="10" rx="5" fill="#EEF3F2"/>
+<rect id="Rectangle_3" x="960" y="433" width="260" height="10" rx="5" fill="#1A9484"/>
+</g>
+</g>
+<g id="Group_32" clip-path="url(#clip24_9_410)">
+<g id="Group_33" clip-path="url(#clip25_9_410)">
+<text id="Viral flu" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="960" y="470.304">Viral flu</tspan></text>
+<text id="14%" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1374" y="470.304">14%</tspan></text>
+</g>
+<g id="Group_34">
+<rect x="960" y="479" width="442" height="10" rx="5" fill="#EEF3F2"/>
+<rect id="Rectangle_4" x="960" y="479" width="161" height="10" rx="5" fill="#6FB8AC"/>
+</g>
+</g>
+<g id="Group_35" clip-path="url(#clip26_9_410)">
+<g id="Group_36" clip-path="url(#clip27_9_410)">
+<text id="Wounds or abrasions" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="960" y="516.304">Wounds or abrasions</tspan></text>
+<text id="12%" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1375" y="516.304">12%</tspan></text>
+</g>
+<g id="Group_37">
+<rect x="960" y="525" width="442" height="10" rx="5" fill="#EEF3F2"/>
+<rect id="Rectangle_5" x="960" y="525" width="138" height="10" rx="5" fill="#C98A1E"/>
+</g>
+</g>
+<g id="Group_38" clip-path="url(#clip28_9_410)">
+<g id="Group_39" clip-path="url(#clip29_9_410)">
+<text id="Others" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="960" y="562.304">Others</tspan></text>
+<text id="12.7%" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1363" y="562.304">12.7%</tspan></text>
+</g>
+<g id="Group_40">
+<rect x="960" y="571" width="442" height="10" rx="5" fill="#EEF3F2"/>
+<rect id="Rectangle_6" x="960" y="571" width="146" height="10" rx="5" fill="#C8D6D2"/>
+</g>
+</g>
+</g>
+</g>
+<g id="Card_3" filter="url(#filter10_dd_9_410)">
+<rect x="280" y="675" width="1144" height="340" rx="16" fill="white"/>
+<g id="Group_41">
+<g id="Group_42" clip-path="url(#clip30_9_410)">
+<text id="Reports" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="16" font-weight="bold" letter-spacing="0em"><tspan x="302" y="711.528">Reports</tspan></text>
+</g>
+</g>
+<g id="Group_43">
+<rect x="302" y="729" width="1100" height="36" rx="11" fill="#E3F3EF"/>
+<text id="Supply reports generate monthly. Medicine stock is audited every 1 to 2 months. When the due date arrives, a restock is needed." fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="316" y="752.304">Supply reports generate monthly. Medicine stock is audited every 1 to 2 months. When the due date arrives, a restock is needed.</tspan></text>
+</g>
+<g id="Group_44">
+<g id="Group_45">
+<text id="Monthly supply report" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="302" y="806.712">Monthly supply report</tspan></text>
+<text id="Next due: October 1, 2026" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="500" letter-spacing="0em"><tspan x="302" y="825.1">Next due: October 1, 2026</tspan></text>
+</g>
+<g id="Button/Generate">
+<rect x="1306.5" y="791.5" width="95" height="37" rx="10.5" fill="white"/>
+<rect x="1306.5" y="791.5" width="95" height="37" rx="10.5" stroke="#137A6D"/>
+<text id="Generate" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="1323" y="815.508">Generate</tspan></text>
+</g>
+</g>
+<g id="Group_46">
+<g id="Group_47">
+<text id="Medicine restock cycle report" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="302" y="883.712">Medicine restock cycle report</tspan></text>
+<text id="Next due: October 15, 2026, restock needed" fill="#8A5C0A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="500" letter-spacing="0em"><tspan x="302" y="902.1">Next due: October 15, 2026, restock needed</tspan></text>
+</g>
+<g id="Button/Generate_2">
+<rect x="1306.5" y="868.5" width="95" height="37" rx="10.5" fill="white"/>
+<rect x="1306.5" y="868.5" width="95" height="37" rx="10.5" stroke="#137A6D"/>
+<text id="Generate_2" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="1323" y="892.508">Generate</tspan></text>
+</g>
+</g>
+<g id="Group_48">
+<g id="Group_49">
+<text id="System and account activity report" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="302" y="960.712">System and account activity report</tspan></text>
+<text id="Next due: October 1, 2026_2" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="500" letter-spacing="0em"><tspan x="302" y="979.1">Next due: October 1, 2026</tspan></text>
+</g>
+<g id="Button/Generate_3">
+<rect x="1306.5" y="945.5" width="95" height="37" rx="10.5" fill="white"/>
+<rect x="1306.5" y="945.5" width="95" height="37" rx="10.5" stroke="#137A6D"/>
+<text id="Generate_3" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="1323" y="969.508">Generate</tspan></text>
+</g>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_dd_9_410" x="-12" y="-2" width="300" height="1055" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_9_410"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_9_410" result="effect2_dropShadow_9_410"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_9_410" result="shape"/>
+</filter>
+<pattern id="pattern0_9_410" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_9_410" transform="scale(0.0126582)"/>
+</pattern>
+<filter id="filter1_dd_9_410" x="252" y="-2" width="1200" height="120" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_9_410"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_9_410" result="effect2_dropShadow_9_410"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_9_410" result="shape"/>
+</filter>
+<filter id="filter2_d_9_410" x="891" y="109" width="271" height="48" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.06 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_9_410"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_9_410" result="shape"/>
+</filter>
+<filter id="filter3_d_9_410" x="1168" y="109" width="176" height="48" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.06 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_9_410"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_9_410" result="shape"/>
+</filter>
+<filter id="filter4_dd_9_410" x="252" y="156" width="328.5" height="155" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_9_410"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_9_410" result="effect2_dropShadow_9_410"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_9_410" result="shape"/>
+</filter>
+<filter id="filter5_dd_9_410" x="542.5" y="156" width="328.5" height="155" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_9_410"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_9_410" result="effect2_dropShadow_9_410"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_9_410" result="shape"/>
+</filter>
+<filter id="filter6_dd_9_410" x="833" y="156" width="328.5" height="155" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_9_410"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_9_410" result="effect2_dropShadow_9_410"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_9_410" result="shape"/>
+</filter>
+<filter id="filter7_dd_9_410" x="1123.5" y="156" width="328.5" height="155" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_9_410"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_9_410" result="effect2_dropShadow_9_410"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_9_410" result="shape"/>
+</filter>
+<filter id="filter8_dd_9_410" x="252" y="275" width="696" height="418" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_9_410"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_9_410" result="effect2_dropShadow_9_410"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_9_410" result="shape"/>
+</filter>
+<filter id="filter9_dd_9_410" x="910" y="275" width="542" height="364" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_9_410"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_9_410" result="effect2_dropShadow_9_410"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_9_410" result="shape"/>
+</filter>
+<filter id="filter10_dd_9_410" x="252" y="657" width="1200" height="396" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_9_410"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_9_410" result="effect2_dropShadow_9_410"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_9_410" result="shape"/>
+</filter>
+<clipPath id="clip0_9_410">
+<rect width="1440" height="1031" fill="white"/>
+</clipPath>
+<clipPath id="clip1_9_410">
+<rect width="100" height="36" fill="white" transform="translate(90 40)"/>
+</clipPath>
+<clipPath id="clip2_9_410">
+<rect width="75" height="33" fill="white" transform="translate(84 110.5)"/>
+</clipPath>
+<clipPath id="clip3_9_410">
+<rect width="18" height="18" fill="white" transform="translate(42 415)"/>
+</clipPath>
+<clipPath id="clip4_9_410">
+<rect width="1144" height="999" fill="white" transform="translate(280 16)"/>
+</clipPath>
+<clipPath id="clip5_9_410">
+<rect width="123" height="38" fill="white" transform="translate(1285 29)"/>
+</clipPath>
+<clipPath id="clip6_9_410">
+<rect width="75" height="33" fill="white" transform="translate(1333 31.5)"/>
+</clipPath>
+<clipPath id="clip7_9_410">
+<rect width="1144" height="54" fill="white" transform="translate(280 100)"/>
+</clipPath>
+<clipPath id="clip8_9_410">
+<rect width="329" height="54" fill="white" transform="translate(280 100)"/>
+</clipPath>
+<clipPath id="clip9_9_410">
+<rect width="531" height="44" fill="white" transform="translate(893 110)"/>
+</clipPath>
+<clipPath id="clip10_9_410">
+<rect width="1144" height="99" fill="white" transform="translate(280 174)"/>
+</clipPath>
+<clipPath id="clip11_9_410">
+<rect width="181" height="63" fill="white" transform="translate(368 192)"/>
+</clipPath>
+<clipPath id="clip12_9_410">
+<rect width="102" height="63" fill="white" transform="translate(658.5 192)"/>
+</clipPath>
+<clipPath id="clip13_9_410">
+<rect width="121" height="63" fill="white" transform="translate(949 192)"/>
+</clipPath>
+<clipPath id="clip14_9_410">
+<rect width="141" height="63" fill="white" transform="translate(1239.5 192)"/>
+</clipPath>
+<clipPath id="clip15_9_410">
+<rect width="1144" height="362" fill="white" transform="translate(280 293)"/>
+</clipPath>
+<clipPath id="clip16_9_410">
+<rect width="220" height="38" fill="white" transform="translate(302 313)"/>
+</clipPath>
+<clipPath id="clip17_9_410">
+<rect width="596" height="220" fill="white" transform="translate(302 365)"/>
+</clipPath>
+<clipPath id="clip18_9_410">
+<rect width="222" height="38" fill="white" transform="translate(960 313)"/>
+</clipPath>
+<clipPath id="clip19_9_410">
+<rect width="442" height="32" fill="white" transform="translate(960 365)"/>
+</clipPath>
+<clipPath id="clip20_9_410">
+<rect width="442" height="16" fill="white" transform="translate(960 365)"/>
+</clipPath>
+<clipPath id="clip21_9_410">
+<rect x="960" y="387" width="442" height="10" rx="5" fill="white"/>
+</clipPath>
+<clipPath id="clip22_9_410">
+<rect width="442" height="32" fill="white" transform="translate(960 411)"/>
+</clipPath>
+<clipPath id="clip23_9_410">
+<rect width="442" height="16" fill="white" transform="translate(960 411)"/>
+</clipPath>
+<clipPath id="clip24_9_410">
+<rect width="442" height="32" fill="white" transform="translate(960 457)"/>
+</clipPath>
+<clipPath id="clip25_9_410">
+<rect width="442" height="16" fill="white" transform="translate(960 457)"/>
+</clipPath>
+<clipPath id="clip26_9_410">
+<rect width="442" height="32" fill="white" transform="translate(960 503)"/>
+</clipPath>
+<clipPath id="clip27_9_410">
+<rect width="442" height="16" fill="white" transform="translate(960 503)"/>
+</clipPath>
+<clipPath id="clip28_9_410">
+<rect width="442" height="32" fill="white" transform="translate(960 549)"/>
+</clipPath>
+<clipPath id="clip29_9_410">
+<rect width="442" height="16" fill="white" transform="translate(960 549)"/>
+</clipPath>
+<clipPath id="clip30_9_410">
+<rect width="63" height="20" fill="white" transform="translate(302 695)"/>
+</clipPath>
+<image id="image0_9_410" width="79" height="79" preserveAspectRatio="none" xlink:href="data:image/png;base64,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"/>
+</defs>
+</svg>

@@ -1,0 +1,784 @@
+<svg width="1440" height="1325" viewBox="0 0 1440 1325" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="Admin / Settings" clip-path="url(#clip0_11_667)">
+<rect width="1440" height="1325" fill="#F2F6F5"/>
+<g id="Sidebar" filter="url(#filter0_dd_11_667)">
+<rect x="16" y="16" width="244" height="1293" rx="18" fill="white"/>
+<g id="Brand">
+<circle id="ISU seal" cx="58" cy="58" r="20" fill="url(#pattern0_11_667)"/>
+<g id="Group" clip-path="url(#clip1_11_667)">
+<text id="ISU Infirmary" fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="16" font-weight="800" letter-spacing="0em"><tspan x="90" y="56.528">ISU Infirmary</tspan></text>
+<text id="Log Book System" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="90" y="73.396">Log Book System</tspan></text>
+</g>
+</g>
+<g id="User">
+<rect x="30" y="100" width="216" height="54" rx="12" fill="#EEF2F8"/>
+<g id="Group_2">
+<rect x="40" y="110" width="34" height="34" rx="17" fill="#D6E4F2"/>
+<text id="AC" fill="#1D5F8E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="48" y="131.896">AC</tspan></text>
+</g>
+<g id="Group_3" clip-path="url(#clip2_11_667)">
+<text id="Admin Cruz" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="84" y="124.508">Admin Cruz</tspan></text>
+<text id="Admin" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="84" y="140.896">Admin</tspan></text>
+</g>
+</g>
+<g id="Section label">
+<text id="Overview" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="42" y="184.396">Overview</tspan></text>
+</g>
+<g id="link:Admin / Dashboard">
+<g id="icon/grid">
+<path id="Vector" d="M48.375 209.25H45.375C44.7537 209.25 44.25 209.754 44.25 210.375V213.375C44.25 213.996 44.7537 214.5 45.375 214.5H48.375C48.9963 214.5 49.5 213.996 49.5 213.375V210.375C49.5 209.754 48.9963 209.25 48.375 209.25Z" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_2" d="M56.625 209.25H53.625C53.0037 209.25 52.5 209.754 52.5 210.375V213.375C52.5 213.996 53.0037 214.5 53.625 214.5H56.625C57.2463 214.5 57.75 213.996 57.75 213.375V210.375C57.75 209.754 57.2463 209.25 56.625 209.25Z" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M56.625 217.5H53.625C53.0037 217.5 52.5 218.004 52.5 218.625V221.625C52.5 222.246 53.0037 222.75 53.625 222.75H56.625C57.2463 222.75 57.75 222.246 57.75 221.625V218.625C57.75 218.004 57.2463 217.5 56.625 217.5Z" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_4" d="M48.375 217.5H45.375C44.7537 217.5 44.25 218.004 44.25 218.625V221.625C44.25 222.246 44.7537 222.75 45.375 222.75H48.375C48.9963 222.75 49.5 222.246 49.5 221.625V218.625C49.5 218.004 48.9963 217.5 48.375 217.5Z" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Dashboard" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="500" letter-spacing="0em"><tspan x="72" y="221.712">Dashboard</tspan></text>
+</g>
+<g id="Section label_2">
+<text id="Management" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="42" y="265.396">Management</tspan></text>
+</g>
+<g id="link:Admin / Stock requests">
+<g id="icon/check">
+<path id="Vector_5" d="M53.25 291.5H48.75C48.3358 291.5 48 291.836 48 292.25V293.75C48 294.164 48.3358 294.5 48.75 294.5H53.25C53.6642 294.5 54 294.164 54 293.75V292.25C54 291.836 53.6642 291.5 53.25 291.5Z" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_6" d="M54 293H55.5C55.8978 293 56.2794 293.158 56.5607 293.439C56.842 293.721 57 294.102 57 294.5V305C57 305.398 56.842 305.779 56.5607 306.061C56.2794 306.342 55.8978 306.5 55.5 306.5H46.5C46.1022 306.5 45.7206 306.342 45.4393 306.061C45.158 305.779 45 305.398 45 305V294.5C45 294.102 45.158 293.721 45.4393 293.439C45.7206 293.158 46.1022 293 46.5 293H48M48.75 300.5L50.25 302L53.25 299" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Stock requests" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="500" letter-spacing="0em"><tspan x="72" y="304.712">Stock requests</tspan></text>
+<g id="Group_4">
+<rect x="212" y="288" width="22" height="22" rx="11" fill="#FDF3E2"/>
+<text id="1" fill="#8A5C0A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="220.5" y="303.488">1</tspan></text>
+</g>
+</g>
+<g id="link:Admin / User management">
+<g id="icon/users">
+<path id="Vector_7" d="M54 349.75V348.25C54 347.454 53.6839 346.691 53.1213 346.129C52.5587 345.566 51.7956 345.25 51 345.25H46.5C45.7044 345.25 44.9413 345.566 44.3787 346.129C43.8161 346.691 43.5 347.454 43.5 348.25V349.75" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_8" d="M48.75 342.25C50.4069 342.25 51.75 340.907 51.75 339.25C51.75 337.593 50.4069 336.25 48.75 336.25C47.0931 336.25 45.75 337.593 45.75 339.25C45.75 340.907 47.0931 342.25 48.75 342.25Z" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_9" d="M58.5 349.75V348.25C58.4995 347.585 58.2783 346.94 57.871 346.414C57.4638 345.889 56.8936 345.514 56.25 345.348M54 336.348C54.6453 336.513 55.2173 336.888 55.6257 337.414C56.0342 337.941 56.2559 338.588 56.2559 339.254C56.2559 339.92 56.0342 340.567 55.6257 341.093C55.2173 341.62 54.6453 341.995 54 342.16" stroke="#3E4E4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="User management" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="500" letter-spacing="0em"><tspan x="72" y="348.712">User management</tspan></text>
+</g>
+<g id="Section label_3">
+<text id="System" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="42" y="392.396">System</tspan></text>
+</g>
+<g id="link:Admin / Settings">
+<rect x="30" y="405" width="216" height="38" rx="10" fill="#E3F3EF"/>
+<g id="icon/gear" clip-path="url(#clip3_11_667)">
+<path id="Vector_10" d="M51 426.25C52.2426 426.25 53.25 425.243 53.25 424C53.25 422.757 52.2426 421.75 51 421.75C49.7574 421.75 48.75 422.757 48.75 424C48.75 425.243 49.7574 426.25 51 426.25Z" stroke="#0F5E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_11" d="M51 416.5V418.75M51 429.25V431.5M45.15 418.15L46.725 419.725M55.275 428.275L56.85 429.85M43.5 424H45.75M56.25 424H58.5M45.15 429.85L46.725 428.275M55.275 419.725L56.85 418.15" stroke="#0F5E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Settings" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="72" y="429.712">Settings</tspan></text>
+</g>
+<g id="link:Sign in / Admin">
+<g id="icon/out">
+<path id="Vector_12" d="M48.75 1278.75H45.75C45.3522 1278.75 44.9706 1278.59 44.6893 1278.31C44.408 1278.03 44.25 1277.65 44.25 1277.25V1266.75C44.25 1266.35 44.408 1265.97 44.6893 1265.69C44.9706 1265.41 45.3522 1265.25 45.75 1265.25H48.75M54 1268.25L57.75 1272L54 1275.75M57.75 1272H48.75" stroke="#5B6B68" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Sign out" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="500" letter-spacing="0em"><tspan x="72" y="1277.71">Sign out</tspan></text>
+</g>
+</g>
+<g id="Main" clip-path="url(#clip4_11_667)">
+<g id="Topbar" filter="url(#filter1_dd_11_667)">
+<rect x="280" y="16" width="1144" height="64" rx="16" fill="white"/>
+<g id="Menu">
+<g id="icon/menu">
+<path id="Vector_13" d="M305.333 43H318.667M305.333 48H318.667M305.333 53H318.667" stroke="#3E4E4B" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<text id="Settings_2" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="600" letter-spacing="0em"><tspan x="344" y="53.712">Settings</tspan></text>
+<g id="link:Admin / Stock requests_2">
+<rect x="1218" y="27" width="42" height="42" rx="11" fill="#F2F6F5"/>
+<g id="icon/bell">
+<path id="Vector_14" d="M1237.65 55.1252C1237.79 55.3662 1237.98 55.5672 1238.22 55.7072C1238.45 55.8472 1238.72 55.9211 1239 55.9211C1239.28 55.9211 1239.55 55.8472 1239.78 55.7072C1240.02 55.5672 1240.21 55.3662 1240.35 55.1252M1234.25 44.8335C1234.25 43.5737 1234.75 42.3655 1235.64 41.4747C1236.53 40.5839 1237.74 40.0835 1239 40.0835C1240.26 40.0835 1241.47 40.5839 1242.36 41.4747C1243.25 42.3655 1243.75 43.5737 1243.75 44.8335C1243.75 50.3752 1246.13 51.9585 1246.13 51.9585H1231.88C1231.88 51.9585 1234.25 50.3752 1234.25 44.8335Z" stroke="#3E4E4B" stroke-width="1.58333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="Count">
+<rect x="1240" y="32" width="16" height="16" rx="8" fill="#B0332B"/>
+<text id="1_2" fill="white" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="1245.5" y="44.08">1</tspan></text>
+</g>
+</g>
+<rect id="Rectangle" x="1272" y="34" width="1" height="28" fill="#E3EAE8"/>
+<g id="Group_5" clip-path="url(#clip5_11_667)">
+<g id="Group_6">
+<rect x="1285" y="29" width="38" height="38" rx="19" fill="#D6E4F2"/>
+<text id="AC_2" fill="#1D5F8E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1294.5" y="53.304">AC</tspan></text>
+</g>
+<g id="Group_7" clip-path="url(#clip6_11_667)">
+<text id="Admin Cruz_2" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="1333" y="45.508">Admin Cruz</tspan></text>
+<text id="Admin_2" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="1333" y="61.896">Admin</tspan></text>
+</g>
+</g>
+</g>
+<g id="Page header">
+<g id="Group_8" clip-path="url(#clip7_11_667)">
+<text id="System settings" fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="26" font-weight="800" letter-spacing="0em"><tspan x="280" y="127.108">System settings</tspan></text>
+<text id="Backups, retention, security rules and maintenance mode" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" letter-spacing="0em"><tspan x="280" y="151.008">Backups, retention, security rules and maintenance mode</tspan></text>
+</g>
+</g>
+<g id="Group_9" clip-path="url(#clip8_11_667)">
+<g id="Card" filter="url(#filter2_dd_11_667)">
+<rect x="280" y="174" width="563" height="276" rx="16" fill="white"/>
+<g id="Group_10">
+<g id="Group_11" clip-path="url(#clip9_11_667)">
+<g id="Group_12" clip-path="url(#clip10_11_667)">
+<text id="Backup and recovery" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="16" font-weight="bold" letter-spacing="0em"><tspan x="302" y="210.528">Backup and recovery</tspan></text>
+</g>
+<text id="Last backup: today, 12:00 AM, automated, 41.3 MB" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="302" y="229.1">Last backup: today, 12:00 AM, automated, 41.3 MB</tspan></text>
+</g>
+</g>
+<g id="Group_13">
+<g id="Group_14" clip-path="url(#clip11_11_667)">
+<text id="Automated backups" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="302" y="260.712">Automated backups</tspan></text>
+<text id="Daily snapshot at 12:00 AM, kept 30 days" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="302" y="279.1">Daily snapshot at 12:00 AM, kept 30 days</tspan></text>
+</g>
+<g id="Toggle/on">
+<g clip-path="url(#clip12_11_667)">
+<rect x="773" y="250" width="48" height="28" rx="14" fill="#137A6D"/>
+<g id="Ellipse" filter="url(#filter3_d_11_667)">
+<circle cx="807" cy="264" r="11" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+<g id="Group_15">
+<g id="Group_16" clip-path="url(#clip13_11_667)">
+<text id="Manual backup" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="302" y="326.712">Manual backup</tspan></text>
+<text id="Take a snapshot right now" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="302" y="345.1">Take a snapshot right now</tspan></text>
+</g>
+<g id="Button/Back up now">
+<rect x="705" y="311" width="116" height="38" rx="11" fill="#137A6D"/>
+<text id="Back up now" fill="white" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="721" y="335.508">Back up now</tspan></text>
+</g>
+</g>
+<g id="Group_17">
+<g id="Group_18" clip-path="url(#clip14_11_667)">
+<text id="Restore from backup" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="302" y="393.712">Restore from backup</tspan></text>
+<text id="Roll the database back to an earlier snapshot" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="302" y="412.1">Roll the database back to an earlier snapshot</tspan></text>
+</g>
+<g id="Button/Restore">
+<rect x="736.5" y="378.5" width="84" height="37" rx="10.5" fill="white"/>
+<rect x="736.5" y="378.5" width="84" height="37" rx="10.5" stroke="#DCE5E2"/>
+<text id="Restore" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="753" y="402.508">Restore</tspan></text>
+</g>
+</g>
+</g>
+<g id="Card_2" filter="url(#filter4_dd_11_667)">
+<rect x="861" y="174" width="563" height="276" rx="16" fill="white"/>
+<g id="Group_19">
+<g id="Group_20" clip-path="url(#clip15_11_667)">
+<g id="Group_21" clip-path="url(#clip16_11_667)">
+<text id="Retention schedule" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="16" font-weight="bold" letter-spacing="0em"><tspan x="883" y="210.528">Retention schedule</tspan></text>
+</g>
+<text id="412 MB across 1,247 patient records" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="883" y="229.1">412 MB across 1,247 patient records</tspan></text>
+</g>
+</g>
+<g id="Group_22">
+<g id="Group_23" clip-path="url(#clip17_11_667)">
+<text id="Export database" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="883" y="261.712">Export database</tspan></text>
+<text id="Full dump for offline storage" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="883" y="280.1">Full dump for offline storage</tspan></text>
+</g>
+<g id="Button/Export .SQL">
+<rect x="1265.5" y="246.5" width="136" height="37" rx="10.5" fill="white"/>
+<rect x="1265.5" y="246.5" width="136" height="37" rx="10.5" stroke="#DCE5E2"/>
+<g id="icon/dl">
+<path id="Vector_15" d="M1296 267V269.667C1296 270.02 1295.86 270.359 1295.61 270.609C1295.36 270.86 1295.02 271 1294.67 271H1285.33C1284.98 271 1284.64 270.86 1284.39 270.609C1284.14 270.359 1284 270.02 1284 269.667V267M1293.33 263.667L1290 267L1286.67 263.667M1290 267V259" stroke="#137A6D" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Export .SQL" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="1306" y="270.508">Export .SQL</tspan></text>
+</g>
+</g>
+<g id="Group_24">
+<g id="Group_25" clip-path="url(#clip18_11_667)">
+<text id="Soft delete" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="883" y="327.712">Soft delete</tspan></text>
+<text id="Deleted records recoverable for 90 days" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="883" y="346.1">Deleted records recoverable for 90 days</tspan></text>
+</g>
+<g id="Badge/90 days">
+<rect x="1341" y="321" width="61" height="20" rx="7" fill="#E3F3EF"/>
+<text id="90 days" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1350" y="335.488">90 days</tspan></text>
+</g>
+</g>
+<g id="Group_26">
+<g id="Group_27" clip-path="url(#clip19_11_667)">
+<text id="Trash" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="883" y="393.712">Trash</tspan></text>
+<text id="18 records waiting to be purged" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="883" y="412.1">18 records waiting to be purged</tspan></text>
+</g>
+<g id="Button/Open trash">
+<rect x="1295.5" y="378.5" width="106" height="37" rx="10.5" fill="white"/>
+<rect x="1295.5" y="378.5" width="106" height="37" rx="10.5" stroke="#DCE5E2"/>
+<text id="Open trash" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="1312" y="402.508">Open trash</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<g id="Group_28" clip-path="url(#clip20_11_667)">
+<g id="Card_3" filter="url(#filter5_dd_11_667)">
+<rect x="280" y="470" width="563" height="345" rx="16" fill="white"/>
+<g id="Group_29">
+<g id="Group_30" clip-path="url(#clip21_11_667)">
+<g id="Group_31" clip-path="url(#clip22_11_667)">
+<text id="Security" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="16" font-weight="bold" letter-spacing="0em"><tspan x="302" y="506.528">Security</tspan></text>
+</g>
+<text id="Applies to every account" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="302" y="525.1">Applies to every account</tspan></text>
+</g>
+</g>
+<g id="Group_32">
+<g id="Group_33" clip-path="url(#clip23_11_667)">
+<text id="Minimum password length" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="302" y="558.712">Minimum password length</tspan></text>
+<text id="Currently 8 characters" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="302" y="577.1">Currently 8 characters</tspan></text>
+</g>
+<g id="Select/8">
+<rect x="741.5" y="542.5" width="79" height="39" rx="9.5" fill="white"/>
+<rect x="741.5" y="542.5" width="79" height="39" rx="9.5" stroke="#DCE5E2"/>
+<text id="8" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="754" y="567.304">8</tspan></text>
+<g id="icon/chev">
+<path id="Vector_16" d="M796.75 560.125L800.5 563.875L804.25 560.125" stroke="#7A8A87" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+<g id="Group_34">
+<g id="Group_35" clip-path="url(#clip24_11_667)">
+<text id="Require a symbol" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="302" y="625.712">Require a symbol</tspan></text>
+<text id="At least one special character" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="302" y="644.1">At least one special character</tspan></text>
+</g>
+<g id="Toggle/on_2">
+<g clip-path="url(#clip25_11_667)">
+<rect x="773" y="615" width="48" height="28" rx="14" fill="#137A6D"/>
+<g id="Ellipse_2" filter="url(#filter6_d_11_667)">
+<circle cx="807" cy="629" r="11" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+<g id="Group_36">
+<g id="Group_37" clip-path="url(#clip26_11_667)">
+<text id="Failed login limit" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="302" y="692.712">Failed login limit</tspan></text>
+<text id="Locks the account for 15 minutes" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="302" y="711.1">Locks the account for 15 minutes</tspan></text>
+</g>
+<g id="Select/5 attempts">
+<rect x="701.5" y="676.5" width="119" height="39" rx="9.5" fill="white"/>
+<rect x="701.5" y="676.5" width="119" height="39" rx="9.5" stroke="#DCE5E2"/>
+<text id="5 attempts" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="714" y="701.304">5 attempts</tspan></text>
+<g id="icon/chev_2">
+<path id="Vector_17" d="M796.75 694.125L800.5 697.875L804.25 694.125" stroke="#7A8A87" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+<g id="Group_38">
+<g id="Group_39" clip-path="url(#clip27_11_667)">
+<text id="Password reset by email" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="302" y="759.712">Password reset by email</tspan></text>
+<text id="Sends a reset link to the account email" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="302" y="778.1">Sends a reset link to the account email</tspan></text>
+</g>
+<g id="Toggle/on_3">
+<g clip-path="url(#clip28_11_667)">
+<rect x="773" y="749" width="48" height="28" rx="14" fill="#137A6D"/>
+<g id="Ellipse_3" filter="url(#filter7_d_11_667)">
+<circle cx="807" cy="763" r="11" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="Card_4" filter="url(#filter8_dd_11_667)">
+<rect x="861" y="470" width="563" height="276" rx="16" fill="white"/>
+<g id="Group_40">
+<g id="Group_41" clip-path="url(#clip29_11_667)">
+<g id="Group_42" clip-path="url(#clip30_11_667)">
+<text id="Maintenance mode" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="16" font-weight="bold" letter-spacing="0em"><tspan x="883" y="506.528">Maintenance mode</tspan></text>
+</g>
+<text id="Blocks sign-in while the database is being worked on" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="883" y="525.1">Blocks sign-in while the database is being worked on</tspan></text>
+</g>
+</g>
+<g id="Group_43">
+<g id="Group_44" clip-path="url(#clip31_11_667)">
+<text id="Maintenance mode_2" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="883" y="556.712">Maintenance mode</tspan></text>
+<text id="Currently off. Staff can sign in normally." fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="883" y="575.1">Currently off. Staff can sign in normally.</tspan></text>
+</g>
+<g id="Toggle/off">
+<g clip-path="url(#clip32_11_667)">
+<rect x="1354" y="546" width="48" height="28" rx="14" fill="#C8D6D2"/>
+<g id="Ellipse_4" filter="url(#filter9_d_11_667)">
+<circle cx="1368" cy="560" r="11" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+<g id="Group_45">
+<g id="Group_46" clip-path="url(#clip33_11_667)">
+<text id="Scheduled window" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="883" y="622.712">Scheduled window</tspan></text>
+<text id="Sundays 11:00 PM &#226;&#128;&#147; 1:00 AM" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="883" y="641.1">Sundays 11:00 PM &#x2013; 1:00 AM</tspan></text>
+</g>
+<g id="Button/Edit">
+<rect x="1342.5" y="607.5" width="59" height="37" rx="10.5" fill="white"/>
+<rect x="1342.5" y="607.5" width="59" height="37" rx="10.5" stroke="#DCE5E2"/>
+<text id="Edit" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="1359" y="631.508">Edit</tspan></text>
+</g>
+</g>
+<g id="Group_47">
+<g id="Group_48" clip-path="url(#clip34_11_667)">
+<text id="Notice shown to staff" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="883" y="689.712">Notice shown to staff</tspan></text>
+<text id="System under maintenance, please try again later" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="883" y="708.1">System under maintenance, please try again later</tspan></text>
+</g>
+<g id="Button/Edit_2">
+<rect x="1342.5" y="674.5" width="59" height="37" rx="10.5" fill="white"/>
+<rect x="1342.5" y="674.5" width="59" height="37" rx="10.5" stroke="#DCE5E2"/>
+<text id="Edit_2" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="1359" y="698.508">Edit</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<g id="Activity log" filter="url(#filter10_dd_11_667)">
+<rect x="280" y="835" width="1144" height="474" rx="16" fill="white"/>
+<g id="Group_49">
+<g id="Group_50" clip-path="url(#clip35_11_667)">
+<g id="Group_51" clip-path="url(#clip36_11_667)">
+<text id="Activity log_2" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="16" font-weight="bold" letter-spacing="0em"><tspan x="302" y="871.528">Activity log</tspan></text>
+</g>
+<text id="Every administrative action, kept for audit" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="302" y="890.1">Every administrative action, kept for audit</tspan></text>
+</g>
+</g>
+<g id="Group_52" clip-path="url(#clip37_11_667)">
+<g id="Search">
+<rect x="302" y="907" width="459" height="40" rx="10" fill="#F2F6F5"/>
+<g id="icon/search">
+<path id="Vector_18" d="M323.333 931C325.91 931 328 928.91 328 926.333C328 923.756 325.91 921.667 323.333 921.667C320.756 921.667 318.667 923.756 318.667 926.333C318.667 928.91 320.756 931 323.333 931Z" stroke="#7A8A87" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_19" d="M329.333 932.333L327 930" stroke="#7A8A87" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Search action, user or detail" fill="#7A8A87" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" letter-spacing="0em"><tspan x="342" y="932.508">Search action, user or detail</tspan></text>
+</g>
+<g id="Select/Type: all">
+<rect x="771.5" y="907.5" width="99" height="39" rx="9.5" fill="white"/>
+<rect x="771.5" y="907.5" width="99" height="39" rx="9.5" stroke="#DCE5E2"/>
+<text id="Type: all" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="784" y="932.304">Type: all</tspan></text>
+<g id="icon/chev_3">
+<path id="Vector_20" d="M846.75 925.125L850.5 928.875L854.25 925.125" stroke="#7A8A87" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<g id="Select/2026-09-01">
+<rect x="881.5" y="907.5" width="129" height="39" rx="9.5" fill="white"/>
+<rect x="881.5" y="907.5" width="129" height="39" rx="9.5" stroke="#DCE5E2"/>
+<text id="2026-09-01" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="894" y="932.304">2026-09-01</tspan></text>
+<g id="icon/cal">
+<path id="Vector_21" d="M994.875 922H986.125C985.435 922 984.875 922.56 984.875 923.25V932C984.875 932.69 985.435 933.25 986.125 933.25H994.875C995.565 933.25 996.125 932.69 996.125 932V923.25C996.125 922.56 995.565 922 994.875 922Z" stroke="#7A8A87" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_22" d="M993 920.75V923.25M988 920.75V923.25M984.875 925.75H996.125" stroke="#7A8A87" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<g id="Select/2026-09-15">
+<rect x="1021.5" y="907.5" width="128" height="39" rx="9.5" fill="white"/>
+<rect x="1021.5" y="907.5" width="128" height="39" rx="9.5" stroke="#DCE5E2"/>
+<text id="2026-09-15" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="1034" y="932.304">2026-09-15</tspan></text>
+<g id="icon/cal_2">
+<path id="Vector_23" d="M1133.88 922H1125.12C1124.43 922 1123.88 922.56 1123.88 923.25V932C1123.88 932.69 1124.43 933.25 1125.12 933.25H1133.88C1134.57 933.25 1135.12 932.69 1135.12 932V923.25C1135.12 922.56 1134.57 922 1133.88 922Z" stroke="#7A8A87" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_24" d="M1132 920.75V923.25M1127 920.75V923.25M1123.88 925.75H1135.12" stroke="#7A8A87" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<g id="Button/Apply">
+<rect x="1160" y="907" width="68" height="40" rx="11" fill="#E3F3EF"/>
+<text id="Apply" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="1174" y="932.508">Apply</tspan></text>
+</g>
+<g id="Select/Sort: date, newest">
+<rect x="1238.5" y="907.5" width="163" height="39" rx="9.5" fill="white"/>
+<rect x="1238.5" y="907.5" width="163" height="39" rx="9.5" stroke="#DCE5E2"/>
+<text id="Sort: date, newest" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="1251" y="932.304">Sort: date, newest</tspan></text>
+<g id="icon/chev_4">
+<path id="Vector_25" d="M1377.75 925.125L1381.5 928.875L1385.25 925.125" stroke="#7A8A87" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+<g id="Header row">
+<g clip-path="url(#clip38_11_667)">
+<rect x="302" y="961" width="1100" height="37" rx="10" fill="#F2F8F6"/>
+<g id="Group_53">
+<text id="When" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="312" y="984.396">When</tspan></text>
+</g>
+<g id="Group_54">
+<text id="Who" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="452" y="984.396">Who</tspan></text>
+</g>
+<g id="Group_55">
+<text id="Action" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="552" y="984.396">Action</tspan></text>
+</g>
+<g id="Group_56">
+<text id="Detail" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="922" y="984.396">Detail</tspan></text>
+</g>
+<g id="Group_57">
+<text id="Type" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" font-weight="600" letter-spacing="0em"><tspan x="1292" y="984.396">Type</tspan></text>
+</g>
+</g>
+</g>
+<g id="Row">
+<g id="td">
+<text id="Sep 15, 12:00 AM" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="312" y="1039.3">Sep 15, 12:00 AM</tspan></text>
+</g>
+<g id="td_2">
+<text id="system" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="452" y="1039.3">system</tspan></text>
+</g>
+<g id="td_3">
+<text id="Automated backup completed" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="552" y="1039.3">Automated backup completed</tspan></text>
+</g>
+<g id="td_4">
+<text id="41.3 MB, 30-day retention" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="922" y="1039.3">41.3 MB, 30-day retention</tspan></text>
+</g>
+<g id="td_5">
+<g id="Badge/Backup">
+<rect x="1292" y="1024" width="59" height="20" rx="7" fill="#E3F3EF"/>
+<text id="Backup" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1301" y="1038.49">Backup</tspan></text>
+</g>
+</g>
+</g>
+<g id="Row_2">
+<g id="td_6">
+<text id="Sep 14, 2:11 PM" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="312" y="1098.3">Sep 14, 2:11 PM</tspan></text>
+</g>
+<g id="td_7">
+<text id="acruz" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="452" y="1098.3">acruz</tspan></text>
+</g>
+<g id="td_8">
+<text id="Password reset" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="552" y="1098.3">Password reset</tspan></text>
+</g>
+<g id="td_9">
+<text id="Account pramos" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="922" y="1098.3">Account pramos</tspan></text>
+</g>
+<g id="td_10">
+<g id="Badge/Security">
+<rect x="1292" y="1083" width="63" height="20" rx="7" fill="#FDF3E2"/>
+<text id="Security_2" fill="#8A5C0A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1301" y="1097.49">Security</tspan></text>
+</g>
+</g>
+</g>
+<g id="Row_3">
+<g id="td_11">
+<text id="Sep 14, 9:44 AM" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="312" y="1157.3">Sep 14, 9:44 AM</tspan></text>
+</g>
+<g id="td_12">
+<text id="nsantos" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="452" y="1157.3">nsantos</tspan></text>
+</g>
+<g id="td_13">
+<text id="Patient record edited" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="552" y="1157.3">Patient record edited</tspan></text>
+</g>
+<g id="td_14">
+<text id="Domingo, Aira, contact number" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="922" y="1157.3">Domingo, Aira, contact number</tspan></text>
+</g>
+<g id="td_15">
+<g id="Badge/Record">
+<rect x="1292" y="1142" width="58" height="20" rx="7" fill="#E6EFF8"/>
+<text id="Record" fill="#1D5F8E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1301" y="1156.49">Record</tspan></text>
+</g>
+</g>
+</g>
+<g id="Row_4" clip-path="url(#clip39_11_667)">
+<g id="td_16">
+<text id="Sep 13, 4:30 PM" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="312" y="1216.3">Sep 13, 4:30 PM</tspan></text>
+</g>
+<g id="td_17">
+<text id="acruz_2" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="452" y="1216.3">acruz</tspan></text>
+</g>
+<g id="td_18">
+<text id="Requisition approved" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="552" y="1216.3">Requisition approved</tspan></text>
+</g>
+<g id="td_19">
+<text id="REQ-0041, Amoxicillin &#195;&#151; 60" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="922" y="1216.3">REQ-0041, Amoxicillin &#xd7; 60</tspan></text>
+</g>
+<g id="td_20">
+<g id="Badge/Inventory">
+<rect x="1292" y="1201" width="70" height="20" rx="7" fill="#E6F5EC"/>
+<text id="Inventory" fill="#1F6B45" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1301" y="1215.49">Inventory</tspan></text>
+</g>
+</g>
+</g>
+<g id="Pagination">
+<text id="Showing 1&#226;&#128;&#147;4 of 842" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="306" y="1277.3">Showing 1&#x2013;4 of 842</tspan></text>
+<g id="Group_58" clip-path="url(#clip40_11_667)">
+<g id="Group_59">
+<rect x="1124.5" y="1255.5" width="33" height="33" rx="8.5" fill="white"/>
+<rect x="1124.5" y="1255.5" width="33" height="33" rx="8.5" stroke="#DCE5E2"/>
+<text id="&#226;&#128;&#185;" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="1138.5" y="1277.3">&#x2039;</tspan></text>
+</g>
+<g id="Group_60">
+<rect x="1164" y="1255" width="34" height="34" rx="9" fill="#137A6D"/>
+<text id="1_3" fill="white" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1178" y="1277.3">1</tspan></text>
+</g>
+<g id="Group_61">
+<rect x="1204.5" y="1255.5" width="33" height="33" rx="8.5" fill="white"/>
+<rect x="1204.5" y="1255.5" width="33" height="33" rx="8.5" stroke="#DCE5E2"/>
+<text id="2" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="1217" y="1277.3">2</tspan></text>
+</g>
+<g id="Group_62">
+<rect x="1244.5" y="1255.5" width="33" height="33" rx="8.5" fill="white"/>
+<rect x="1244.5" y="1255.5" width="33" height="33" rx="8.5" stroke="#DCE5E2"/>
+<text id="3" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="1257" y="1277.3">3</tspan></text>
+</g>
+<g id="Group_63">
+<text id="&#226;&#128;&#166;" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="1296" y="1277.3">&#x2026;</tspan></text>
+</g>
+<g id="Group_64">
+<rect x="1324.5" y="1255.5" width="33" height="33" rx="8.5" fill="white"/>
+<rect x="1324.5" y="1255.5" width="33" height="33" rx="8.5" stroke="#DCE5E2"/>
+<text id="17" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="1334.5" y="1277.3">17</tspan></text>
+</g>
+<g id="Group_65">
+<rect x="1364.5" y="1255.5" width="33" height="33" rx="8.5" fill="white"/>
+<rect x="1364.5" y="1255.5" width="33" height="33" rx="8.5" stroke="#DCE5E2"/>
+<text id="&#226;&#128;&#186;" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="1378.5" y="1277.3">&#x203a;</tspan></text>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_dd_11_667" x="-12" y="-2" width="300" height="1349" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_667"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_11_667" result="effect2_dropShadow_11_667"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_11_667" result="shape"/>
+</filter>
+<pattern id="pattern0_11_667" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_11_667" transform="scale(0.0126582)"/>
+</pattern>
+<filter id="filter1_dd_11_667" x="252" y="-2" width="1200" height="120" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_667"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_11_667" result="effect2_dropShadow_11_667"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_11_667" result="shape"/>
+</filter>
+<filter id="filter2_dd_11_667" x="252" y="156" width="619" height="332" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_667"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_11_667" result="effect2_dropShadow_11_667"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_11_667" result="shape"/>
+</filter>
+<filter id="filter3_d_11_667" x="793" y="251" width="28" height="28" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1.5"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_667"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_11_667" result="shape"/>
+</filter>
+<filter id="filter4_dd_11_667" x="833" y="156" width="619" height="332" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_667"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_11_667" result="effect2_dropShadow_11_667"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_11_667" result="shape"/>
+</filter>
+<filter id="filter5_dd_11_667" x="252" y="452" width="619" height="401" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_667"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_11_667" result="effect2_dropShadow_11_667"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_11_667" result="shape"/>
+</filter>
+<filter id="filter6_d_11_667" x="793" y="616" width="28" height="28" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1.5"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_667"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_11_667" result="shape"/>
+</filter>
+<filter id="filter7_d_11_667" x="793" y="750" width="28" height="28" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1.5"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_667"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_11_667" result="shape"/>
+</filter>
+<filter id="filter8_dd_11_667" x="833" y="452" width="619" height="332" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_667"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_11_667" result="effect2_dropShadow_11_667"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_11_667" result="shape"/>
+</filter>
+<filter id="filter9_d_11_667" x="1354" y="547" width="28" height="28" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1.5"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_667"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_11_667" result="shape"/>
+</filter>
+<filter id="filter10_dd_11_667" x="252" y="817" width="1200" height="530" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_667"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="10"/>
+<feGaussianBlur stdDeviation="14"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.05 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_11_667" result="effect2_dropShadow_11_667"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_11_667" result="shape"/>
+</filter>
+<clipPath id="clip0_11_667">
+<rect width="1440" height="1325" fill="white"/>
+</clipPath>
+<clipPath id="clip1_11_667">
+<rect width="100" height="36" fill="white" transform="translate(90 40)"/>
+</clipPath>
+<clipPath id="clip2_11_667">
+<rect width="75" height="33" fill="white" transform="translate(84 110.5)"/>
+</clipPath>
+<clipPath id="clip3_11_667">
+<rect width="18" height="18" fill="white" transform="translate(42 415)"/>
+</clipPath>
+<clipPath id="clip4_11_667">
+<rect width="1144" height="1293" fill="white" transform="translate(280 16)"/>
+</clipPath>
+<clipPath id="clip5_11_667">
+<rect width="123" height="38" fill="white" transform="translate(1285 29)"/>
+</clipPath>
+<clipPath id="clip6_11_667">
+<rect width="75" height="33" fill="white" transform="translate(1333 31.5)"/>
+</clipPath>
+<clipPath id="clip7_11_667">
+<rect width="365" height="54" fill="white" transform="translate(280 100)"/>
+</clipPath>
+<clipPath id="clip8_11_667">
+<rect width="1144" height="276" fill="white" transform="translate(280 174)"/>
+</clipPath>
+<clipPath id="clip9_11_667">
+<rect width="295" height="38" fill="white" transform="translate(302 194)"/>
+</clipPath>
+<clipPath id="clip10_11_667">
+<rect width="165" height="20" fill="white" transform="translate(302 194)"/>
+</clipPath>
+<clipPath id="clip11_11_667">
+<rect width="457" height="36" fill="white" transform="translate(302 246)"/>
+</clipPath>
+<clipPath id="clip12_11_667">
+<rect x="773" y="250" width="48" height="28" rx="14" fill="white"/>
+</clipPath>
+<clipPath id="clip13_11_667">
+<rect width="389" height="36" fill="white" transform="translate(302 312)"/>
+</clipPath>
+<clipPath id="clip14_11_667">
+<rect width="420" height="36" fill="white" transform="translate(302 379)"/>
+</clipPath>
+<clipPath id="clip15_11_667">
+<rect width="209" height="38" fill="white" transform="translate(883 194)"/>
+</clipPath>
+<clipPath id="clip16_11_667">
+<rect width="151" height="20" fill="white" transform="translate(883 194)"/>
+</clipPath>
+<clipPath id="clip17_11_667">
+<rect width="368" height="36" fill="white" transform="translate(883 247)"/>
+</clipPath>
+<clipPath id="clip18_11_667">
+<rect width="444" height="36" fill="white" transform="translate(883 313)"/>
+</clipPath>
+<clipPath id="clip19_11_667">
+<rect width="398" height="36" fill="white" transform="translate(883 379)"/>
+</clipPath>
+<clipPath id="clip20_11_667">
+<rect width="1144" height="345" fill="white" transform="translate(280 470)"/>
+</clipPath>
+<clipPath id="clip21_11_667">
+<rect width="146" height="38" fill="white" transform="translate(302 490)"/>
+</clipPath>
+<clipPath id="clip22_11_667">
+<rect width="66" height="20" fill="white" transform="translate(302 490)"/>
+</clipPath>
+<clipPath id="clip23_11_667">
+<rect width="425" height="36" fill="white" transform="translate(302 544)"/>
+</clipPath>
+<clipPath id="clip24_11_667">
+<rect width="457" height="36" fill="white" transform="translate(302 611)"/>
+</clipPath>
+<clipPath id="clip25_11_667">
+<rect x="773" y="615" width="48" height="28" rx="14" fill="white"/>
+</clipPath>
+<clipPath id="clip26_11_667">
+<rect width="385" height="36" fill="white" transform="translate(302 678)"/>
+</clipPath>
+<clipPath id="clip27_11_667">
+<rect width="457" height="36" fill="white" transform="translate(302 745)"/>
+</clipPath>
+<clipPath id="clip28_11_667">
+<rect x="773" y="749" width="48" height="28" rx="14" fill="white"/>
+</clipPath>
+<clipPath id="clip29_11_667">
+<rect width="310" height="38" fill="white" transform="translate(883 490)"/>
+</clipPath>
+<clipPath id="clip30_11_667">
+<rect width="150" height="20" fill="white" transform="translate(883 490)"/>
+</clipPath>
+<clipPath id="clip31_11_667">
+<rect width="457" height="36" fill="white" transform="translate(883 542)"/>
+</clipPath>
+<clipPath id="clip32_11_667">
+<rect x="1354" y="546" width="48" height="28" rx="14" fill="white"/>
+</clipPath>
+<clipPath id="clip33_11_667">
+<rect width="445" height="36" fill="white" transform="translate(883 608)"/>
+</clipPath>
+<clipPath id="clip34_11_667">
+<rect width="445" height="36" fill="white" transform="translate(883 675)"/>
+</clipPath>
+<clipPath id="clip35_11_667">
+<rect width="243" height="38" fill="white" transform="translate(302 855)"/>
+</clipPath>
+<clipPath id="clip36_11_667">
+<rect width="89" height="20" fill="white" transform="translate(302 855)"/>
+</clipPath>
+<clipPath id="clip37_11_667">
+<rect width="1100" height="40" fill="white" transform="translate(302 907)"/>
+</clipPath>
+<clipPath id="clip38_11_667">
+<rect x="302" y="961" width="1100" height="37" rx="10" fill="white"/>
+</clipPath>
+<clipPath id="clip39_11_667">
+<rect width="1100" height="44" fill="white" transform="translate(302 1189)"/>
+</clipPath>
+<clipPath id="clip40_11_667">
+<rect width="274" height="34" fill="white" transform="translate(1124 1255)"/>
+</clipPath>
+<image id="image0_11_667" width="79" height="79" preserveAspectRatio="none" xlink:href="data:image/png;base64,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"/>
+</defs>
+</svg>
