@@ -1,28 +1,36 @@
 // Nav metadata per role — drives the sidebar AND the topbar breadcrumb.
 // Keep 'id' values in sync with the view switch in App.jsx.
-// Order and labels follow the Figma (LogbookISU) sidebar exactly.
+// Grouping, labels and icons follow the Figma v2 sidebar.
 export const NAVS = {
   nurse: [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'add-visit', label: 'Add Visit Record' },
-    { id: 'patient-records', label: 'Patient Records' },
-    { id: 'flag-cases', label: 'Priority & Special Cases' },
-    { id: 'search-history', label: 'Search & History' },
-    { id: 'stock', label: 'Stock & Supplies' },
-    { id: 'insights', label: 'Insights' },
+    { section: 'Clinical' },
+    { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { id: 'add-visit', label: 'Add visit record', icon: 'plusSquare' },
+    { id: 'patient-records', label: 'Patient records', icon: 'clipboard' },
+    { id: 'flag-cases', label: 'Priority & special cases', icon: 'flag' },
+    { id: 'search-history', label: 'Search & history', icon: 'search' },
+    { section: 'Supplies & reports' },
+    { id: 'stock', label: 'Stock & supplies', icon: 'box', badge: 'lowStock' },
+    { id: 'insights', label: 'Insights', icon: 'chart' },
   ],
   admin: [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'stock-requests', label: 'Stock Requests' },
-    { id: 'users', label: 'User Management' },
-    { id: 'settings', label: 'Settings' },
+    { section: 'Overview' },
+    { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { section: 'Management' },
+    { id: 'stock-requests', label: 'Stock requests', icon: 'clipboardCheck', badge: 'pendingRequests' },
+    { id: 'users', label: 'User management', icon: 'users' },
+    { section: 'System' },
+    { id: 'settings', label: 'Settings', icon: 'settings' },
   ],
 };
+
+/** Just the real links, with the section headers dropped. */
+export const linksOf = (role) => NAVS[role].filter((n) => n.id);
 
 // Views reachable outside the sidebar (drill-down and print pages) still need a
 // breadcrumb label.
 export const EXTRA_VIEW_LABELS = {
-  profile: 'Patient Records',
-  'medical-certificate': 'Medical Certificate',
-  'parental-notification': 'Parental Notification',
+  profile: 'Patient records / Patient profile',
+  'medical-certificate': 'Medical certificate',
+  'parental-notification': 'Parental notification',
 };

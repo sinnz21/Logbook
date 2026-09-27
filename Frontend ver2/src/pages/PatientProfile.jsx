@@ -4,23 +4,27 @@ import { useAsync } from '../hooks/useAsync';
 import { deletePatient, getPatient, retireSpecialCase } from '../api/patients';
 import { listVisits } from '../api/visits';
 import Pagination from '../components/Pagination';
+import Icon from '../components/Icon';
 import { formatDate, formatTime, parseApiDate } from '../lib/time';
 import {
-  dispensedSummary, initialsOf, patientMeta, SPECIAL_CASE_CLASS, specialCaseCategory,
+  dispensedSummary, initialsOf, SPECIAL_CASE_CLASS, specialCaseCategory,
   specialCaseLabel, vitalsSummary,
 } from '../lib/format';
 import { downloadCsv, toCsv } from '../lib/csv';
 
 const dash = (v) => v || '—';
 
+const DISPOSITION_PILL = (name = '') =>
+  /hospital|referred/i.test(name) ? 'blue' : /sent home/i.test(name) ? 'amber' : 'teal';
+
 const CSV_COLUMNS = [
   { header: 'Date', value: (v) => formatDate(parseApiDate(v.startedAt)) },
   { header: 'Time In', value: (v) => formatTime(parseApiDate(v.startedAt)) },
   { header: 'Time Out', value: (v) => (v.endedAt ? formatTime(parseApiDate(v.endedAt)) : '') },
-  { header: 'BP / Temp / Pulse', value: (v) => vitalsSummary(v) },
-  { header: 'Chief Complaint', value: (v) => v.chiefComplaint },
-  { header: 'Treatment Notes', value: (v) => v.treatmentNotes || v.management },
-  { header: 'Medicines & Supplies', value: (v) => dispensedSummary(v) },
+  { header: 'BP, temp, pulse', value: (v) => vitalsSummary(v) },
+  { header: 'Chief complaint', value: (v) => v.chiefComplaint },
+  { header: 'Treatment notes', value: (v) => v.treatmentNotes || v.management },
+  { header: 'Medicines and supplies', value: (v) => dispensedSummary(v) },
   { header: 'Disposition', value: (v) => v.dispositionName },
   { header: 'Nurse', value: (v) => v.attendingName },
 ];
@@ -55,7 +59,7 @@ export default function PatientProfile() {
   const [committed, setCommitted] = useState({ dateFrom: '', dateTo: '' });
   const [draftRange, setDraftRange] = useState({ dateFrom: '', dateTo: '' });
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(50);
+  const [perPage] = useState(5);
 
   // Filter locally too, in case the backend doesn't support ?patient_id= yet.
   const allVisits = useMemo(
@@ -88,6 +92,7 @@ export default function PatientProfile() {
     0,
   );
   const pageRows = visits.slice((page - 1) * perPage, page * perPage);
+  const name = p?.fullName || selectedPatient.patientName || 'Loading…';
 
   const refresh = () => {
     patient.reload();
@@ -103,79 +108,84 @@ export default function PatientProfile() {
     }
   };
 
-  const flaggedLine = activeCases
-    .map((c) => specialCaseLabel(c))
-    .join(' · ');
+  const flaggedBy = activeCases.find((c) => c.flaggedByName)?.flaggedByName;
+  const flaggedAt = activeCases.find((c) => c.flaggedAt)?.flaggedAt;
 
   return (
     <div className="view active">
-      <div className="page-head">
-        <div>
-          <h1>Patient Profile</h1>
-          <div className="sub">
-            {p?.fullName || selectedPatient.patientName || 'Loading…'} · complete visit history
-          </div>
-        </div>
-      </div>
+      <button className="back-link no-print" onClick={() => navigate('patient-records')}>
+        <Icon name="chevronLeft" size={16} /> Back to patient records
+      </button>
 
-      {patient.error && <div className="login-error">Couldn&rsquo;t load this patient: {patient.error}</div>}
+      {patient.error && <div className="login-error" style={{ marginBottom: 14 }}>Couldn&rsquo;t load this patient: {patient.error}</div>}
 
       {activeCases.length > 0 && (
         <div className="alert-banner danger">
-          <div className="ic">⚑</div>
+          <div className="ic-wrap"><Icon name="flag" size={20} /></div>
           <div className="txt">
-            <strong>Special case — appears on every visit</strong>
-            <span>{flaggedLine}</span>
+            <strong>Special case, appears on every visit</strong>
+            <span>
+              {activeCases.map((c) => specialCaseLabel(c)).join('. ')}.
+              {flaggedAt && ` Flagged ${formatDate(parseApiDate(flaggedAt))}`}
+              {flaggedBy && ` by ${flaggedBy}`}.
+            </span>
           </div>
-          <button className="go no-print" onClick={() => navigate('flag-cases')}>Manage flags →</button>
+          <button className="go no-print" onClick={() => navigate('flag-cases')}>Manage flags</button>
         </div>
       )}
 
       <div className="card">
-        <div className="card-head">
-          <div className="profile-head">
-            <div className="avatar-lg">{initialsOf(p?.fullName || selectedPatient.patientName || '')}</div>
+        <div className="card-head" style={{ marginBottom: 0 }}>
+          <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
+            <div className="avatar lg">{initialsOf(name)}</div>
             <div>
-              <div className="profile-name">
-                {p?.fullName || selectedPatient.patientName || 'Loading…'}
-                {p?.patientTypeName && <span className="pill active" style={{ marginLeft: '8px' }}>{p.patientTypeName}</span>}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: 'var(--head)', letterSpacing: '-.02em' }}>{name}</h1>
+                {p?.patientTypeName && <span className="pill teal"><span className="dot" />{p.patientTypeName}</span>}
                 {activeCases
                   .filter((c) => specialCaseCategory(c.caseName) !== 'medical')
                   .map((c) => (
                     <span key={c.patientSpecialCaseId} className={SPECIAL_CASE_CLASS[specialCaseCategory(c.caseName)]}>
-                      {c.caseName}
+                      ★ {c.caseName}
                     </span>
                   ))}
               </div>
-              <div className="sub">{p ? patientMeta(p) || 'No details on file' : ''}</div>
-              {p && (
-                <div className="sub" style={{ marginTop: '4px' }}>
-                  {[p.sex, p.age != null && `${p.age} years old`, p.civilStatus, p.contactNumber].filter(Boolean).join(' · ')}
-                </div>
-              )}
+              <div className="sub" style={{ marginTop: 5 }}>
+                {[p?.patientNumber, p?.program, p?.yearLevel, p?.department].filter(Boolean).join(', ') || 'No details on file'}
+              </div>
+              <div className="sub">
+                {[p?.sex, p?.age != null && `${p.age} years old`, p?.contactNumber].filter(Boolean).join(', ')}
+              </div>
             </div>
           </div>
 
           <div className="head-actions no-print">
-            <button className="btn btn-outline btn-sm" disabled={!p} onClick={() => navigate('medical-certificate', selectedPatient)}>
-              Print Medical Certificate
+            <button className="btn btn-ghost" disabled={!p} onClick={() => navigate('medical-certificate', selectedPatient)}>
+              <Icon name="printer" size={17} /> Medical certificate
             </button>
-            <button className="btn btn-outline btn-sm" disabled={!p} onClick={() => navigate('parental-notification', selectedPatient)}>
-              Print Parental Notification
+            <button className="btn btn-ghost" disabled={!p} onClick={() => navigate('parental-notification', selectedPatient)}>
+              <Icon name="printer" size={17} /> Parental notification
             </button>
-            <button className="btn btn-primary btn-sm" disabled={!p} onClick={() => openModal('editPatient', { patientId, onSuccess: refresh })}>
+            <button className="btn btn-primary" disabled={!p} onClick={() => openModal('editPatient', { patientId, onSuccess: refresh })}>
               Edit patient
             </button>
-            <button className="btn btn-ghost btn-sm" disabled={!p} onClick={() => openModal('softDelete', {
-              what: 'patient record',
-              onConfirm: () => deletePatient(patientId),
-              onSuccess: () => navigate('patient-records'),
-            })}>🗑</button>
+            <button
+              className="icon-btn danger"
+              disabled={!p}
+              title="Move to trash"
+              onClick={() => openModal('softDelete', {
+                what: 'patient record',
+                onConfirm: () => deletePatient(patientId),
+                onSuccess: () => navigate('patient-records'),
+              })}
+            >
+              <Icon name="trash" size={16} />
+            </button>
           </div>
         </div>
 
         {activeCases.length > 0 && (
-          <div className="badge-row" style={{ marginTop: '12px' }}>
+          <div className="badge-row" style={{ marginTop: 16 }}>
             {activeCases.map((c) => (
               <span key={c.patientSpecialCaseId} className={SPECIAL_CASE_CLASS[specialCaseCategory(c.caseName)]}>
                 {specialCaseLabel(c)}
@@ -188,93 +198,81 @@ export default function PatientProfile() {
 
       <div className="kpi-row">
         <div className="kpi">
-          <div className="label">Total Visits</div>
+          <div className="cap ink">Total visits</div>
           <div className="value">{p?.visitCount ?? allVisits.length}</div>
           <div className="foot">On record</div>
         </div>
         <div className="kpi">
-          <div className="label">Last Visit</div>
-          <div className="value" style={{ fontSize: '19px' }}>{lastVisit ? formatDate(lastVisit) : '—'}</div>
+          <div className="cap ink">Last visit</div>
+          <div className="value" style={{ fontSize: 22 }}>{lastVisit ? formatDate(lastVisit) : '—'}</div>
           <div className="foot">{lastVisit ? formatTime(lastVisit) : 'No visits yet'}</div>
         </div>
         <div className="kpi">
-          <div className="label">Most Common</div>
-          <div className="value" style={{ fontSize: '19px' }}>{common?.name || '—'}</div>
+          <div className="cap ink">Most common</div>
+          <div className="value" style={{ fontSize: 22 }}>{common?.name || '—'}</div>
           <div className="foot">{common ? `${common.count} of ${allVisits.length} visits` : '—'}</div>
         </div>
         <div className="kpi">
-          <div className="label">Medicines Received</div>
+          <div className="cap ink">Medicines received</div>
           <div className="value">{medicineUnits || 0}</div>
           <div className="foot">Units all-time</div>
         </div>
       </div>
 
-      <div className="card" style={{ padding: '18px 20px 6px' }}>
+      <div className="card" style={{ padding: '20px 22px 6px' }}>
         <div className="card-head">
           <div>
-            <h3>Visit History</h3>
+            <h3>Visit history</h3>
             <div className="sub">One search replaces flipping the logbook page by page</div>
           </div>
-          <button
-            className="btn btn-ghost btn-sm no-print"
-            disabled={visits.length === 0}
-            onClick={() => downloadCsv(`visit-history-${p?.patientNumber || patientId}.csv`, toCsv(visits, CSV_COLUMNS))}
-          >
-            Export history
-          </button>
-        </div>
-
-        <div className="toolbar no-print">
-          <select style={{ maxWidth: '150px' }} value={order} onChange={(e) => setOrder(e.target.value)}>
-            <option value="desc">Newest first</option>
-            <option value="asc">Oldest first</option>
-          </select>
-          <div className="date-range">
-            <span>From</span>
-            <input type="date" value={draftRange.dateFrom} onChange={(e) => setDraftRange({ ...draftRange, dateFrom: e.target.value })} />
-            <span>to</span>
-            <input type="date" value={draftRange.dateTo} onChange={(e) => setDraftRange({ ...draftRange, dateTo: e.target.value })} />
+          <div className="head-actions no-print">
+            <select className="auto" value={order} onChange={(e) => setOrder(e.target.value)}>
+              <option value="desc">Sort: date, newest</option>
+              <option value="asc">Sort: date, oldest</option>
+            </select>
+            <input type="date" className="auto" value={draftRange.dateFrom} onChange={(e) => setDraftRange({ ...draftRange, dateFrom: e.target.value })} />
+            <input type="date" className="auto" value={draftRange.dateTo} onChange={(e) => setDraftRange({ ...draftRange, dateTo: e.target.value })} />
+            <button className="btn btn-soft btn-sm" onClick={() => { setCommitted(draftRange); setPage(1); }}>Apply</button>
+            <button
+              className="btn btn-ghost btn-sm"
+              disabled={visits.length === 0}
+              onClick={() => downloadCsv(`visit-history-${p?.patientNumber || patientId}.csv`, toCsv(visits, CSV_COLUMNS))}
+            >
+              <Icon name="download" size={16} /> Export history
+            </button>
           </div>
-          <button className="btn btn-primary btn-sm" onClick={() => { setCommitted(draftRange); setPage(1); }}>Apply</button>
         </div>
 
-        {history.error && <div className="login-error">{history.error}</div>}
+        {history.error && <div className="login-error" style={{ marginBottom: 14 }}>{history.error}</div>}
 
-        <div className="table-card" style={{ margin: '0 -20px' }}>
+        <div className="table-card">
           <table>
             <thead>
               <tr>
-                <th>Date</th>
-                <th>BP / Temp / Pulse</th>
-                <th>Chief Complaint</th>
-                <th>Treatment Notes</th>
-                <th>Medicines &amp; Supplies</th>
-                <th>Disposition</th>
-                <th>Nurse</th>
+                <th>Date</th><th>BP, temp, pulse</th><th>Chief complaint</th>
+                <th>Treatment notes</th><th>Medicines and supplies</th><th>Disposition</th><th>Nurse</th>
               </tr>
             </thead>
             <tbody>
               {history.loading ? (
-                <tr><td colSpan={7} className="sub empty-cell">Loading…</td></tr>
+                <tr><td colSpan={7} className="empty-cell">Loading…</td></tr>
               ) : pageRows.length === 0 ? (
-                <tr><td colSpan={7} className="sub empty-cell">No visits on record.</td></tr>
+                <tr><td colSpan={7} className="empty-cell">No visits on record.</td></tr>
               ) : (
                 pageRows.map((v) => {
                   const at = parseApiDate(v.startedAt);
                   return (
                     <tr key={v.visitId}>
-                      <td className="nowrap nm">
-                        {formatDate(at)}
-                        <div className="sub">{formatTime(at)}{v.endedAt ? ` – ${formatTime(parseApiDate(v.endedAt))}` : ''}</div>
-                      </td>
+                      <td className="nowrap nm">{formatDate(at)}</td>
                       <td className="sub nowrap">{vitalsSummary(v) || '—'}</td>
-                      <td>
-                        <div>{dash(v.chiefComplaint)}</div>
-                        {v.complaints?.length > 0 && <div className="sub">{v.complaints.join(', ')}</div>}
-                      </td>
+                      <td>{dash(v.chiefComplaint)}</td>
                       <td>{dash(v.treatmentNotes || v.management)}</td>
                       <td>{dispensedSummary(v) || '—'}</td>
-                      <td>{v.dispositionName ? <span className="pill active">{v.dispositionName}</span> : '—'}</td>
+                      <td>
+                        {v.dispositionName
+                          ? <span className={`pill ${DISPOSITION_PILL(v.dispositionName)}`}><span className="dot" />{v.dispositionName}</span>
+                          : '—'}
+                      </td>
                       <td>{dash(v.attendingName)}</td>
                     </tr>
                   );
@@ -284,13 +282,7 @@ export default function PatientProfile() {
           </table>
         </div>
 
-        <Pagination
-          page={page}
-          perPage={perPage}
-          total={visits.length}
-          onPageChange={setPage}
-          onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
-        />
+        <Pagination page={page} perPage={perPage} total={visits.length} onPageChange={setPage} />
       </div>
     </div>
   );

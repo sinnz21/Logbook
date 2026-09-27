@@ -1,6 +1,11 @@
+import Icon from './Icon';
+
 /**
- * The Figma's pager: "Show [50] per page" on the left, numbered pages on the
- * right with an ellipsis once the list gets long ("‹ 1 2 3 … 25 ›").
+ * The design's pager: a count or "Show [50] per page" on the left, numbered
+ * pages on the right with an ellipsis once the list gets long ("‹ 1 2 3 … 25 ›").
+ *
+ * Omit `onPerPageChange` to get the compact form used on the shorter tables,
+ * which shows "Showing 1–5 of 12" instead of a page-size picker.
  */
 
 /** Page numbers to render around `page`, with nulls standing in for ellipses. */
@@ -10,14 +15,10 @@ function pageWindow(page, totalPages) {
   const pages = new Set([1, totalPages, page, page - 1, page + 1]);
   const shown = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
 
-  const out = [];
-  let prev = 0;
-  for (const p of shown) {
-    if (prev && p - prev > 1) out.push(null);
-    out.push(p);
-    prev = p;
-  }
-  return out;
+  return shown.flatMap((p, i) => {
+    const prev = shown[i - 1];
+    return prev && p - prev > 1 ? [null, p] : [p];
+  });
 }
 
 export default function Pagination({
@@ -27,7 +28,6 @@ export default function Pagination({
   onPageChange,
   onPerPageChange,
   perPageOptions = [25, 50, 100],
-  label,
 }) {
   const totalPages = Math.max(1, Math.ceil(total / perPage));
   const first = total === 0 ? 0 : (page - 1) * perPage + 1;
@@ -35,18 +35,24 @@ export default function Pagination({
 
   return (
     <div className="pagination-bar no-print">
-      <div className="pg-size">
-        {label ?? `Showing ${first}–${last} of ${total.toLocaleString()}`}{' '}
-        <select value={perPage} onChange={(e) => onPerPageChange(Number(e.target.value))}>
-          {perPageOptions.map((n) => (
-            <option key={n} value={n}>{n}</option>
-          ))}
-        </select>{' '}
-        per page
-      </div>
+      {onPerPageChange ? (
+        <div className="pg-size">
+          Show
+          <select value={perPage} onChange={(e) => onPerPageChange(Number(e.target.value))}>
+            {perPageOptions.map((n) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
+          per page
+        </div>
+      ) : (
+        <div className="pg-size">Showing {first}–{last} of {total.toLocaleString()}</div>
+      )}
 
       <div className="pg-nav">
-        <button disabled={page <= 1} onClick={() => onPageChange(page - 1)} aria-label="Previous page">‹</button>
+        <button disabled={page <= 1} onClick={() => onPageChange(page - 1)} aria-label="Previous page">
+          <Icon name="chevronLeft" size={16} />
+        </button>
         {pageWindow(page, totalPages).map((p, i) =>
           p === null ? (
             <span className="pg-gap" key={`gap-${i}`}>…</span>
@@ -61,7 +67,9 @@ export default function Pagination({
             </button>
           ),
         )}
-        <button disabled={page >= totalPages} onClick={() => onPageChange(page + 1)} aria-label="Next page">›</button>
+        <button disabled={page >= totalPages} onClick={() => onPageChange(page + 1)} aria-label="Next page">
+          <Icon name="chevronRight" size={16} />
+        </button>
       </div>
     </div>
   );

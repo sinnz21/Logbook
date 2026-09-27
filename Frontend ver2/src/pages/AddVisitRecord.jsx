@@ -4,29 +4,37 @@ import { useLookups } from '../hooks/useLookups';
 import PatientSearch from '../components/forms/PatientSearch';
 import PatientFields from '../components/forms/PatientFields';
 import DispenseFields from '../components/forms/DispenseFields';
+import Icon from '../components/Icon';
 import { EMPTY_PATIENT, patientFromApi, toPatientPayload, validatePatient } from '../components/forms/patientForm';
 import {
   dispensePayload, EMPTY_VISIT, toVisitPayload, validateDispense, validateVisit,
 } from '../components/forms/visitForm';
-import { EMPTY_FLAGS, flagsToCreate, isPriorityType } from '../components/forms/specialCaseForm';
+import { isPriorityType } from '../components/forms/specialCaseForm';
 import { createPatient, flagSpecialCase } from '../api/patients';
 import { createVisit, signOutVisit } from '../api/visits';
-import { formatDate, formatTime } from '../lib/time';
+import { formatTime } from '../lib/time';
 import { specialCaseCategory } from '../lib/format';
 
-/** Colour tone for a flag chip, matching the Figma's blue / amber / red groups. */
+/** "Non-Teaching Staff (NASA)" → "NASA". */
+const shortType = (typeName = '') => typeName.match(/\(([^)]+)\)/)?.[1] || typeName;
+
+/** Colour tone for a flag chip, matching the design's grey / blue / red / amber groups. */
 function flagTone(caseName) {
   const category = specialCaseCategory(caseName);
-  if (category !== 'medical') return 'tone-priority';
-  return /allerg/i.test(caseName) ? 'tone-allergy' : 'tone-medical';
+  if (category === 'pwd') return 'tone-teal';
+  if (category === 'senior') return 'tone-blue';
+  return /allerg/i.test(caseName) ? 'tone-red' : 'tone-amber';
 }
 
 function Step({ n, title, hint, children }) {
   return (
-    <div className="card">
+    <div className="step-card">
       <div className="step-head">
-        <div className="step-label">Step {n} · {title}</div>
-        {hint && <div className="step-hint">{hint}</div>}
+        <div className="step-num">{n}</div>
+        <div>
+          <div className="step-title">{title}</div>
+          {hint && <div className="step-hint">{hint}</div>}
+        </div>
       </div>
       {children}
     </div>
@@ -34,7 +42,7 @@ function Step({ n, title, hint, children }) {
 }
 
 export default function AddVisitRecord() {
-  const { navigate } = useApp();
+  const { navigate, userName } = useApp();
   const { patientTypes, specialCaseTypes, dispositions } = useLookups();
 
   const [patient, setPatient] = useState(() => ({ ...EMPTY_PATIENT, patientTypeId: patientTypes[0]?.patientTypeId ?? null }));
@@ -61,8 +69,8 @@ export default function AddVisitRecord() {
     setPatient({ ...EMPTY_PATIENT, patientTypeId: patientTypes[0]?.patientTypeId ?? null });
   };
 
-  const toggleCase = (id) =>
-    setCaseIds((ids) => (ids.includes(id) ? ids.filter((c) => c !== id) : [...ids, id]));
+  const pickType = (t) => setPatient({ ...patient, patientTypeId: t.patientTypeId });
+  const toggleCase = (id) => setCaseIds((ids) => (ids.includes(id) ? ids.filter((c) => c !== id) : [...ids, id]));
 
   const reset = () => {
     clearPick();
@@ -75,7 +83,7 @@ export default function AddVisitRecord() {
 
   // One Save does up to four things, in order: register the patient (skipped when
   // an existing roster record was picked), add any new flags, open the visit —
-  // which stamps Time In server-side — and, if a disposition was chosen in step 5,
+  // which stamps Time in server-side — and, if a disposition was chosen in step 5,
   // sign it straight back out.
   const handleSave = async () => {
     const invalid = (!existing && validatePatient(patient)) || validateVisit(visit) || validateDispense(dispensed);
@@ -127,64 +135,78 @@ export default function AddVisitRecord() {
     }
   };
 
+  const hasMedicalFlag = caseIds.some((id) => !isPriorityType(specialCaseTypes.find((t) => t.specialCaseTypeId === id) || {}));
+
   return (
     <div className="view active">
       <div className="page-head">
         <div>
-          <h1>Add Visit Record</h1>
+          <h1>Add visit record</h1>
           <div className="sub">Records one clinic encounter from arrival to sign-out</div>
         </div>
       </div>
 
-      {error && <div className="login-error">{error}</div>}
+      {error && <div className="login-error" style={{ marginBottom: 14 }}>{error}</div>}
 
-      <Step n={1} title="Smart Patient Lookup" hint="Faculty, staff and returning students are pre-recorded — search before registering">
+      <Step n={1} title="Smart patient lookup" hint="Faculty, staff and returning students are pre-recorded. Search before registering.">
+        <div className="chip-row">
+          {patientTypes.map((t) => (
+            <button
+              type="button"
+              key={t.patientTypeId}
+              className={`chip${patient.patientTypeId === t.patientTypeId ? ' on' : ''}`}
+              onClick={() => pickType(t)}
+              disabled={Boolean(existing)}
+            >
+              {shortType(t.typeName)}
+            </button>
+          ))}
+        </div>
+
         {existing ? (
-          <div className="modal-note picked-banner">
-            Using existing record: <strong>{existing.fullName}</strong>
+          <div className="picked-banner">
+            <span>Using existing record: <strong>{existing.fullName}</strong></span>
             <button type="button" className="btn btn-ghost btn-sm" onClick={clearPick} disabled={saving}>Change</button>
           </div>
         ) : (
           <>
-            <PatientSearch onPick={pick} placeholder="Search by ID number or full name…" />
+            <PatientSearch onPick={pick} />
             <div className="sub">
-              Not found? Fill in Step 2 to register on the spot — visitors without an ID get a generated visitor number.
+              Not found? Register on the spot. Visitors without an ID get a visitor number automatically.
             </div>
           </>
         )}
       </Step>
 
-      <Step n={2} title="Patient Details" hint="Auto-filled from the roster · fields change with patient type">
+      <Step n={2} title="Patient details" hint="Auto-filled from the roster. Fields change with patient type.">
         <PatientFields value={patient} onChange={setPatient} readOnly={Boolean(existing)} />
       </Step>
 
-      <Step n={3} title="Triage & Special Case Flagging" hint="Flags save against the patient and reappear on every future visit">
-        <div className="field-row three">
+      <Step n={3} title="Triage and special case flagging" hint="Flags save against the patient and reappear on every future visit.">
+        <div className="field-row four">
           <div className="field">
-            <label>Time In</label>
-            <input type="text" value={formatTime(now)} readOnly title="Stamped by the server when you save" />
+            <label>Time in</label>
+            <div className="input-wrap">
+              <Icon name="clock" size={16} className="ic" />
+              <input type="text" value={formatTime(now)} readOnly style={{ paddingLeft: 36 }} title="Stamped by the server when you save" />
+            </div>
           </div>
           <div className="field">
-            <label>Blood Pressure</label>
+            <label>Blood pressure</label>
             <input type="text" placeholder="110/70 mmHg" value={visit.bloodPressure} onChange={setVisitField('bloodPressure')} />
           </div>
           <div className="field">
             <label>Temperature (°C)</label>
             <input type="text" inputMode="decimal" placeholder="36.8" value={visit.temperature} onChange={setVisitField('temperature')} />
           </div>
-        </div>
-        <div className="field-row">
           <div className="field">
-            <label>Pulse Rate (bpm)</label>
+            <label>Pulse rate (bpm)</label>
             <input type="text" inputMode="numeric" placeholder="78" value={visit.pulseRate} onChange={setVisitField('pulseRate')} />
           </div>
-          <div className="field">
-            <label>Date</label>
-            <input type="text" value={formatDate(now)} readOnly />
-          </div>
         </div>
-        <div className="field full" style={{ marginBottom: '14px' }}>
-          <label>Chief Complaint</label>
+
+        <div className="field full" style={{ marginBottom: 16 }}>
+          <label>Chief complaint</label>
           <textarea
             placeholder="e.g. Tension headache with dizziness since this morning"
             value={visit.chiefComplaint}
@@ -193,61 +215,68 @@ export default function AddVisitRecord() {
         </div>
 
         <div className="field full">
-          <label>Special Case Flags</label>
+          <label>Priority and special cases</label>
           <div className="flag-pick">
-            {specialCaseTypes.map((t) => (
-              <label className={`flag-chip ${flagTone(t.caseName)}`} key={t.specialCaseTypeId}>
-                <input
-                  type="checkbox"
-                  checked={caseIds.includes(t.specialCaseTypeId)}
-                  onChange={() => toggleCase(t.specialCaseTypeId)}
-                />
-                {t.caseName}
-              </label>
-            ))}
+            {specialCaseTypes.map((t) => {
+              const on = caseIds.includes(t.specialCaseTypeId);
+              return (
+                <label className={`flag-chip ${flagTone(t.caseName)}${on ? ' on' : ''}`} key={t.specialCaseTypeId}>
+                  <input type="checkbox" checked={on} onChange={() => toggleCase(t.specialCaseTypeId)} />
+                  {t.caseName}
+                </label>
+              );
+            })}
           </div>
-          {caseIds.some((id) => !isPriorityType(specialCaseTypes.find((t) => t.specialCaseTypeId === id) || {})) && (
+          {hasMedicalFlag && (
             <input
               type="text"
               placeholder="Flag details, e.g. Penicillin"
               value={caseNotes}
               onChange={(e) => setCaseNotes(e.target.value)}
-              style={{ marginTop: '10px' }}
+              style={{ marginTop: 12 }}
             />
           )}
         </div>
 
         {alreadyFlagged.length > 0 && (
-          <div className="danger-note" style={{ marginTop: '14px' }}>
-            ⚑ Already flagged — {alreadyFlagged.map((c) => (c.notes ? `${c.caseName}: ${c.notes}` : c.caseName)).join(' · ')}
+          <div className="danger-note" style={{ marginTop: 16 }}>
+            <Icon name="flag" size={16} />
+            <span>
+              Already flagged: {alreadyFlagged.map((c) => (c.notes ? `${c.caseName} (${c.notes})` : c.caseName)).join(', ')}, carried over from an earlier visit.
+            </span>
           </div>
         )}
       </Step>
 
-      <Step n={4} title="Treatment Delivery" hint="Medicines dispensed and supplies consumed are deducted together on save">
+      <Step n={4} title="Treatment delivery" hint="Medicines dispensed and supplies used are deducted together on save.">
         <DispenseFields value={dispensed} onChange={setDispensed} />
-        <div className="field full" style={{ marginBottom: '14px' }}>
+        <div className="field full" style={{ marginBottom: 16 }}>
           <label>Management</label>
           <textarea placeholder="e.g. Advised rest 30 mins, BP monitored" value={visit.management} onChange={setVisitField('management')} />
         </div>
         <div className="info-note">
-          On save, medicine and supply stock are both deducted and the movements are written to the audit ledger.
+          <Icon name="box" size={17} />
+          <span>On save, medicine and supply stock are both deducted and two rows are written to the audit ledger.</span>
         </div>
       </Step>
 
-      <Step n={5} title="Disposition & Sign Out" hint="Leave the disposition blank to keep the patient in today's queue — time out is captured when you sign them out">
-        <div className="field-row">
+      <Step n={5} title="Disposition and sign out" hint="Time out is captured automatically. Leave disposition blank to keep the patient in the queue.">
+        <div className="field-row three">
           <div className="field">
-            <label>Disposition <span className="opt">(optional)</span></label>
+            <label>Disposition</label>
             <select value={signOut.dispositionId} onChange={(e) => setSignOut({ ...signOut, dispositionId: e.target.value })}>
-              <option value="">Keep in queue — sign out later</option>
+              <option value="">Keep in queue, sign out later</option>
               {dispositions.map((d) => (
                 <option key={d.dispositionId} value={d.dispositionId}>{d.dispositionName}</option>
               ))}
             </select>
           </div>
           <div className="field">
-            <label>Treatment Notes</label>
+            <label>Attending personnel</label>
+            <input type="text" value={userName || 'Nurse on duty'} readOnly />
+          </div>
+          <div className="field">
+            <label>Treatment notes</label>
             <input
               type="text"
               placeholder="e.g. Advised rest 30 mins, BP monitored"
@@ -258,9 +287,9 @@ export default function AddVisitRecord() {
         </div>
         {signOut.dispositionId && (
           <div className="field full">
-            <label>Sign-out Notes <span className="opt">(optional)</span></label>
+            <label>Sign-out notes <span className="opt">(optional)</span></label>
             <textarea
-              placeholder="Anything to add before closing this visit…"
+              placeholder="Anything to add before closing this visit"
               value={signOut.notes}
               onChange={(e) => setSignOut({ ...signOut, notes: e.target.value })}
             />
@@ -269,8 +298,8 @@ export default function AddVisitRecord() {
       </Step>
 
       <div className="head-actions no-print" style={{ justifyContent: 'flex-end', display: 'flex' }}>
-        <button className="btn btn-ghost" onClick={() => navigate('patient-records')} disabled={saving}>Cancel</button>
-        <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+        <button className="btn btn-link" onClick={() => navigate('patient-records')} disabled={saving}>Cancel</button>
+        <button className="btn btn-primary btn-lg" onClick={handleSave} disabled={saving}>
           {saving ? 'Saving…' : 'Save visit record'}
         </button>
       </div>

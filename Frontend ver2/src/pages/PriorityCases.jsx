@@ -3,13 +3,29 @@ import { useApp } from '../context/useApp';
 import { useAsync } from '../hooks/useAsync';
 import { listSpecialCases } from '../api/patients';
 import Pagination from '../components/Pagination';
+import Icon from '../components/Icon';
 import { formatDate, formatTime, parseApiDate } from '../lib/time';
 import { SPECIAL_CASE_CLASS, specialCaseCategory } from '../lib/format';
 
 const dash = (v) => v || '—';
 
+/** Tile caption colour, matching the design's per-flag palette. */
+function tileTone(caseName) {
+  const cat = specialCaseCategory(caseName);
+  if (cat === 'pwd') return 'teal';
+  if (cat === 'senior') return 'blue';
+  return /allerg/i.test(caseName) ? 'red' : 'amber';
+}
+
+const TILE_FOOT = {
+  PWD: 'Priority queue',
+  'Senior Citizen': 'Priority queue',
+  Allergy: 'Most common flag',
+  Anxiety: 'Usually exam season',
+};
+
 /**
- * The Figma's tile strip: total active flags, then the five most common case
+ * The design's tile strip: total active flags, then the five most common case
  * types. Derived from the data rather than hardcoded, so a clinic that flags
  * different things still gets meaningful tiles.
  */
@@ -33,9 +49,9 @@ export default function PriorityCases() {
   const [filters, setFilters] = useState({ search: '', caseType: '', patientType: '' });
   const [committed, setCommitted] = useState({ dateFrom: '', dateTo: '' });
   const [draftRange, setDraftRange] = useState({ dateFrom: '', dateTo: '' });
-  const [sort, setSort] = useState({ by: 'flagged', order: 'desc' });
+  const [sort, setSort] = useState('flagged-desc');
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(50);
+  const [perPage] = useState(6);
 
   const all = useMemo(() => cases.data || [], [cases.data]);
   const activeRows = all.filter((r) => r.active);
@@ -47,7 +63,7 @@ export default function PriorityCases() {
 
   const rows = useMemo(() => {
     const q = filters.search.trim().toLowerCase();
-    const dir = sort.order === 'asc' ? 1 : -1;
+    const dir = sort.endsWith('asc') ? 1 : -1;
     return all
       .filter((r) => {
         if (q && ![r.patientName, r.patientNumber, r.caseName, r.notes].some((s) => s && String(s).toLowerCase().includes(q))) return false;
@@ -59,7 +75,7 @@ export default function PriorityCases() {
         return true;
       })
       .sort((a, b) => {
-        if (sort.by === 'name') return a.patientName.localeCompare(b.patientName) * dir;
+        if (sort.startsWith('patient')) return a.patientName.localeCompare(b.patientName) * dir;
         return ((a.flaggedAt || '') < (b.flaggedAt || '') ? -dir : dir);
       });
   }, [all, filters, committed, sort]);
@@ -75,92 +91,91 @@ export default function PriorityCases() {
     <div className="view active">
       <div className="page-head">
         <div>
-          <h1>Priority &amp; Special Cases</h1>
+          <h1>Priority and special cases</h1>
           <div className="sub">Flags are stored against the patient, so they appear on every future visit</div>
         </div>
+        <button className="btn btn-primary no-print" onClick={() => openModal('flagPatient', { onSuccess: cases.reload })}>
+          <Icon name="plus" size={18} /> Flag a patient
+        </button>
       </div>
 
-      <div className="card no-print" style={{ padding: '14px 16px' }}>
-        <div className="toolbar" style={{ marginBottom: '10px' }}>
-          <input type="text" placeholder="🔍 Search patient name or ID…" value={filters.search} onChange={setFilter('search')} />
-          <select style={{ maxWidth: '170px' }} value={filters.caseType} onChange={setFilter('caseType')}>
-            <option value="">Case type: All</option>
+      <div className="filter-card no-print">
+        <div className="filter-row">
+          <div className="search-field">
+            <Icon name="search" size={17} className="ic" />
+            <input type="text" placeholder="Search patient name or ID" value={filters.search} onChange={setFilter('search')} />
+          </div>
+          <select className="auto" value={filters.caseType} onChange={setFilter('caseType')}>
+            <option value="">Case type: all</option>
             {caseTypes.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
-          <select style={{ maxWidth: '180px' }} value={filters.patientType} onChange={setFilter('patientType')}>
-            <option value="">Patient type: All</option>
+          <select className="auto" value={filters.patientType} onChange={setFilter('patientType')}>
+            <option value="">Patient type: all</option>
             {patientTypes.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
-          <select style={{ maxWidth: '150px' }} value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
-            <option value="active">Status: Active</option>
-            <option value="retired">Status: Retired</option>
-            <option value="all">Status: All</option>
+          <select className="auto" value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
+            <option value="active">Status: active</option>
+            <option value="retired">Status: inactive</option>
+            <option value="all">Status: all</option>
           </select>
         </div>
-        <div className="toolbar" style={{ marginBottom: 0 }}>
+        <div className="filter-row">
           <div className="date-range">
             <span>From</span>
             <input type="date" value={draftRange.dateFrom} onChange={(e) => setDraftRange({ ...draftRange, dateFrom: e.target.value })} />
             <span>to</span>
             <input type="date" value={draftRange.dateTo} onChange={(e) => setDraftRange({ ...draftRange, dateTo: e.target.value })} />
           </div>
-          <button className="btn btn-primary btn-sm" onClick={() => { setCommitted(draftRange); setPage(1); }}>Apply</button>
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
-            <select style={{ maxWidth: '180px' }} value={sort.by} onChange={(e) => setSort({ ...sort, by: e.target.value })}>
-              <option value="flagged">Sort by: Flagged on</option>
-              <option value="name">Sort by: Patient</option>
-            </select>
-            <select style={{ maxWidth: '150px' }} value={sort.order} onChange={(e) => setSort({ ...sort, order: e.target.value })}>
-              <option value="desc">Newest first</option>
-              <option value="asc">Oldest first</option>
-            </select>
-            <button className="btn btn-primary btn-sm" onClick={() => openModal('flagPatient', { onSuccess: cases.reload })}>
-              ＋ Flag a patient
-            </button>
-          </div>
+          <button className="btn btn-soft btn-sm" onClick={() => { setCommitted(draftRange); setPage(1); }}>Apply</button>
+          <div className="spacer" />
+          <select className="auto" value={sort} onChange={(e) => setSort(e.target.value)}>
+            <option value="flagged-desc">Sort: flagged on, newest</option>
+            <option value="flagged-asc">Sort: flagged on, oldest</option>
+            <option value="patient-asc">Sort: patient, A to Z</option>
+          </select>
         </div>
       </div>
 
       <div className={`kpi-row ${tiles.length >= 5 ? 'six' : 'five'}`}>
         <div className="kpi">
-          <div className="label">Active Flags</div>
+          <div className="cap ink">Active flags</div>
           <div className="value">{cases.loading ? '…' : activeRows.length}</div>
           <div className="foot">Across {patientCount} patient{patientCount === 1 ? '' : 's'}</div>
         </div>
         {tiles.map(([name, count]) => (
           <div className="kpi" key={name}>
-            <div className="label">{name}</div>
+            <div className={`cap ${tileTone(name)}`}>{name}</div>
             <div className="value">{count}</div>
             <div className="foot">
-              {specialCaseCategory(name) === 'medical' ? 'Medical flag' : 'Priority queue'}
+              {TILE_FOOT[name] || (specialCaseCategory(name) === 'medical' ? 'Chronic conditions' : 'Priority queue')}
             </div>
           </div>
         ))}
       </div>
 
-      {cases.error && <div className="login-error">{cases.error}</div>}
+      {cases.error && <div className="login-error" style={{ marginBottom: 14 }}>{cases.error}</div>}
 
-      <div className="card" style={{ padding: '18px 20px 6px' }}>
+      <div className="card" style={{ padding: '20px 22px 6px' }}>
         <div className="card-head">
           <div>
-            <h3>Flagged Patients</h3>
+            <h3>Flagged patients</h3>
             <div className="sub">Linked to the patient record, not to a single visit</div>
           </div>
         </div>
 
-        <div className="table-card" style={{ margin: '0 -20px' }}>
+        <div className="table-card">
           <table>
             <thead>
               <tr>
-                <th>Status</th><th>Flagged On</th><th>Patient</th>
-                <th>Case Type</th><th>Notes</th><th>Flagged By</th><th className="no-print">Actions</th>
+                <th>Status</th><th>Flagged on</th><th>Patient</th>
+                <th>Case type</th><th>Notes</th><th>Flagged by</th><th className="no-print" />
               </tr>
             </thead>
             <tbody>
               {cases.loading ? (
-                <tr><td colSpan={7} className="sub empty-cell">Loading…</td></tr>
+                <tr><td colSpan={7} className="empty-cell">Loading…</td></tr>
               ) : pageRows.length === 0 ? (
-                <tr><td colSpan={7} className="sub empty-cell">No flagged patients match.</td></tr>
+                <tr><td colSpan={7} className="empty-cell">No flagged patients match.</td></tr>
               ) : (
                 pageRows.map((r) => {
                   const at = r.flaggedAt ? parseApiDate(r.flaggedAt) : null;
@@ -170,30 +185,38 @@ export default function PriorityCases() {
                       key={r.patientSpecialCaseId}
                       onClick={() => navigate('profile', { patientId: r.patientId, patientName: r.patientName })}
                     >
-                      <td><span className={`pill ${r.active ? 'active' : 'inactive'}`}>{r.active ? 'Active' : 'Inactive'}</span></td>
-                      <td className="nowrap">
-                        {at ? formatDate(at) : '—'}
-                        {at && <div className="sub">{formatTime(at)}</div>}
+                      <td>
+                        <span className={`pill ${r.active ? 'teal' : 'grey'}`}><span className="dot" />{r.active ? 'Active' : 'Inactive'}</span>
+                      </td>
+                      <td className="nowrap stack-cell">
+                        <div>{at ? formatDate(at) : '—'}</div>
+                        {at && <div className="lo">{formatTime(at)}</div>}
+                      </td>
+                      <td className="stack-cell">
+                        <div className="nm">{r.patientName}</div>
+                        <div className="lo">{[r.patientTypeName, r.patientNumber].filter(Boolean).join(', ')}</div>
                       </td>
                       <td>
-                        <div className="nm">{r.patientName}</div>
-                        <div className="sub">{[r.patientTypeName, r.patientNumber].filter(Boolean).join(' · ')}</div>
+                        <span className={SPECIAL_CASE_CLASS[specialCaseCategory(r.caseName)]}>
+                          {specialCaseCategory(r.caseName) === 'medical' ? r.caseName : `★ ${r.caseName}`}
+                        </span>
                       </td>
-                      <td><span className={SPECIAL_CASE_CLASS[specialCaseCategory(r.caseName)]}>{r.caseName}</span></td>
                       <td>{dash(r.notes)}</td>
                       <td className="sub">{dash(r.flaggedByName)}</td>
                       <td className="no-print" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          onClick={() => openModal('flagPatient', {
-                            patientId: r.patientId,
-                            patientName: r.patientName,
-                            flag: r,
-                            onSuccess: cases.reload,
-                          })}
-                        >
-                          {r.active ? 'Edit' : 'Restore'}
-                        </button>
+                        <div className="cell-actions">
+                          <button
+                            className={`btn btn-sm ${r.active ? 'btn-ghost' : 'btn-soft'}`}
+                            onClick={() => openModal('flagPatient', {
+                              patientId: r.patientId,
+                              patientName: r.patientName,
+                              flag: r,
+                              onSuccess: cases.reload,
+                            })}
+                          >
+                            {r.active ? 'Edit' : 'Restore'}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -203,13 +226,7 @@ export default function PriorityCases() {
           </table>
         </div>
 
-        <Pagination
-          page={page}
-          perPage={perPage}
-          total={rows.length}
-          onPageChange={setPage}
-          onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
-        />
+        <Pagination page={page} perPage={perPage} total={rows.length} onPageChange={setPage} />
       </div>
     </div>
   );

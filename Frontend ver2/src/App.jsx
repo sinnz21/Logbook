@@ -1,6 +1,7 @@
 import Sidebar from './components/Sidebar';
 import ModalRoot from './components/ModalRoot';
 import NotificationBell from './components/NotificationBell';
+import Icon from './components/Icon';
 import LoginScreen from './pages/LoginScreen';
 import NurseDashboard from './pages/NurseDashboard';
 import AddVisitRecord from './pages/AddVisitRecord';
@@ -17,6 +18,7 @@ import StockRequests from './pages/admin/StockRequests';
 import UserManagement from './pages/admin/UserManagement';
 import Settings from './pages/admin/Settings';
 import { useApp } from './context/useApp';
+import { initialsOf, ROLE_LABELS } from './lib/format';
 
 // view id (see config/navs.js) → page, per role. The backend enforces the same
 // split: nurse-only routes use require_nurse, admin-only use require_admin.
@@ -42,24 +44,37 @@ const VIEWS = {
 };
 
 function App() {
-  const { isLoggedIn, role, currentView, crumbLabel } = useApp();
+  const { isLoggedIn, role, userName, currentView, crumbLabel } = useApp();
 
   if (!isLoggedIn) {
     return <LoginScreen />;
   }
 
   const Page = VIEWS[role][currentView] || VIEWS[role].dashboard;
+  const isAdmin = role === 'admin';
 
   return (
     <div id="app" className="active">
       <Sidebar />
 
       <div className="main">
-        <div className="topbar">
-          <div className="crumb">☰ {crumbLabel}</div>
+        <div className="topbar no-print">
+          <div className="crumb">
+            <Icon name="menu" size={20} />
+            {crumbLabel}
+          </div>
           <div className="icons">
             <NotificationBell />
-            <span id="topRolePill">👤 {role === 'admin' ? 'Admin' : 'Nurse'}</span>
+            <div className="divider" />
+            <div className="who">
+              <div className={`avatar${isAdmin ? ' blue' : ''}`}>
+                {initialsOf(userName) || (isAdmin ? 'AD' : 'NS')}
+              </div>
+              <div>
+                <div className="nm">{userName || ROLE_LABELS[role]}</div>
+                <div className="rl">{isAdmin ? 'Admin' : 'Nurse on duty'}</div>
+              </div>
+            </div>
           </div>
         </div>
 

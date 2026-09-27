@@ -12,7 +12,6 @@
     "build:demo": "vite build --mode demo --outDir dist-demo"
   },
   "dependencies": {
-    "@builder.io/sdk-react": "^5.2.11",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

@@ -22,12 +22,12 @@ export default function EditPatientModal() {
   return (
     <Modal
       wide
-      title="Edit Patient"
-      subtitle="Update patient details, demographics, and clinical flags"
+      title="Edit patient"
+      subtitle="Update details, demographics and clinical flags"
       onClose={closeModal}
     >
       {loaded.loading && <div className="sub">Loading patient record…</div>}
-      {loaded.error && <div className="login-error">Couldn't load this patient: {loaded.error}</div>}
+      {loaded.error && <div className="login-error">Couldn&rsquo;t load this patient: {loaded.error}</div>}
       {loaded.data && (
         <EditForm patient={loaded.data} visit={visit} onSaved={() => { onSuccess?.(); closeModal(); }} onCancel={closeModal} />
       )}
@@ -85,11 +85,11 @@ function EditForm({ patient, visit, onSaved, onCancel }) {
 
   return (
     <>
-      {error && <div className="login-error">{error}</div>}
-      <PatientFields value={form} onChange={setForm} />
+      {error && <div className="login-error" style={{ marginBottom: 14 }}>{error}</div>}
+      <PatientFields value={form} onChange={setForm} showTypePicker />
 
-      <div className="flag-box">
-        <label className="flag-box-title">Clinical Flags</label>
+      <div className="sub-panel">
+        <div className="panel-title">Clinical flags</div>
         <div className="badge-row">
           {cases.length === 0 && <span className="sub">No active flags.</span>}
           {cases.map((c) => (
@@ -104,20 +104,22 @@ function EditForm({ patient, visit, onSaved, onCancel }) {
             {specialCaseTypes.map((t) => <option key={t.specialCaseTypeId} value={t.specialCaseTypeId}>{t.caseName}</option>)}
           </select>
           <input type="text" placeholder="Details (optional)" value={newFlag.notes} onChange={(e) => setNewFlag({ ...newFlag, notes: e.target.value })} />
-          <button type="button" className="btn btn-outline btn-sm" onClick={addFlag}>＋ Flag</button>
+          <button type="button" className="btn btn-soft btn-sm" onClick={addFlag}>Add flag</button>
         </div>
       </div>
 
       {visitForm && (
         <>
-          <div className="section-label">This Visit</div>
+          <div className="panel-title" style={{ margin: '18px 0 10px' }}>This visit</div>
           <VisitFields value={visitForm} onChange={setVisitForm} />
         </>
       )}
 
-      <div className="modal-actions inline-actions">
-        <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save Patient Record'}</button>
-        <button className="btn btn-ghost" onClick={onCancel} disabled={saving}>Cancel</button>
+      <div className="head-actions" style={{ justifyContent: 'flex-end', marginTop: 18 }}>
+        <button className="btn btn-link" onClick={onCancel} disabled={saving}>Cancel</button>
+        <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+          {saving ? 'Saving…' : 'Save patient record'}
+        </button>
       </div>
     </>
   );

@@ -7,20 +7,22 @@ import { listStock, listStockRequests } from '../../api/stock';
 import { getSettings } from '../../api/settings';
 import { clinicDay, formatDate, presetRange } from '../../lib/time';
 import { topComplaintsFrom } from '../../lib/insights';
+import { HBars } from '../../components/Charts';
+import Icon from '../../components/Icon';
 import { notConnected } from '../../lib/notConnected';
 
 const today = clinicDay(new Date());
 
 const REPORTS = [
-  { name: 'Monthly Supply Report', cadence: 'Generated at the start of every month' },
-  { name: 'Medicine Restock Cycle Report', cadence: 'Audited every 1–2 months' },
-  { name: 'System & Account Activity Report', cadence: 'Generated at the start of every month' },
+  { name: 'Monthly supply report', cadence: 'Generated at the start of every month' },
+  { name: 'Medicine restock cycle report', cadence: 'Audited every 1 to 2 months' },
+  { name: 'System and account activity report', cadence: 'Generated at the start of every month' },
 ];
 
 export default function AdminDashboard() {
   const { navigate } = useApp();
-  const [preset, setPreset] = useState('month');
-  const [range, setRange] = useState(() => presetRange('month', today));
+  const [preset, setPreset] = useState('week');
+  const [range, setRange] = useState(() => presetRange('week', today));
   const [draft, setDraft] = useState(range);
 
   const applyPreset = (p) => {
@@ -32,108 +34,115 @@ export default function AdminDashboard() {
 
   const users = useAsync(() => listUsers(), []);
   const requests = useAsync(() => listStockRequests({ perPage: 200 }), []);
-  const stock = useAsync(() => listStock(), []);
+  const stock = useAsync(() => listStock({ perPage: 200 }), []);
   const settings = useAsync(() => getSettings(), []);
   const visits = useVisitsInRange(range.from, range.to);
 
   const userList = users.data?.items || [];
   const active = userList.filter((u) => u.status === 'active').length;
   const pending = (requests.data?.items || []).filter((r) => r.status === 'pending');
-  const stockItems = stock.data?.items || [];
-  const needsAttention = stockItems.filter((i) => i.stockStatus !== 'high').length;
+  const needsAttention = (stock.data?.items || []).filter((i) => i.stockStatus !== 'high').length;
 
-  const complaints = useMemo(() => topComplaintsFrom(visits.visits, { limit: 5 }), [visits.visits]);
+  const complaints = useMemo(() => topComplaintsFrom(visits.visits, { limit: 4 }), [visits.visits]);
 
   return (
     <div className="view active">
       <div className="page-head">
         <div>
-          <h1>Admin Dashboard</h1>
-          <div className="sub">
-            ISU Infirmary · {formatDate(new Date(`${today}T00:00:00Z`))} · system oversight
+          <h1>Admin dashboard</h1>
+          <div className="sub">ISU Infirmary, {formatDate(new Date(`${today}T00:00:00Z`))}, system oversight</div>
+        </div>
+        <div className="range-bar no-print">
+          <div className="segmented solid">
+            <button className={preset === 'today' ? 'active' : ''} onClick={() => applyPreset('today')}>Today</button>
+            <button className={preset === 'week' ? 'active' : ''} onClick={() => applyPreset('week')}>This week</button>
+            <button className={preset === 'month' ? 'active' : ''} onClick={() => applyPreset('month')}>This month</button>
           </div>
+          <div className="date-chip">
+            <Icon name="calendar" size={17} />
+            <input type="date" style={{ border: 'none', padding: 0, width: 120 }} value={draft.from}
+              onChange={(e) => { setPreset('custom'); setDraft({ ...draft, from: e.target.value }); }} />
+            <span style={{ color: 'var(--muted)' }}>–</span>
+            <input type="date" style={{ border: 'none', padding: 0, width: 120 }} value={draft.to}
+              onChange={(e) => { setPreset('custom'); setDraft({ ...draft, to: e.target.value }); }} />
+          </div>
+          <button className="btn btn-soft" onClick={() => setRange(draft)}>Apply</button>
         </div>
-      </div>
-
-      <div className="range-bar no-print">
-        <div className="presets">
-          <button className={preset === 'today' ? 'active' : ''} onClick={() => applyPreset('today')}>Today</button>
-          <button className={preset === 'week' ? 'active' : ''} onClick={() => applyPreset('week')}>This Week</button>
-          <button className={preset === 'month' ? 'active' : ''} onClick={() => applyPreset('month')}>This Month</button>
-        </div>
-        <span style={{ fontSize: '12px', color: 'var(--muted)' }}>From</span>
-        <input type="date" value={draft.from} onChange={(e) => { setPreset('custom'); setDraft({ ...draft, from: e.target.value }); }} style={{ maxWidth: '150px' }} />
-        <span style={{ fontSize: '12px', color: 'var(--muted)' }}>to</span>
-        <input type="date" value={draft.to} onChange={(e) => { setPreset('custom'); setDraft({ ...draft, to: e.target.value }); }} style={{ maxWidth: '150px' }} />
-        <button className="btn btn-primary btn-sm" onClick={() => setRange(draft)}>Apply</button>
       </div>
 
       <div className="kpi-row">
-        <div className="kpi" onClick={() => navigate('settings')}>
-          <div className="label">Automated Backups</div>
-          <div className="value" style={{ fontSize: '19px' }}>
-            {settings.loading ? '…' : settings.error ? '—' : settings.data?.autoBackupEnabled ? 'On' : 'Off'}
-          </div>
-          <div className="foot">Manage in Settings</div>
-        </div>
-        <div className="kpi" onClick={() => navigate('users')}>
-          <div className="label">Active Accounts</div>
-          <div className="value">{users.loading ? '…' : users.error ? '—' : active}</div>
-          <div className="foot">
-            {users.error ? 'Unavailable' : `${active} active · ${userList.length - active} inactive`}
+        <div className="kpi with-icon clickable" onClick={() => navigate('settings')}>
+          <div className="ic-badge"><Icon name="cloudUp" size={24} /></div>
+          <div>
+            <div className="value" style={{ fontSize: 24 }}>
+              {settings.loading ? '…' : settings.error ? '—' : settings.data?.autoBackupEnabled ? 'On' : 'Off'}
+            </div>
+            <div className="label">Automated backups</div>
+            <div className="foot">Manage in Settings</div>
           </div>
         </div>
-        <div className="kpi warn" onClick={() => navigate('stock-requests')}>
-          <div className="label">Stock Needing Attention</div>
-          <div className="value">{stock.loading ? '…' : stock.error ? '—' : needsAttention}</div>
-          <div className="foot">Low or out of stock</div>
+        <div className="kpi with-icon clickable" onClick={() => navigate('users')}>
+          <div className="ic-badge blue"><Icon name="users" size={24} /></div>
+          <div>
+            <div className="value">{users.loading ? '…' : users.error ? '—' : active}</div>
+            <div className="label">Active accounts</div>
+            <div className="foot">{users.error ? 'Unavailable' : `${active} active, ${userList.length - active} inactive`}</div>
+          </div>
         </div>
-        <div className="kpi pending" onClick={() => navigate('stock-requests')}>
-          <div className="label">Pending Requisitions</div>
-          <div className="value">{requests.loading ? '…' : requests.error ? '—' : pending.length}</div>
-          <div className="foot">Waiting for your approval</div>
+        <div className="kpi with-icon clickable" onClick={() => navigate('stock-requests')}>
+          <div className="ic-badge violet"><Icon name="database" size={24} /></div>
+          <div>
+            <div className="value">{stock.loading ? '…' : stock.error ? '—' : needsAttention}</div>
+            <div className="label">Stock needing attention</div>
+            <div className="foot">Low or out of stock</div>
+          </div>
+        </div>
+        <div className="kpi with-icon clickable" onClick={() => navigate('stock-requests')}>
+          <div className="ic-badge amber"><Icon name="clipboardCheck" size={24} /></div>
+          <div>
+            <div className="value">{requests.loading ? '…' : requests.error ? '—' : pending.length}</div>
+            <div className="label">Pending requisitions</div>
+            <div className="foot">Waiting for your approval</div>
+          </div>
         </div>
       </div>
 
       <div className="chart-row">
         <div className="card">
-          <h3>Sign-in Activity</h3>
-          <div className="sub" style={{ marginTop: '-8px', marginBottom: '12px' }}>Successful sign-ins per day this week</div>
+          <h3>Sign-in activity</h3>
+          <div className="card-sub">Successful sign-ins per day this week</div>
           <div className="info-note">
-            This chart needs a sign-in audit endpoint, which the backend doesn&rsquo;t expose yet —
-            see the &ldquo;System &amp; Account Activity&rdquo; section of BACKEND_REQUIREMENTS.md.
+            <Icon name="alert" size={17} />
+            <span>
+              This chart needs a sign-in audit endpoint, which the backend doesn&rsquo;t expose yet.
+              See the System and account activity section of BACKEND_REQUIREMENTS.md.
+            </span>
           </div>
-          <div className="sub" style={{ marginTop: '10px' }}>
+          <div className="warn-note" style={{ marginTop: 12 }}>
             Accounts lock for {settings.data?.lockoutMinutes ?? 15} minutes after{' '}
             {settings.data?.failedLoginLimit ?? 5} failed attempts.
           </div>
         </div>
 
         <div className="card">
-          <h3>Campus Complaint Summary</h3>
-          <div className="sub" style={{ marginTop: '-8px', marginBottom: '12px' }}>Read-only — recorded by the nurses</div>
+          <h3>Campus complaint summary</h3>
+          <div className="card-sub">Read-only, recorded by the nurses</div>
           {visits.error && <div className="login-error">{visits.error}</div>}
           {complaints.length === 0 ? (
             <div className="sub">{visits.loading ? 'Loading…' : 'No visits recorded in this range.'}</div>
           ) : (
-            <div className="hbar-list">
-              {complaints.map((c) => (
-                <div className="hbar" key={c.name}>
-                  <span className="name">{c.name}</span>
-                  <span className="track"><span className="fill" style={{ width: `${c.pct}%`, background: c.color }} /></span>
-                  <span className="pct">{c.pct}%</span>
-                </div>
-              ))}
-            </div>
+            <HBars rows={complaints} />
           )}
         </div>
       </div>
 
       <div className="card">
         <h3>Reports</h3>
-        <div className="cadence-note">
-          Supply reports generate monthly. Medicine stock is audited every 1–2 months — when the due
-          date arrives, a restock is needed.
+        <div className="info-note" style={{ margin: '12px 0 6px' }}>
+          <span>
+            Supply reports generate monthly. Medicine stock is audited every 1 to 2 months.
+            When the due date arrives, a restock is needed.
+          </span>
         </div>
         {REPORTS.map((r) => (
           <div className="settings-row" key={r.name}>

@@ -24,20 +24,20 @@ export default function SoftDeleteModal() {
 
   return (
     <Modal
-      maxWidth="480px"
-      title="🗑 Move to Trash?"
+      narrow
+      title="Move to trash?"
       onClose={closeModal}
       actions={
         <>
-          <button className="btn btn-ghost" onClick={closeModal} disabled={saving}>Cancel</button>
-          <button className="btn btn-danger" onClick={handleConfirm} disabled={saving}>{saving ? 'Moving…' : 'Move to Trash'}</button>
+          <button className="btn btn-link" onClick={closeModal} disabled={saving}>Cancel</button>
+          <button className="btn btn-danger" onClick={handleConfirm} disabled={saving}>{saving ? 'Moving…' : 'Move to trash'}</button>
         </>
       }
     >
-      {error && <div className="login-error">{error}</div>}
-      <p style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--ink)', margin: 0 }}>
-        This {what} will be <strong>soft-deleted</strong> — hidden from normal views but kept for 90 days
-        (see Soft Delete in System Settings) so it can still be recovered if needed. It won't be permanently erased.
+      {error && <div className="login-error" style={{ marginBottom: 14 }}>{error}</div>}
+      <p style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--ink)', margin: 0 }}>
+        This {what} will be <strong>soft-deleted</strong> — hidden from normal views but kept for the retention
+        window (see Soft delete in System settings) so it can still be recovered if needed. It won&rsquo;t be permanently erased.
       </p>
     </Modal>
   );

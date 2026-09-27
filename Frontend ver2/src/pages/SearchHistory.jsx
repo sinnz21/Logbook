@@ -3,14 +3,20 @@ import { useApp } from '../context/useApp';
 import { useAsync } from '../hooks/useAsync';
 import { listAllVisits } from '../api/visits';
 import Pagination from '../components/Pagination';
+import Icon from '../components/Icon';
 import { formatDate, parseApiDate } from '../lib/time';
 import { dispensedSummary, SPECIAL_CASE_CLASS, specialCaseCategory } from '../lib/format';
 
 const dash = (v) => v || '—';
 
+const TYPE_PILL = (t = '') =>
+  /faculty/i.test(t) ? 'blue' : /student/i.test(t) ? 'teal' : 'grey';
+const DISPOSITION_PILL = (name = '') =>
+  /hospital|referred/i.test(name) ? 'blue' : /sent home/i.test(name) ? 'amber' : 'teal';
+
 /**
- * Collapses a flat visit list into one row per patient — the Figma's result
- * table is patient-shaped ("12 visits · last visit Sep 15"), while the backend
+ * Collapses a flat visit list into one row per patient — the design's result
+ * table is patient-shaped ("12 visits, last visit Sep 15"), while the backend
  * only exposes visits. Picked apart here rather than server-side because
  * GET /api/patients doesn't return visit counts yet (see BACKEND_REQUIREMENTS.md).
  */
@@ -61,9 +67,9 @@ export default function SearchHistory() {
   const [filters, setFilters] = useState({ search: '', patientType: '', department: '', flag: '' });
   const [committed, setCommitted] = useState({ dateFrom: '', dateTo: '' });
   const [draftRange, setDraftRange] = useState({ dateFrom: '', dateTo: '' });
-  const [sort, setSort] = useState({ by: 'last-visit', order: 'desc' });
+  const [sort, setSort] = useState('last-desc');
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(50);
+  const [perPage] = useState(10);
   const [openKey, setOpenKey] = useState(null);
 
   const source = useAsync(
@@ -77,11 +83,10 @@ export default function SearchHistory() {
   const all = useMemo(() => groupByPatient(source.data || []), [source.data]);
 
   const results = useMemo(() => {
-    const dir = sort.order === 'asc' ? 1 : -1;
-    const filtered = all.filter((r) => matches(r, filters));
-    return filtered.sort((a, b) => {
-      if (sort.by === 'name') return a.name.localeCompare(b.name) * dir;
-      if (sort.by === 'visits') return (a.visits.length - b.visits.length) * dir;
+    const dir = sort.endsWith('asc') ? 1 : -1;
+    return all.filter((r) => matches(r, filters)).sort((a, b) => {
+      if (sort.startsWith('name')) return a.name.localeCompare(b.name) * dir;
+      if (sort.startsWith('visits')) return (a.visits.length - b.visits.length) * dir;
       return (a.lastVisit - b.lastVisit) * dir;
     });
   }, [all, filters, sort]);
@@ -99,33 +104,37 @@ export default function SearchHistory() {
     <div className="view active">
       <div className="page-head">
         <div>
-          <h1>Search &amp; History</h1>
+          <h1>Search and history</h1>
           <div className="sub">Type a name and the whole record comes up</div>
         </div>
       </div>
 
-      <div className="search-hero no-print">
-        <input
-          type="text"
-          placeholder="Search by name, ID number, department or complaint…"
-          value={filters.search}
-          onChange={setFilter('search')}
-        />
-        <button className="btn btn-primary" onClick={() => setPage(1)}>Search</button>
-      </div>
+      <div className="filter-card no-print">
+        <div className="filter-row">
+          <div className="search-field">
+            <Icon name="search" size={18} className="ic" />
+            <input
+              type="text"
+              placeholder="Search by name, ID number, department or complaint"
+              value={filters.search}
+              onChange={setFilter('search')}
+              style={{ padding: '13px 14px 13px 40px', fontSize: 15 }}
+            />
+          </div>
+          <button className="btn btn-primary" onClick={() => setPage(1)}>Search</button>
+        </div>
 
-      <div className="card no-print" style={{ padding: '14px 16px' }}>
-        <div className="toolbar" style={{ marginBottom: '0' }}>
-          <select style={{ maxWidth: '170px' }} value={filters.patientType} onChange={setFilter('patientType')}>
-            <option value="">Patient type: All</option>
+        <div className="filter-row">
+          <select className="auto" value={filters.patientType} onChange={setFilter('patientType')}>
+            <option value="">Patient type: all</option>
             {optionsFor('type').map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
-          <select style={{ maxWidth: '190px' }} value={filters.department} onChange={setFilter('department')}>
-            <option value="">Department: All</option>
+          <select className="auto" value={filters.department} onChange={setFilter('department')}>
+            <option value="">Department: all</option>
             {optionsFor('department').map((d) => <option key={d} value={d}>{d}</option>)}
           </select>
-          <select style={{ maxWidth: '170px' }} value={filters.flag} onChange={setFilter('flag')}>
-            <option value="">Priority flag: All</option>
+          <select className="auto" value={filters.flag} onChange={setFilter('flag')}>
+            <option value="">Priority flag: all</option>
             <option value="any">Flagged only</option>
             <option value="none">Unflagged only</option>
           </select>
@@ -135,24 +144,20 @@ export default function SearchHistory() {
             <span>to</span>
             <input type="date" value={draftRange.dateTo} onChange={(e) => setDraftRange({ ...draftRange, dateTo: e.target.value })} />
           </div>
-          <button className="btn btn-primary btn-sm" onClick={() => { setCommitted(draftRange); setPage(1); }}>Apply</button>
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
-            <select style={{ maxWidth: '170px' }} value={sort.by} onChange={(e) => setSort({ ...sort, by: e.target.value })}>
-              <option value="last-visit">Sort by: Last visit</option>
-              <option value="name">Sort by: Name</option>
-              <option value="visits">Sort by: Visits</option>
-            </select>
-            <select style={{ maxWidth: '150px' }} value={sort.order} onChange={(e) => setSort({ ...sort, order: e.target.value })}>
-              <option value="desc">Newest first</option>
-              <option value="asc">Oldest first</option>
-            </select>
-          </div>
+          <button className="btn btn-soft btn-sm" onClick={() => { setCommitted(draftRange); setPage(1); }}>Apply</button>
+          <div className="spacer" />
+          <select className="auto" value={sort} onChange={(e) => setSort(e.target.value)}>
+            <option value="last-desc">Sort: last visit, newest</option>
+            <option value="last-asc">Sort: last visit, oldest</option>
+            <option value="name-asc">Sort: name, A to Z</option>
+            <option value="visits-desc">Sort: visits, most</option>
+          </select>
         </div>
       </div>
 
-      {source.error && <div className="login-error">{source.error}</div>}
+      {source.error && <div className="login-error" style={{ marginBottom: 14 }}>{source.error}</div>}
 
-      <div className="card" style={{ padding: '18px 20px 6px' }}>
+      <div className="card" style={{ padding: '20px 22px 6px' }}>
         <div className="card-head">
           <div>
             <h3>Results</h3>
@@ -164,93 +169,97 @@ export default function SearchHistory() {
           </div>
         </div>
 
-        <div className="table-card" style={{ margin: '0 -20px' }}>
+        <div className="table-card">
           <table>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>ID Number</th>
-                <th>Program / Department</th>
-                <th>Visits</th>
-                <th>Last Visit</th>
-                <th>Flags</th>
-                <th className="no-print">Actions</th>
+                <th>Name</th><th>Type</th><th>ID number</th><th>Program or department</th>
+                <th>Visits</th><th>Last visit</th><th>Flags</th><th className="no-print" />
               </tr>
             </thead>
             <tbody>
               {source.loading ? (
-                <tr><td colSpan={8} className="sub empty-cell">Loading records…</td></tr>
+                <tr><td colSpan={8} className="empty-cell">Loading records…</td></tr>
               ) : pageRows.length === 0 ? (
-                <tr><td colSpan={8} className="sub empty-cell">No patients matched.</td></tr>
+                <tr><td colSpan={8} className="empty-cell">No patients matched.</td></tr>
               ) : (
-                pageRows.map((r) => (
-                  <tr className="rowlink" key={r.key} onClick={() => setOpenKey(r.key === openKey ? null : r.key)}>
-                    <td className="nm">{r.name}</td>
-                    <td><span className="pill active">{dash(r.type)}</span></td>
-                    <td>{dash(r.patientNumber)}</td>
-                    <td>{[r.program, r.department].filter(Boolean).join(' · ') || '—'}</td>
-                    <td>{r.visits.length}</td>
-                    <td className="nowrap">{formatDate(r.lastVisit)}</td>
-                    <td>
-                      {r.flags.length === 0 ? '—' : r.flags.map((c) => (
-                        <span key={c.caseName} className={SPECIAL_CASE_CLASS[specialCaseCategory(c.caseName)]} style={{ marginRight: '4px' }}>
-                          {c.caseName}
-                        </span>
-                      ))}
-                    </td>
-                    <td className="no-print nowrap" onClick={(e) => e.stopPropagation()}>
-                      <button className="btn btn-ghost btn-sm" onClick={() => setOpenKey(r.key === openKey ? null : r.key)}>
-                        {r.key === openKey ? 'Hide history' : 'Open history'}
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                pageRows.map((r) => {
+                  const open = r.key === openKey;
+                  return (
+                    <tr className="rowlink" key={r.key} onClick={() => setOpenKey(open ? null : r.key)}>
+                      <td className="nm">{r.name}</td>
+                      <td><span className={`pill ${TYPE_PILL(r.type)}`}>{dash(r.type)}</span></td>
+                      <td>{dash(r.patientNumber)}</td>
+                      <td>{[r.program, r.department].filter(Boolean).join(', ') || '—'}</td>
+                      <td className="nm">{r.visits.length}</td>
+                      <td className="nowrap">{formatDate(r.lastVisit)}</td>
+                      <td>
+                        {r.flags.length === 0 ? '—' : (
+                          <div className="badge-row">
+                            {r.flags.map((c) => {
+                              const cat = specialCaseCategory(c.caseName);
+                              return (
+                                <span key={c.caseName} className={SPECIAL_CASE_CLASS[cat]}>
+                                  {cat === 'medical' ? c.caseName : `★ ${c.caseName}`}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </td>
+                      <td className="no-print" onClick={(e) => e.stopPropagation()}>
+                        <div className="cell-actions">
+                          <button
+                            className={`btn btn-sm ${open ? 'btn-primary' : 'btn-soft'}`}
+                            onClick={() => setOpenKey(open ? null : r.key)}
+                          >
+                            {open ? 'Hide history' : 'Open history'}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
 
-        <Pagination
-          page={page}
-          perPage={perPage}
-          total={results.length}
-          onPageChange={setPage}
-          onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
-        />
+        <Pagination page={page} perPage={perPage} total={results.length} onPageChange={setPage} />
       </div>
 
       {opened && (
-        <div className="card">
+        <div className="card" style={{ padding: '20px 22px' }}>
           <div className="card-head">
             <div>
-              <h3>Visit history — {opened.name}</h3>
+              <h3>Visit history, {opened.name}</h3>
               <div className="sub">Expands under the selected result</div>
             </div>
-            <button className="btn btn-ghost btn-sm no-print" onClick={() => navigate('profile', opened.visits[0])}>
+            <button className="btn btn-soft btn-sm no-print" onClick={() => navigate('profile', opened.visits[0])}>
               Open full profile
             </button>
           </div>
-          <div className="table-card" style={{ margin: '0 -20px -18px' }}>
+          <div className="table-card">
             <table>
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Chief Complaint</th>
-                  <th>Medicines &amp; Supplies</th>
-                  <th>Disposition</th>
-                  <th>Nurse</th>
+                  <th>Date</th><th>Chief complaint</th><th>Medicines and supplies</th><th>Disposition</th><th>Nurse</th>
                 </tr>
               </thead>
               <tbody>
                 {[...opened.visits]
                   .sort((a, b) => parseApiDate(b.startedAt) - parseApiDate(a.startedAt))
+                  .slice(0, 10)
                   .map((v) => (
                     <tr key={v.visitId}>
                       <td className="nowrap nm">{formatDate(parseApiDate(v.startedAt))}</td>
                       <td>{dash(v.chiefComplaint)}</td>
                       <td>{dispensedSummary(v) || '—'}</td>
-                      <td>{v.dispositionName ? <span className="pill active">{v.dispositionName}</span> : '—'}</td>
+                      <td>
+                        {v.dispositionName
+                          ? <span className={`pill ${DISPOSITION_PILL(v.dispositionName)}`}><span className="dot" />{v.dispositionName}</span>
+                          : '—'}
+                      </td>
                       <td>{dash(v.attendingName)}</td>
                     </tr>
                   ))}

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import Modal from '../Modal';
+import Icon from '../Icon';
 import { useApp } from '../../context/useApp';
 import { useLookups } from '../../hooks/useLookups';
 import { signOutVisit } from '../../api/visits';
 import { formatDuration, formatTime, parseApiDate } from '../../lib/time';
-import { formatQty, patientMeta } from '../../lib/format';
+import { formatQty } from '../../lib/format';
 
 const SENT_HOME = /sent home/i;
 
@@ -29,6 +30,11 @@ export default function CheckoutModal() {
   const medicines = (visit.medicines || []).map((m) => `${m.medicineName} × ${formatQty(m.quantityGiven)}`);
   const supplies = (visit.supplies || []).map((s) => `${s.supplyName} × ${formatQty(s.quantityUsed)}`);
 
+  // The design shows three radio pills; anything beyond those stays in a select
+  // so a clinic with extra dispositions can still pick them.
+  const primary = dispositions.slice(0, 3);
+  const rest = dispositions.slice(3);
+
   const handleConfirm = async () => {
     if (!dispositionId) return setError('Choose a disposition.');
     setSaving(true);
@@ -48,38 +54,34 @@ export default function CheckoutModal() {
 
   return (
     <Modal
-      title={`Sign Out — ${visit.patientName}`}
-      subtitle={patientMeta(visit)}
+      title={`Sign out, ${visit.patientName}`}
+      subtitle={[visit.patientTypeName, visit.program, visit.yearLevel, visit.patientNumber].filter(Boolean).join(', ')}
       onClose={closeModal}
       actions={
         <>
-          <button
-            className="btn btn-outline"
-            style={{ marginRight: 'auto' }}
-            onClick={() => navigate('parental-notification', visit)}
-          >
-            🖨 Print Slip
+          <button className="btn btn-ghost left" onClick={() => navigate('parental-notification', visit)}>
+            <Icon name="printer" size={16} /> Print slip
           </button>
-          <button className="btn btn-ghost" onClick={closeModal} disabled={saving}>Cancel</button>
+          <button className="btn btn-link" onClick={closeModal} disabled={saving}>Cancel</button>
           <button className="btn btn-primary" onClick={handleConfirm} disabled={saving}>
-            {saving ? 'Signing out…' : 'Confirm Sign Out'}
+            {saving ? 'Signing out…' : 'Confirm sign out'}
           </button>
         </>
       }
     >
-      {error && <div className="login-error">{error}</div>}
+      {error && <div className="login-error" style={{ marginBottom: 14 }}>{error}</div>}
 
-      <div className="field-row three">
-        <div className="field"><label>Time In</label><input type="text" value={formatTime(startedAt)} readOnly /></div>
-        <div className="field"><label>Time of Exit</label><input type="text" value={formatTime(now)} readOnly /></div>
-        <div className="field"><label>Duration</label><input type="text" value={formatDuration(previewMinutes)} readOnly /></div>
+      <div className="stat-row">
+        <div className="stat-box"><div className="k">Time in</div><div className="v">{formatTime(startedAt)}</div></div>
+        <div className="stat-box"><div className="k">Time of exit</div><div className="v">{formatTime(now)}</div></div>
+        <div className="stat-box"><div className="k">Duration</div><div className="v">{previewMinutes < 60 ? `Under 1 hour` : formatDuration(previewMinutes)}</div></div>
       </div>
 
-      <div className="field full" style={{ marginBottom: '14px' }}>
+      <div className="field full" style={{ marginBottom: 16 }}>
         <label>Disposition</label>
-        <div className="radio-row" style={{ marginTop: '6px' }}>
-          {dispositions.map((d) => (
-            <label key={d.dispositionId}>
+        <div className="radio-row" style={{ marginTop: 4 }}>
+          {primary.map((d) => (
+            <label className={`radio-pill${dispositionId === d.dispositionId ? ' on' : ''}`} key={d.dispositionId}>
               <input
                 type="radio"
                 name="dispChoice"
@@ -90,19 +92,31 @@ export default function CheckoutModal() {
             </label>
           ))}
         </div>
+        {rest.length > 0 && (
+          <select
+            style={{ marginTop: 10 }}
+            value={rest.some((d) => d.dispositionId === dispositionId) ? dispositionId : ''}
+            onChange={(e) => setDispositionId(Number(e.target.value))}
+          >
+            <option value="">Other disposition…</option>
+            {rest.map((d) => <option key={d.dispositionId} value={d.dispositionId}>{d.dispositionName}</option>)}
+          </select>
+        )}
       </div>
 
-      <div className="field full" style={{ marginBottom: '14px' }}>
-        <label>Treatment Given</label>
-        <input type="text" value={medicines.join(', ') || 'None recorded'} readOnly />
-      </div>
-      <div className="field full" style={{ marginBottom: '14px' }}>
-        <label>Supplies Used</label>
-        <input type="text" value={supplies.join(', ') || 'None recorded'} readOnly />
+      <div className="field-row">
+        <div className="field">
+          <label>Treatment given</label>
+          <div className="readonly-box">{medicines.join(', ') || 'None recorded'}</div>
+        </div>
+        <div className="field">
+          <label>Supplies used</label>
+          <div className="readonly-box">{supplies.join(', ') || 'None recorded'}</div>
+        </div>
       </div>
 
-      <div className="field full">
-        <label>Sign-out Notes <span className="opt">(Optional)</span></label>
+      <div className="field full" style={{ marginBottom: 16 }}>
+        <label>Sign-out notes</label>
         <textarea
           placeholder="e.g. Advised rest, no further symptoms"
           value={notes}
@@ -111,8 +125,9 @@ export default function CheckoutModal() {
       </div>
 
       {sendingHome && (
-        <div className="warn-note" style={{ marginTop: '12px' }}>
-          Sending a student home — print a Parental Notification before they leave.
+        <div className="info-note">
+          <Icon name="printer" size={17} />
+          <span>Sending a student home prints a parental notification automatically.</span>
         </div>
       )}
     </Modal>

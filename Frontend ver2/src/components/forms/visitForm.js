@@ -38,6 +38,7 @@ export function dispensePayload(rows) {
   const medicines = [];
   const supplies = [];
   for (const row of rows) {
+    if (!row.key) continue; // a blank row the nurse added but never filled in
     const [itemType, id] = row.key.split(':');
     const quantity = String(row.quantity).trim();
     if (itemType === 'medicine') {
@@ -51,8 +52,9 @@ export function dispensePayload(rows) {
 
 export function validateDispense(rows) {
   for (const row of rows) {
+    if (!row.key) continue; // blank rows are ignored on save
     const q = Number(row.quantity);
-    if (!Number.isFinite(q) || q <= 0) return 'Each medicine/supply given needs a quantity above 0.';
+    if (!Number.isFinite(q) || q <= 0) return 'Each medicine or supply given needs a quantity above 0.';
   }
   return null;
 }
