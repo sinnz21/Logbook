@@ -188,7 +188,7 @@ export default function AddVisitRecord() {
             <label>Time in</label>
             <div className="input-wrap">
               <Icon name="clock" size={16} className="ic" />
-              <input type="text" value={formatTime(now)} readOnly style={{ paddingLeft: 36 }} title="Stamped by the server when you save" />
+              <input type="text" value={formatTime(now)} readOnly title="Stamped by the server when you save" />
             </div>
           </div>
           <div className="field">

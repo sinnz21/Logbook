@@ -38,6 +38,26 @@ body{
 a{text-decoration:none;color:inherit;}
 .icon{flex-shrink:0;display:block;}
 
+/* ===================== FORM CONTROLS (base) =====================
+   Keep these ABOVE the component sections. `input[type=text]` and
+   `.search-field input` carry the same specificity, so source order decides,
+   and this rule's `padding` shorthand would otherwise reset the left padding
+   that makes room for an input's leading icon. */
+input[type=text],input[type=date],input[type=number],input[type=email],input[type=password],input[type=search],select,textarea{
+  border:1px solid var(--line);border-radius:var(--r-md);padding:9px 12px;font-size:13.5px;
+  font-family:var(--font);color:var(--ink);background:#fff;width:100%;
+}
+select{
+  appearance:none;padding-right:32px;cursor:pointer;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7a77' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+}
+input::placeholder,textarea::placeholder{color:var(--faint);}
+textarea{resize:vertical;min-height:80px;line-height:1.55;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(16,122,107,.13);}
+input[readonly]{background:var(--teal-softer);color:var(--muted);}
+select.auto,input.auto{width:auto;}
+
 /* ===================== LOGIN ===================== */
 #loginScreen{
   min-height:100vh;display:flex;flex-direction:column;align-items:center;
@@ -192,21 +212,10 @@ a{text-decoration:none;color:inherit;}
 .search-field{position:relative;display:flex;align-items:center;flex:1;min-width:210px;}
 .search-field .ic{position:absolute;left:13px;color:var(--faint);pointer-events:none;}
 .search-field input{padding-left:38px;}
+/* Same deal for the icon-in-field pattern used outside a filter bar. */
+.input-wrap{position:relative;display:flex;align-items:center;}
+.input-wrap input{padding-left:38px;}
 
-input[type=text],input[type=date],input[type=number],input[type=email],input[type=password],input[type=search],select,textarea{
-  border:1px solid var(--line);border-radius:var(--r-md);padding:9px 12px;font-size:13.5px;
-  font-family:var(--font);color:var(--ink);background:#fff;width:100%;
-}
-select{
-  appearance:none;padding-right:32px;cursor:pointer;
-  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7a77' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 10px center;
-}
-input::placeholder,textarea::placeholder{color:var(--faint);}
-textarea{resize:vertical;min-height:80px;line-height:1.55;}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(16,122,107,.13);}
-input[readonly]{background:var(--teal-softer);color:var(--muted);}
-select.auto,input.auto{width:auto;}
 .date-range{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);}
 .date-range input[type=date]{width:auto;min-width:148px;}
 
@@ -567,6 +576,50 @@ tr.rowlink:hover{background:var(--teal-softer);}
 .doc-sign .cap{text-align:center;font-size:13px;color:#555;margin-top:6px;}
 .doc-foot{margin-top:44px;border-top:1px solid var(--line);padding-top:12px;font-size:12.5px;color:#666;line-height:1.6;}
 .doc-foot em{display:block;font-style:italic;}
+
+/* ===================== LAYOUT SAFETY =====================
+   A flex child won't shrink below its content width unless told to, which is
+   what makes long names and labels shove their neighbours out of a row. These
+   let the text side shrink (and wrap) while the fixed side keeps its size. */
+.topbar .crumb{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sidebar .user > div:last-child{min-width:0;}
+.sidebar .user-name,.sidebar .user-role{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.nav a{min-width:0;}
+.nav a .count{flex-shrink:0;}
+
+.page-head > div:first-child{min-width:0;}
+.card-head > div:first-child{min-width:0;}
+.alert-banner .txt{min-width:0;}
+.alert-banner .go{flex-shrink:0;}
+
+.hbar .name{min-width:0;overflow-wrap:anywhere;}
+.hbar .pct{flex-shrink:0;}
+.legend-row .name{min-width:0;overflow-wrap:anywhere;}
+.legend-row .pct,.legend-row .sw{flex-shrink:0;}
+.kpi .value,.kpi .label,.kpi .cap{overflow-wrap:anywhere;}
+.kpi.with-icon > div{min-width:0;}
+
+.settings-row > div:first-child{min-width:0;}
+.settings-row > :last-child{flex-shrink:0;}
+.pairing-card > div{min-width:0;}
+.pairing-card .pill{flex-shrink:0;}
+.activity-row > div:first-child{min-width:0;}
+.activity-row .pill{flex-shrink:0;}
+
+.roster-row .who{min-width:0;}
+.roster-row .who > div:last-child{min-width:0;}
+.roster-row > button{flex-shrink:0;}
+.picked-banner > :last-child{flex-shrink:0;}
+.visit-mini-card .actions > .sub{min-width:0;}
+.visit-mini-card .actions > .btn{flex-shrink:0;}
+.visit-mini-card .top .name{min-width:0;overflow-wrap:anywhere;}
+.visit-mini-card .top .pill{flex-shrink:0;}
+.today-panel-head h3{min-width:0;}
+.today-panel-head > span{flex-shrink:0;}
+
+.modal-head > div:first-child{min-width:0;}
+.step-head > div:last-child{min-width:0;}
+.dispense-row > button{align-self:end;margin-bottom:1px;}
 
 /* ===================== PRINT ===================== */
 @media print{
