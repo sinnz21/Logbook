@@ -1,0 +1,49 @@
+{
+ "model": {
+  "outbreaks_in_test": 35,
+  "detected": 25,
+  "detection_rate": 0.714,
+  "avg_days_to_detect": 12.9,
+  "false_alarms": 1,
+  "false_alarms_per_month": 0.08,
+  "total_alerts": 38,
+  "detected_by_size": {
+   "+3/week": "3/9",
+   "+4/week": "7/8",
+   "+5/week": "4/6",
+   "+6/week": "5/5",
+   "+8/week": "6/7"
+  }
+ },
+ "baseline_last_4_weeks": {
+  "outbreaks_in_test": 35,
+  "detected": 21,
+  "detection_rate": 0.6,
+  "avg_days_to_detect": 11.0,
+  "false_alarms": 18,
+  "false_alarms_per_month": 1.51,
+  "total_alerts": 48,
+  "detected_by_size": {
+   "+3/week": "1/9",
+   "+4/week": "6/8",
+   "+5/week": "3/6",
+   "+6/week": "5/5",
+   "+8/week": "6/7"
+  }
+ },
+ "mean_abs_error_cases_per_week": {
+  "model": 0.722,
+  "baseline": 0.9
+ },
+ "alert_rule": {
+  "alpha": 0.005,
+  "min_cases": 4,
+  "watched": [
+   "Fever",
+   "Viral Flu",
+   "Cough / Colds",
+   "Stomach Pain",
+   "Allergic Reaction"
+  ]
+ }
+}

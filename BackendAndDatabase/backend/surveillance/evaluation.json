@@ -1,0 +1,118 @@
+{
+ "model": [
+  {
+   "alpha": 0.0005,
+   "detection_rate": 0.47,
+   "false_alarms_per_month": 0.05,
+   "avg_days_to_detect": 13.2,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.001,
+   "detection_rate": 0.5,
+   "false_alarms_per_month": 0.1,
+   "avg_days_to_detect": 13.0,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.002,
+   "detection_rate": 0.556,
+   "false_alarms_per_month": 0.17,
+   "avg_days_to_detect": 12.3,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.005,
+   "detection_rate": 0.636,
+   "false_alarms_per_month": 0.3,
+   "avg_days_to_detect": 11.6,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.01,
+   "detection_rate": 0.687,
+   "false_alarms_per_month": 0.59,
+   "avg_days_to_detect": 11.1,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.02,
+   "detection_rate": 0.742,
+   "false_alarms_per_month": 1.14,
+   "avg_days_to_detect": 11.0,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.05,
+   "detection_rate": 0.798,
+   "false_alarms_per_month": 2.09,
+   "avg_days_to_detect": 10.5,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.1,
+   "detection_rate": 0.859,
+   "false_alarms_per_month": 4.01,
+   "avg_days_to_detect": 9.7,
+   "outbreaks": 198
+  }
+ ],
+ "baseline": [
+  {
+   "alpha": 0.0005,
+   "detection_rate": 0.444,
+   "false_alarms_per_month": 0.54,
+   "avg_days_to_detect": 10.9,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.001,
+   "detection_rate": 0.465,
+   "false_alarms_per_month": 0.62,
+   "avg_days_to_detect": 11.0,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.002,
+   "detection_rate": 0.53,
+   "false_alarms_per_month": 0.9,
+   "avg_days_to_detect": 10.9,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.005,
+   "detection_rate": 0.631,
+   "false_alarms_per_month": 1.89,
+   "avg_days_to_detect": 9.6,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.01,
+   "detection_rate": 0.662,
+   "false_alarms_per_month": 2.44,
+   "avg_days_to_detect": 9.4,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.02,
+   "detection_rate": 0.692,
+   "false_alarms_per_month": 3.46,
+   "avg_days_to_detect": 9.2,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.05,
+   "detection_rate": 0.788,
+   "false_alarms_per_month": 5.45,
+   "avg_days_to_detect": 9.0,
+   "outbreaks": 198
+  },
+  {
+   "alpha": 0.1,
+   "detection_rate": 0.828,
+   "false_alarms_per_month": 7.48,
+   "avg_days_to_detect": 8.9,
+   "outbreaks": 198
+  }
+ ]
+}
