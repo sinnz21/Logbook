@@ -6,6 +6,8 @@ import StockItemModal from './modals/StockItemModal';
 import SoftDeleteModal from './modals/SoftDeleteModal';
 import FlagPatientModal from './modals/FlagPatientModal';
 import UserModal from './modals/UserModal';
+import FullListModal from './modals/FullListModal';
+import ConfirmModal from './modals/ConfirmModal';
 
 // Each modal is only mounted while it's the active one (see Modal.jsx), so it
 // always renders "open" — no per-modal visibility prop to thread through.
@@ -17,6 +19,8 @@ const MODALS = {
   softDelete: SoftDeleteModal,
   flagPatient: FlagPatientModal,
   user: UserModal,
+  fullList: FullListModal,
+  confirm: ConfirmModal,
 };
 
 export default function ModalRoot() {

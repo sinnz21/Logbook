@@ -32,7 +32,7 @@ function signInLabel(iso, todayKey, yesterdayKey) {
 }
 
 export default function UserManagement() {
-  const { openModal } = useApp();
+  const { openModal, navigate } = useApp();
   const users = useAsync(() => listUsers(), []);
   const settings = useAsync(() => getSettings(), []);
 
@@ -89,9 +89,15 @@ export default function UserManagement() {
             {list.length} account{list.length === 1 ? '' : 's'}, with creation, role assignment and deactivation
           </div>
         </div>
-        <button className="btn btn-primary no-print" onClick={() => openModal('user', { onSuccess: users.reload })}>
-          <Icon name="plus" size={18} /> Add user
-        </button>
+        <div className="head-actions no-print">
+          {/* Account activity (sign-ins, password resets, status changes) lives in the Audit log. */}
+          <button className="btn btn-ghost" onClick={() => navigate('audit-log')}>
+            <Icon name="history" size={17} /> View account activity
+          </button>
+          <button className="btn btn-primary" onClick={() => openModal('user', { onSuccess: users.reload })}>
+            <Icon name="plus" size={18} /> Add user
+          </button>
+        </div>
       </div>
 
       <div className="filter-card no-print">
@@ -215,18 +221,6 @@ export default function UserManagement() {
         </div>
 
         <Pagination page={page} perPage={perPage} total={rows.length} onPageChange={setPage} />
-      </div>
-
-      <div className="card">
-        <h3>Recent account activity</h3>
-        <div className="card-sub">Who changed what</div>
-        <div className="info-note">
-          <Icon name="alert" size={17} />
-          <span>
-            The account audit trail needs an activity-log endpoint, which the backend doesn&rsquo;t expose
-            yet. Password resets and status changes made here are already recorded server-side.
-          </span>
-        </div>
       </div>
     </div>
   );

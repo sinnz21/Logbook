@@ -360,4 +360,108 @@ export const patterns = [
   { trigger: 'Viral Flu', associatedWith: 'rest and hydration', matchRate: 0.61, support: 41 },
 ];
 
+// ───────────────────────────── audit log ─────────────────────────────
+// Sixty days of account activity: a sign-in per staff member per clinic day,
+// a "visit added" entry for every visit, plus the edits, deletions, failed
+// sign-ins and admin actions a real log would carry.
+
+const auditRand = mulberry32(20261017);
+const aPick = (list) => list[Math.floor(auditRand() * list.length)];
+const aBetween = (lo, hi) => lo + Math.floor(auditRand() * (hi - lo + 1));
+const hhmm = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+/** Shared by the seed and handlers.js, so new entries look like the old ones. */
+export function auditEntry(logId, at, user, action, entity, entityId, details) {
+  return {
+    logId,
+    at,
+    userId: user?.userId ?? null,
+    username: user?.username ?? null,
+    fullName: user?.fullName ?? null,
+    role: user?.role ?? null,
+    action,
+    entity,
+    entityId: entityId ?? null,
+    details,
+  };
+}
+
+function buildAuditLogs() {
+  const byName = (name) => users.find((u) => u.fullName === name);
+  const nurses = users.filter((u) => u.role === 'nurse' && u.status === 'active');
+  const admins = users.filter((u) => u.role === 'admin');
+  const list = [];
+  let id = 1;
+  const add = (...args) => list.push(auditEntry(id++, ...args));
+
+  for (let back = 60; back >= 0; back--) {
+    const day = addDays(TODAY, -back);
+    const dow = new Date(`${day}T00:00:00Z`).getUTCDay();
+    if (dow === 0) continue;
+    const staff = dow === 6 ? [aPick(nurses)] : [...nurses, aPick(admins)];
+    for (const u of staff) {
+      if (auditRand() < 0.12) {
+        add(manilaIso(day, hhmm(7, aBetween(0, 9))), u, 'login_failed', 'session', null, 'Wrong password');
+      }
+      add(manilaIso(day, hhmm(u.role === 'admin' ? 8 : 7, aBetween(10, 40))), u, 'login', 'session', null, 'Signed in');
+    }
+    if (auditRand() < 0.06) {
+      add(manilaIso(day, hhmm(aBetween(9, 15), aBetween(0, 59))), null, 'login_failed', 'session', null, 'Unknown username "admin"');
+    }
+  }
+
+  const cutoff = manilaIso(addDays(TODAY, -60), '00:00');
+  for (const v of visits) {
+    if (v.startedAt < cutoff) continue;
+    const nurse = byName(v.attendingName) || nurses[0];
+    add(v.startedAt, nurse, 'create', 'visit', v.visitId, `Added a visit for ${v.patientName}: ${v.chiefComplaint}`);
+    if (v.endedAt) add(v.endedAt, nurse, 'update', 'visit', v.visitId, `Signed out ${v.patientName}: ${v.dispositionName}`);
+    if (auditRand() < 0.05) {
+      add(v.endedAt || v.startedAt, nurse, 'update', 'patient', v.patientId, `Edited contact details of ${v.patientName}`);
+    }
+  }
+
+  const extras = [
+    [-52, '10:05', admins[0], 'create', 'user', 4, 'Created nurse account rlim'],
+    [-45, '14:20', nurses[0], 'delete', 'visit', 8811, 'Moved a duplicate visit record to trash'],
+    [-38, '09:12', admins[0], 'update', 'settings', null, 'Changed failed login limit from 3 to 5'],
+    [-30, '11:40', nurses[1], 'create', 'stock_request', 3, 'Requested restock: Paracetamol 500mg, Sterile Gauze'],
+    [-29, '15:02', admins[1], 'update', 'stock_request', 3, 'Approved restock request REQ-0003'],
+    [-21, '13:30', nurses[0], 'delete', 'patient', 77, 'Moved a test patient record to trash'],
+    [-14, '08:55', admins[0], 'update', 'user', 5, 'Deactivated account pramos'],
+    [-9, '10:18', nurses[0], 'create', 'special_case', 1, 'Flagged Santos, Maria R.: Allergy (Penicillin)'],
+    [-6, '16:10', nurses[1], 'update', 'stock', 2, 'Restocked Mefenamic Acid 500mg (+200)'],
+    [-3, '09:47', nurses[0], 'delete', 'visit', 8902, 'Moved a visit logged on the wrong patient to trash'],
+    [-2, '14:15', admins[0], 'backup', 'backup', 7, 'Took a manual backup'],
+  ];
+  for (const [back, time, u, action, entity, entityId, details] of extras) {
+    add(manilaIso(addDays(TODAY, back), time), u, action, entity, entityId, details);
+  }
+
+  return list.sort((a, b) => (a.at < b.at ? 1 : -1));
+}
+
+export const auditLogs = buildAuditLogs();
+
+// ───────────────────────────── backups ─────────────────────────────
+
+export const backups = [
+  ...Array.from({ length: 6 }, (_, i) => ({
+    backupId: 6 - i,
+    fileName: `isu_infirmary_${addDays(TODAY, -i).replace(/-/g, '')}_0200.sql.gz`,
+    createdAt: manilaIso(addDays(TODAY, -i), '02:00'),
+    sizeBytes: 4_800_000 - i * 23_000,
+    kind: 'automatic',
+    createdByName: null,
+  })),
+  {
+    backupId: 7,
+    fileName: `isu_infirmary_${addDays(TODAY, -2).replace(/-/g, '')}_1415_manual.sql.gz`,
+    createdAt: manilaIso(addDays(TODAY, -2), '14:15'),
+    sizeBytes: 4_760_000,
+    kind: 'manual',
+    createdByName: 'Cruz, Andrea',
+  },
+].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+
 export { TODAY };

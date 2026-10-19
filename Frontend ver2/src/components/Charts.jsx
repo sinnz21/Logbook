@@ -163,7 +163,17 @@ export function BarChart({ bars, height = 230 }) {
 
 /* ── Horizontal bars — complaints, medicines, demographics ────────────── */
 
-export function HBars({ rows, showValue = (r) => `${r.pct}%` }) {
+/** "12 · 34.5%" — the count first, then its share, so every bar has real numbers. */
+export function CountPct({ count, pct, unit }) {
+  return (
+    <>
+      {count}{unit ? ` ${unit}` : ''}
+      {pct != null && <span className="share"> · {pct}%</span>}
+    </>
+  );
+}
+
+export function HBars({ rows, showValue = (r) => <CountPct count={r.count} pct={r.pct} /> }) {
   if (!rows.length) return <div className="sub">Nothing to show yet.</div>;
   return (
     <div className="hbar-list">
@@ -178,6 +188,27 @@ export function HBars({ rows, showValue = (r) => `${r.pct}%` }) {
           </span>
         </div>
       ))}
+    </div>
+  );
+}
+
+/* ── Donut + legend with counts and shares ────────────────────────────── */
+
+export function DonutLegend({ rows, centerValue, centerLabel, size }) {
+  if (!rows.length) return <div className="sub">Nothing to show yet.</div>;
+  const total = rows.reduce((sum, r) => sum + r.count, 0);
+  return (
+    <div className="donut-wrap">
+      <Donut slices={rows} size={size} centerValue={centerValue ?? total} centerLabel={centerLabel} />
+      <div className="donut-legend">
+        {rows.map((r) => (
+          <div className="legend-row" key={r.name}>
+            <span className="sw" style={{ background: r.color }} />
+            <span className="name">{r.name}</span>
+            <span className="pct"><CountPct count={r.count} pct={r.pct} /></span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

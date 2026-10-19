@@ -3,11 +3,16 @@ import { useApp } from '../context/useApp';
 import { useAsync } from '../hooks/useAsync';
 import { useVisitsInRange } from '../hooks/useVisits';
 import { addDays, clinicDay, formatDate, formatTime, parseApiDate, presetRange } from '../lib/time';
-import { formatQty, isOpenVisit, initialsOf, VISIT_STATUS } from '../lib/format';
+import { isOpenVisit, initialsOf, VISIT_STATUS } from '../lib/format';
 import { REFERRAL_DISPOSITIONS } from '../api/lookups';
 import { listStock } from '../api/stock';
-import { topComplaintsFrom } from '../lib/insights';
-import { Donut, HBars, LineChart } from '../components/Charts';
+import { getPatterns } from '../api/insights';
+import { summarize } from '../lib/insights';
+import { LineChart } from '../components/Charts';
+import {
+  ClientBreakdownCard, ComplaintsCard, DepartmentsCard, DispositionsCard, MedicinesCard,
+  MonthlyVisitsCard, PairingsCard, StaffAgesCard, StudentDemographicsCard,
+} from '../components/InsightCards';
 import Icon from '../components/Icon';
 
 const today = clinicDay(new Date());
@@ -37,25 +42,11 @@ function dailyTrend(visits, days) {
   return points;
 }
 
-/** "Top 5 most requested medicine" — units dispensed across the range. */
-function topMedicines(visits, limit = 5) {
-  const counts = new Map();
-  for (const v of visits) {
-    for (const m of v.medicines || []) {
-      counts.set(m.medicineName, (counts.get(m.medicineName) || 0) + (Number(m.quantityGiven) || 0));
-    }
-  }
-  const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
-  if (!sorted.length) return [];
-  const max = Math.max(...sorted.map(([, n]) => n));
-  return sorted.map(([name, count]) => ({ name, count, width: Math.round((count / max) * 100) }));
-}
-
 export default function NurseDashboard() {
   const { navigate } = useApp();
-  const [preset, setPreset] = useState('today');
-  const [range, setRange] = useState(() => presetRange('today', today));
-  const [draft, setDraft] = useState(() => presetRange('today', today));
+  const [preset, setPreset] = useState('month');
+  const [range, setRange] = useState(() => presetRange('month', today));
+  const [draft, setDraft] = useState(() => presetRange('month', today));
   const [trendWindow, setTrendWindow] = useState('30 days');
   const [queueSort, setQueueSort] = useState('time-in');
   const [now] = useState(() => new Date());
@@ -72,13 +63,19 @@ export default function NurseDashboard() {
   // The trend line has its own window, independent of the range picker above.
   const trendDays = TREND_WINDOWS[trendWindow];
   const trendQ = useVisitsInRange(addDays(today, -(trendDays - 1)), today);
+  // Monthly bars and treatment pairings need more than a week of history, so
+  // they always look back over the semester.
+  const semesterFrom = addDays(today, -179);
+  const semesterQ = useVisitsInRange(semesterFrom, today);
+  const patterns = useAsync(() => getPatterns({ dateFrom: semesterFrom, dateTo: today }), [semesterFrom]);
 
   const inCare = todayQ.visits.filter(isOpenVisit).length;
   const referredToday = todayQ.visits.filter((v) => REFERRAL_DISPOSITIONS.has(v.dispositionName)).length;
 
   const trend = useMemo(() => dailyTrend(trendQ.visits, trendDays), [trendQ.visits, trendDays]);
-  const complaints = useMemo(() => topComplaintsFrom(rangeQ.visits, { limit: 4 }), [rangeQ.visits]);
-  const medicines = useMemo(() => topMedicines(rangeQ.visits), [rangeQ.visits]);
+  const stats = useMemo(() => summarize(rangeQ.visits), [rangeQ.visits]);
+  const semester = useMemo(() => summarize(semesterQ.visits), [semesterQ.visits]);
+  const rangeLabel = `${formatDate(new Date(`${range.from}T00:00:00Z`))} – ${formatDate(new Date(`${range.to}T00:00:00Z`))}`;
 
   const queue = useMemo(() => {
     const list = [...todayQ.visits];
@@ -101,6 +98,10 @@ export default function NurseDashboard() {
           <h1>Nurse dashboard</h1>
           <div className="sub">ISU Infirmary, {formatDate(new Date(`${today}T00:00:00Z`))}</div>
         </div>
+      </div>
+
+      <div className="range-row no-print">
+        <span className="range-caption">Charts below cover</span>
 
         <div className="range-bar no-print">
           <div className="segmented solid">
@@ -169,9 +170,7 @@ export default function NurseDashboard() {
           <div>
             <div className="value">{rangeQ.loading ? '…' : rangeQ.visits.length}</div>
             <div className="label">Range total</div>
-            <div className="foot">
-              {formatDate(new Date(`${range.from}T00:00:00Z`))} – {formatDate(new Date(`${range.to}T00:00:00Z`))}
-            </div>
+            <div className="foot">{rangeLabel}</div>
           </div>
         </div>
         <div className="kpi with-icon clickable" onClick={() => navigate('patient-records')}>
@@ -192,7 +191,7 @@ export default function NurseDashboard() {
         </div>
       </div>
 
-      <div className="chart-row">
+      <div className="chart-row even">
         <div className="card">
           <div className="card-head">
             <div>
@@ -210,29 +209,11 @@ export default function NurseDashboard() {
           {trendQ.loading ? <div className="sub">Loading…</div> : <LineChart points={trend} />}
         </div>
 
-        <div className="card">
-          <h3>Top complaints</h3>
-          <div className="card-sub">Across the selected range</div>
-          {complaints.length === 0 ? (
-            <div className="sub">{rangeQ.loading ? 'Loading…' : 'No visits recorded in this range yet.'}</div>
-          ) : (
-            <div className="donut-wrap">
-              <Donut slices={complaints} centerValue={rangeQ.visits.length} centerLabel="visits" />
-              <div className="donut-legend">
-                {complaints.map((c) => (
-                  <div className="legend-row" key={c.name}>
-                    <span className="sw" style={{ background: c.color }} />
-                    <span className="name">{c.name}</span>
-                    <span className="pct">{c.pct}%</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        <ComplaintsCard rows={stats.complaints} loading={rangeQ.loading} />
       </div>
 
-      <div className="chart-row">
+      {/* Full width: the queue table needs the room, and a card beside it left a gap. */}
+      <div>
         <div className="card">
           <div className="card-head">
             <div>
@@ -300,15 +281,30 @@ export default function NurseDashboard() {
           </div>
         </div>
 
-        <div className="card">
-          <h3>Top 5 most requested medicine</h3>
-          <div className="card-sub">Gamot na madalas kunin</div>
-          {medicines.length === 0 ? (
-            <div className="sub">Nothing dispensed in this range yet.</div>
-          ) : (
-            <HBars rows={medicines} showValue={(r) => formatQty(r.count)} />
-          )}
-        </div>
+      </div>
+
+      <div className="section-title">
+        <h2>Insights</h2>
+        <span>{rangeLabel} · {stats.total} visits</span>
+      </div>
+
+      <div className="chart-flow">
+        <MedicinesCard rows={stats.medicines} loading={rangeQ.loading} />
+        <ClientBreakdownCard rows={stats.clients} loading={rangeQ.loading} />
+        <DispositionsCard rows={stats.dispositions} loading={rangeQ.loading} />
+        <StaffAgesCard rows={stats.staffAges} loading={rangeQ.loading} />
+        <DepartmentsCard rows={stats.departments} loading={rangeQ.loading} />
+        <StudentDemographicsCard years={stats.studentYears} sex={stats.studentSex} loading={rangeQ.loading} />
+      </div>
+
+      <div className="section-title">
+        <h2>This semester</h2>
+        <span>Last 180 days · {semester.total} visits</span>
+      </div>
+
+      <div className="chart-row even">
+        <MonthlyVisitsCard perMonth={semester.perMonth} loading={semesterQ.loading} />
+        <PairingsCard patterns={patterns.data} loading={patterns.loading} error={patterns.error} />
       </div>
     </div>
   );

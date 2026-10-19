@@ -5,24 +5,26 @@ import { useVisitsInRange } from '../../hooks/useVisits';
 import { listUsers } from '../../api/users';
 import { listStock, listStockRequests } from '../../api/stock';
 import { getSettings } from '../../api/settings';
-import { clinicDay, formatDate, presetRange } from '../../lib/time';
-import { topComplaintsFrom } from '../../lib/insights';
-import { HBars } from '../../components/Charts';
+import { listAuditLogs } from '../../api/audit';
+import { addDays, clinicDay, formatDate, parseApiDate, presetRange } from '../../lib/time';
+import { rowsFrom, summarize, tally } from '../../lib/insights';
+import { AUDIT_ACTIONS } from '../../lib/audit';
+import { BarChart, DonutLegend } from '../../components/Charts';
+import {
+  ClientBreakdownCard, ComplaintsCard, DepartmentsCard, MedicinesCard, MonthlyVisitsCard,
+} from '../../components/InsightCards';
 import Icon from '../../components/Icon';
-import { notConnected } from '../../lib/notConnected';
 
 const today = clinicDay(new Date());
+const shortDay = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', weekday: 'short', day: 'numeric' });
 
-const REPORTS = [
-  { name: 'Monthly supply report', cadence: 'Generated at the start of every month' },
-  { name: 'Medicine restock cycle report', cadence: 'Audited every 1 to 2 months' },
-  { name: 'System and account activity report', cadence: 'Generated at the start of every month' },
-];
+const STOCK_COLORS = { high: '#107a6b', low: '#d9a13b', out_of_stock: '#c0392b' };
+const STOCK_LABELS = { high: 'In stock', low: 'Low', out_of_stock: 'Out of stock' };
 
 export default function AdminDashboard() {
   const { navigate } = useApp();
-  const [preset, setPreset] = useState('week');
-  const [range, setRange] = useState(() => presetRange('week', today));
+  const [preset, setPreset] = useState('month');
+  const [range, setRange] = useState(() => presetRange('month', today));
   const [draft, setDraft] = useState(range);
 
   const applyPreset = (p) => {
@@ -32,18 +34,47 @@ export default function AdminDashboard() {
     setDraft(next);
   };
 
+  const weekFrom = addDays(today, -6);
   const users = useAsync(() => listUsers(), []);
   const requests = useAsync(() => listStockRequests({ perPage: 200 }), []);
   const stock = useAsync(() => listStock({ perPage: 200 }), []);
   const settings = useAsync(() => getSettings(), []);
+  const audit = useAsync(() => listAuditLogs({ dateFrom: range.from, dateTo: range.to, perPage: 200 }), [range.from, range.to]);
+  const weekAudit = useAsync(() => listAuditLogs({ action: 'login', dateFrom: weekFrom, dateTo: today, perPage: 200 }), [weekFrom]);
   const visits = useVisitsInRange(range.from, range.to);
+  const semesterQ = useVisitsInRange(addDays(today, -179), today);
 
   const userList = users.data?.items || [];
   const active = userList.filter((u) => u.status === 'active').length;
   const pending = (requests.data?.items || []).filter((r) => r.status === 'pending');
-  const needsAttention = (stock.data?.items || []).filter((i) => i.stockStatus !== 'high').length;
+  const stockItems = useMemo(() => stock.data?.items || [], [stock.data]);
+  const needsAttention = stockItems.filter((i) => i.stockStatus !== 'high').length;
 
-  const complaints = useMemo(() => topComplaintsFrom(visits.visits, { limit: 4 }), [visits.visits]);
+  const stats = useMemo(() => summarize(visits.visits), [visits.visits]);
+  const semester = useMemo(() => summarize(semesterQ.visits), [semesterQ.visits]);
+
+  const stockRows = useMemo(
+    () => rowsFrom(tally(stockItems, (i) => STOCK_LABELS[i.stockStatus]))
+      .map((r) => ({ ...r, color: STOCK_COLORS[Object.keys(STOCK_LABELS).find((k) => STOCK_LABELS[k] === r.name)] })),
+    [stockItems],
+  );
+
+  // One bar per day of the past week, zero-filled.
+  const signIns = useMemo(() => {
+    const counts = tally(weekAudit.data?.items || [], (e) => clinicDay(parseApiDate(e.at)));
+    const bars = [];
+    for (let d = weekFrom; d <= today; d = addDays(d, 1)) {
+      bars.push({ label: shortDay.format(new Date(`${d}T12:00:00Z`)), value: counts.get(d) || 0 });
+    }
+    return bars;
+  }, [weekAudit.data, weekFrom]);
+  const weekSignIns = signIns.reduce((sum, b) => sum + b.value, 0);
+
+  const activityRows = useMemo(
+    () => rowsFrom(tally(audit.data?.items || [], (e) => AUDIT_ACTIONS[e.action]?.label || e.action))
+      .map((r) => ({ ...r, color: Object.values(AUDIT_ACTIONS).find((a) => a.label === r.name)?.color || r.color })),
+    [audit.data],
+  );
 
   return (
     <div className="view active">
@@ -78,7 +109,7 @@ export default function AdminDashboard() {
               {settings.loading ? '…' : settings.error ? '—' : settings.data?.autoBackupEnabled ? 'On' : 'Off'}
             </div>
             <div className="label">Automated backups</div>
-            <div className="foot">Manage in Settings</div>
+            <div className="foot">Backup and restore in Settings</div>
           </div>
         </div>
         <div className="kpi with-icon clickable" onClick={() => navigate('users')}>
@@ -94,7 +125,7 @@ export default function AdminDashboard() {
           <div>
             <div className="value">{stock.loading ? '…' : stock.error ? '—' : needsAttention}</div>
             <div className="label">Stock needing attention</div>
-            <div className="foot">Low or out of stock</div>
+            <div className="foot">{stock.error ? 'Unavailable' : `of ${stockItems.length} items (${stockItems.length ? Math.round((needsAttention / stockItems.length) * 100) : 0}%)`}</div>
           </div>
         </div>
         <div className="kpi with-icon clickable" onClick={() => navigate('stock-requests')}>
@@ -109,15 +140,20 @@ export default function AdminDashboard() {
 
       <div className="chart-row">
         <div className="card">
-          <h3>Sign-in activity</h3>
-          <div className="card-sub">Successful sign-ins per day this week</div>
-          <div className="info-note">
-            <Icon name="alert" size={17} />
-            <span>
-              This chart needs a sign-in audit endpoint, which the backend doesn&rsquo;t expose yet.
-              See the System and account activity section of BACKEND_REQUIREMENTS.md.
-            </span>
+          <div className="card-head">
+            <div>
+              <h3>Sign-in activity</h3>
+              <div className="sub">{weekAudit.error ? 'Successful sign-ins per day, past 7 days' : `${weekSignIns} successful sign-ins in the past 7 days`}</div>
+            </div>
+            <button className="btn btn-soft btn-sm no-print" onClick={() => navigate('audit-log')}>Open audit log</button>
           </div>
+          {weekAudit.error ? (
+            <div className="info-note"><Icon name="alert" size={17} /><span>{weekAudit.error}</span></div>
+          ) : weekAudit.loading ? (
+            <div className="sub">Loading…</div>
+          ) : (
+            <BarChart bars={signIns} height={210} />
+          )}
           <div className="warn-note" style={{ marginTop: 12 }}>
             Accounts lock for {settings.data?.lockoutMinutes ?? 15} minutes after{' '}
             {settings.data?.failedLoginLimit ?? 5} failed attempts.
@@ -125,39 +161,42 @@ export default function AdminDashboard() {
         </div>
 
         <div className="card">
-          <h3>Campus complaint summary</h3>
-          <div className="card-sub">Read-only, recorded by the nurses</div>
-          {visits.error && <div className="login-error">{visits.error}</div>}
-          {complaints.length === 0 ? (
-            <div className="sub">{visits.loading ? 'Loading…' : 'No visits recorded in this range.'}</div>
+          <h3>Account activity</h3>
+          <div className="card-sub">
+            {audit.data ? `${audit.data.total ?? (audit.data.items || []).length} logged actions in the selected range` : 'Logged actions in the selected range'}
+          </div>
+          {audit.error ? (
+            <div className="sub">{audit.error}</div>
+          ) : audit.loading ? (
+            <div className="sub">Loading…</div>
           ) : (
-            <HBars rows={complaints} />
+            <DonutLegend rows={activityRows} centerLabel="actions" />
           )}
         </div>
       </div>
 
-      <div className="card">
-        <h3>Reports</h3>
-        <div className="info-note" style={{ margin: '12px 0 6px' }}>
-          <span>
-            Supply reports generate monthly. Medicine stock is audited every 1 to 2 months.
-            When the due date arrives, a restock is needed.
-          </span>
+      <div className="chart-row">
+        <ComplaintsCard title="Campus complaint summary" rows={stats.complaints} loading={visits.loading} />
+
+        <div className="card">
+          <h3>Stock status</h3>
+          <div className="card-sub">{stockItems.length} medicines and supplies on hand</div>
+          {stock.error ? <div className="sub">{stock.error}</div> : stock.loading ? <div className="sub">Loading…</div> : (
+            <DonutLegend rows={stockRows} centerLabel="items" />
+          )}
         </div>
-        {REPORTS.map((r) => (
-          <div className="settings-row" key={r.name}>
-            <div>
-              <div className="t">{r.name}</div>
-              <div className="d">{r.cadence}</div>
-            </div>
-            <button
-              className="btn btn-outline btn-sm no-print"
-              onClick={() => notConnected(r.name, 'the report template isn\'t built yet')}
-            >
-              Generate
-            </button>
-          </div>
-        ))}
+      </div>
+
+      <div className="section-title">
+        <h2>Clinic insights</h2>
+        <span>{formatDate(new Date(`${range.from}T00:00:00Z`))} – {formatDate(new Date(`${range.to}T00:00:00Z`))} · {stats.total} visits</span>
+      </div>
+
+      <div className="chart-flow">
+        <MonthlyVisitsCard perMonth={semester.perMonth} loading={semesterQ.loading} />
+        <ClientBreakdownCard rows={stats.clients} loading={visits.loading} />
+        <DepartmentsCard rows={stats.departments} loading={visits.loading} />
+        <MedicinesCard rows={stats.medicines} loading={visits.loading} />
       </div>
     </div>
   );

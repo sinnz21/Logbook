@@ -5,15 +5,43 @@
 // a demo can't be left in a broken state.
 import * as seed from './data.js';
 
+/** The records a backup covers. The audit log and the backup list itself are kept out on purpose. */
+const freshRecords = () => structuredClone({
+  users: seed.users,
+  patients: seed.patients,
+  visits: seed.visits,
+  stock: seed.stock,
+  requests: seed.stockRequests,
+  settings: seed.settings,
+});
+
 const db = {
-  users: seed.users.map((u) => ({ ...u })),
-  patients: seed.patients.map((p) => ({ ...p, specialCases: p.specialCases.map((c) => ({ ...c })) })),
-  visits: seed.visits.map((v) => ({ ...v })),
-  stock: seed.stock.map((s) => ({ ...s })),
-  requests: seed.stockRequests.map((r) => ({ ...r, items: r.items.map((i) => ({ ...i })) })),
-  settings: { ...seed.settings },
-  nextIds: { visit: 9000, patient: 900, specialCase: 900, request: 900, user: 900 },
+  ...freshRecords(),
+  audit: seed.auditLogs.map((e) => ({ ...e })),
+  backups: seed.backups.map((b) => ({ ...b })),
+  snapshots: new Map(), // backupId → records, for backups taken during this session
+  resetCodes: new Map(), // email → { code, userId, expiresAt }
+  resetTokens: new Map(), // token → userId
+  nextIds: { visit: 9000, patient: 900, specialCase: 900, request: 900, user: 900, audit: 90000, backup: 100 },
 };
+
+const RECORD_KEYS = ['users', 'patients', 'visits', 'stock', 'requests', 'settings'];
+const RESET_CODE_SECONDS = 600;
+
+/** The signed-in user for this request, from the demo token's payload. */
+let currentUser = null;
+function userFromToken(token) {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return db.users.find((u) => u.username === payload.sub) || null;
+  } catch {
+    return null;
+  }
+}
+
+function audit(user, action, entity, entityId, details) {
+  db.audit.unshift(seed.auditEntry(db.nextIds.audit++, now(), user, action, entity, entityId, details));
+}
 
 class HttpError extends Error {
   constructor(status, detail) {
@@ -104,14 +132,80 @@ function fakeJwt(user) {
 
 const routes = [
   ['POST', /^\/auth\/login$/, (_m, _q, body) => {
-    const user = db.users.find((u) => u.username === (body.username || '').trim().toLowerCase());
-    if (!user) throw new HttpError(401, 'Incorrect username or password.');
-    if (user.status !== 'active') throw new HttpError(401, 'This account is inactive. Ask an admin to reactivate it.');
+    const username = (body.username || '').trim().toLowerCase();
+    const user = db.users.find((u) => u.username === username);
+    if (!user) {
+      audit(null, 'login_failed', 'session', null, `Unknown username "${username}"`);
+      throw new HttpError(401, 'Incorrect username or password.');
+    }
+    if (user.status !== 'active') {
+      audit(user, 'login_failed', 'session', null, 'Account is inactive');
+      throw new HttpError(401, 'This account is inactive. Ask an admin to reactivate it.');
+    }
     user.lastLoginAt = now();
+    audit(user, 'login', 'session', null, 'Signed in');
     return {
       accessToken: fakeJwt(user), tokenType: 'bearer',
       userId: user.userId, username: user.username, fullName: user.fullName, role: user.role,
     };
+  }],
+
+  // ── password reset by email ──
+  ['POST', /^\/auth\/forgot-password$/, (_m, _q, body) => {
+    const email = (body.email || '').trim().toLowerCase();
+    const user = db.users.find((u) => u.email?.toLowerCase() === email && u.status === 'active');
+    if (!user) return { expiresInSeconds: RESET_CODE_SECONDS }; // same answer either way
+    const code = String(Math.floor(Math.random() * 1_000_000)).padStart(6, '0');
+    db.resetCodes.set(email, { code, userId: user.userId, expiresAt: Date.now() + RESET_CODE_SECONDS * 1000 });
+    // A real backend emails the code. Demo mode has no mail server, so it hands
+    // the code back for the login screen to show.
+    return { expiresInSeconds: RESET_CODE_SECONDS, demoCode: code };
+  }],
+  ['POST', /^\/auth\/verify-reset-code$/, (_m, _q, body) => {
+    const email = (body.email || '').trim().toLowerCase();
+    const entry = db.resetCodes.get(email);
+    if (!entry || entry.code !== body.code) throw new HttpError(400, 'That code is incorrect. Check the email and try again.');
+    if (Date.now() > entry.expiresAt) throw new HttpError(400, 'That code has expired. Send a new one.');
+    db.resetCodes.delete(email);
+    const token = `reset-${Math.random().toString(36).slice(2)}`;
+    db.resetTokens.set(token, entry.userId);
+    return { resetToken: token };
+  }],
+  ['POST', /^\/auth\/reset-password$/, (_m, _q, body) => {
+    const userId = db.resetTokens.get(body.resetToken);
+    if (!userId) throw new HttpError(400, 'This reset has expired. Start again.');
+    db.resetTokens.delete(body.resetToken);
+    const user = db.users.find((u) => u.userId === userId);
+    audit(user, 'update', 'user', userId, 'Reset own password by email');
+    return { ok: true };
+  }],
+
+  // ── audit log ──
+  ['GET', /^\/audit-logs$/, (_m, q) => {
+    const search = (q.search || '').trim().toLowerCase();
+    const rows = db.audit.filter((e) => {
+      if (q.action && e.action !== q.action) return false;
+      if (q.user_id && e.userId !== Number(q.user_id)) return false;
+      const day = seed.clinicDay(new Date(`${e.at}Z`));
+      if (q.date_from && day < q.date_from) return false;
+      if (q.date_to && day > q.date_to) return false;
+      return !search || [e.fullName, e.username, e.details, e.entity].some((s) => s && s.toLowerCase().includes(search));
+    });
+    return page(rows, q);
+  }],
+
+  // ── backup and recovery ──
+  ['GET', /^\/backups$/, () => db.backups],
+  ['POST', /^\/backups$/, () => takeBackup('manual')],
+  ['POST', /^\/backups\/(\d+)\/restore$/, (m) => {
+    const backup = db.backups.find((b) => b.backupId === Number(m[1]));
+    if (!backup) throw new HttpError(404, 'Backup not found');
+    takeBackup('manual', 'Safety backup before restore');
+    // Backups seeded with the demo have no snapshot; they restore the demo's starting data.
+    const records = structuredClone(db.snapshots.get(backup.backupId) || freshRecords());
+    for (const key of RECORD_KEYS) db[key] = records[key];
+    audit(currentUser, 'restore', 'backup', backup.backupId, `Restored backup ${backup.fileName}`);
+    return { ok: true, restoredAt: now() };
   }],
 
   ['GET', /^\/lookups$/, () => ({
@@ -198,8 +292,8 @@ const routes = [
   ['DELETE', /^\/visits\/(\d+)$/, (m) => {
     const i = db.visits.findIndex((v) => v.visitId === Number(m[1]));
     if (i === -1) throw new HttpError(404, 'Visit not found');
-    db.visits.splice(i, 1);
-    return { ok: true };
+    const removed = decorate(db.visits.splice(i, 1)[0]);
+    return { ok: true, ...removed };
   }],
 
   // ── patients ── (literal /special-cases must precede /:id)
@@ -259,8 +353,8 @@ const routes = [
   ['DELETE', /^\/patients\/(\d+)$/, (m) => {
     const i = db.patients.findIndex((x) => x.patientId === Number(m[1]));
     if (i === -1) throw new HttpError(404, 'Patient not found');
-    db.patients.splice(i, 1);
-    return { ok: true };
+    const removed = db.patients.splice(i, 1)[0];
+    return { ok: true, ...removed };
   }],
   ['POST', /^\/patients\/(\d+)\/special-cases$/, (m, _q, body) => {
     const p = db.patients.find((x) => x.patientId === Number(m[1]));
@@ -357,6 +451,7 @@ const routes = [
     if (!r) throw new HttpError(404, 'Request not found');
     r.status = 'completed';
     r.receivedByName = 'N. Santos';
+    r.receivedAt = now();
     // Delivery arrived: the approved quantity lands in stock.
     for (const line of r.items) {
       const item = findStock(line.itemType, line.itemId);
@@ -446,15 +541,65 @@ const routes = [
   }],
 ];
 
+function takeBackup(kind, details = 'Took a manual backup') {
+  const backupId = db.nextIds.backup++;
+  const stamp = now().replace(/[-:]/g, '').replace('T', '_').slice(0, 13);
+  db.snapshots.set(backupId, structuredClone(Object.fromEntries(RECORD_KEYS.map((k) => [k, db[k]]))));
+  const backup = {
+    backupId,
+    fileName: `isu_infirmary_${stamp}_${kind}.sql.gz`,
+    createdAt: now(),
+    sizeBytes: 4_800_000 + db.visits.length * 600,
+    kind,
+    createdByName: currentUser?.fullName || null,
+  };
+  db.backups.unshift(backup);
+  audit(currentUser, 'backup', 'backup', backupId, `${details} (${backup.fileName})`);
+  return backup;
+}
+
+// What a mutation did, for the audit log. Routes that log for themselves
+// (sign-in, password reset, backups) are skipped in handle().
+const AUDITED = [
+  [/^\/visits\/(\d+)\/sign-out$/, 'update', 'visit', (r) => `Signed out ${r.patientName}: ${r.dispositionName}`],
+  [/^\/visits(?:\/(\d+))?$/, null, 'visit', (r, verb) => (r?.patientName ? `${verb} a visit for ${r.patientName}` : `${verb} a visit record`)],
+  [/^\/patients\/(\d+)\/special-cases(?:\/(\d+))?$/, null, 'special_case', (r, verb) => `${verb} a special-case flag: ${r?.caseName || ''}`],
+  [/^\/patients(?:\/(\d+))?$/, null, 'patient', (r, verb) => `${verb} patient ${r?.fullName || 'record'}`],
+  [/^\/stock\/requests\/(\d+)\/(approve|deny|receive)$/, 'update', 'stock_request', (r) => `Restock request ${r.requestNumber} is now ${r.status}`],
+  [/^\/stock\/requests$/, 'create', 'stock_request', (r) => `Requested restock ${r.requestNumber} (${r.items.length} items)`],
+  [/^\/stock\/(?:medicine|supply)\/(\d+)\/(restock|adjust)$/, 'update', 'stock', (r) => `Updated stock of ${r.name} to ${Number(r.quantity)} ${r.unit}`],
+  [/^\/stock(?:\/(?:medicine|supply)\/(\d+))?$/, null, 'stock', (r, verb) => `${verb} stock item ${r?.name || ''}`],
+  [/^\/users(?:\/(\d+))?$/, null, 'user', (r, verb) => `${verb} account ${r?.username || ''}`],
+  [/^\/settings$/, 'update', 'settings', () => 'Changed system settings'],
+];
+const VERB = { create: 'Added', update: 'Edited', delete: 'Deleted' };
+
+function auditMutation(method, path, result) {
+  for (const [pattern, fixed, entity, describe] of AUDITED) {
+    const m = pattern.exec(path);
+    if (!m) continue;
+    const action = fixed || (method === 'POST' ? 'create' : method === 'DELETE' ? 'delete' : 'update');
+    const id = result?.visitId ?? result?.patientId ?? result?.requestId ?? result?.userId ?? result?.itemId ?? (m[1] ? Number(m[1]) : null);
+    audit(currentUser, action, entity, id, describe(result, VERB[action]));
+    return;
+  }
+}
+
 /**
- * Resolves one API call. `path` is everything after /api, query already parsed.
- * Throws HttpError for anything the real backend would reject.
+ * Resolves one API call. `path` is everything after /api, query already parsed,
+ * `token` the bearer token (if any). Throws HttpError for anything the real
+ * backend would reject.
  */
-export function handle(method, path, query, body) {
+export function handle(method, path, query, body, token) {
+  currentUser = token ? userFromToken(token) : null;
   for (const [verb, pattern, run] of routes) {
     if (verb !== method) continue;
     const match = pattern.exec(path);
-    if (match) return run(match, query, body);
+    if (match) {
+      const result = run(match, query, body);
+      if (method !== 'GET' && !/^\/(auth|backups)\b/.test(path)) auditMutation(method, path, result);
+      return result;
+    }
   }
   throw new HttpError(404, 'Not Found');
 }

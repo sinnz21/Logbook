@@ -11,22 +11,24 @@ The UI follows the team's Figma design. The data comes from the FastAPI backend 
 ## Features
 
 **Nurse**
-- **Dashboard:** today's visits, range total, referrals and low/out-of-stock alerts, the Mon–Sun visit trend, top complaints, top 5 most requested medicines, and the active patient queue. Pick Today / This Week / This Month or a custom date range.
+- **Dashboard:** today's visits, range total, referrals and low/out-of-stock alerts, the visit trend, top complaints, top 5 medicines (with *View full list*), the active patient queue, and insight charts (client breakdown, outcomes, departments, demographics, visits per month, treatment pairings). Every chart shows counts and percentages. To add a visit, use the **Add visit record** button on Patient records.
 - **Add Visit Record:** the five-step flow from the Figma — smart patient lookup, patient details, triage and special-case flagging, treatment delivery, then disposition and sign-out. Search the roster to reuse an existing patient or register one on the spot. Dispensed medicines and supplies are deducted from stock automatically.
 - **Patient Records:** searchable, filterable (gender, year level, program, department, date range), sortable and paginated, with today's clinic queue alongside. Export to CSV, or print / save as PDF.
 - **Priority & Special Cases:** PWD, Senior Citizen, allergies and chronic conditions. A flag stays on the patient's record for every future visit.
 - **Search & History:** type a name and the patient's whole record comes up, with their visit history expanding underneath.
 - **Stock & Supplies:** live inventory with High/Low/Out status and expiry warnings. Add or restock items, raise a restock requisition, and confirm deliveries.
-- **Insights:** visits per month, frequent complaints, plain-language treatment pairings, client breakdown, highest-visiting departments and demographics.
+- **Reports:** every clinic trend as charts **or tables** (Charts/Table toggle), each table with a total row and CSV export.
 - **Patient Profile:** full clinical ledger, plus printable **Medical Certificate** (ISUE-UHS-MCR-007) and **Parental Notification** (ISUE-UHS-PaN-006) on ISU letterhead.
 
 **Admin**
-- **Dashboard:** account and stock status, pending requisitions, campus complaint summary, report cadence.
+- **Dashboard:** account and stock status, pending requisitions, sign-in activity, account activity, stock status, campus complaints, and clinic insight charts.
+- **Reports:** the same Reports page as nurses.
+- **Audit log:** who signed in, when, and what they added, edited or deleted, with filters and CSV export.
 - **Stock Requests:** the restock review pipeline — approve with adjusted quantities, or deny with a justification.
 - **User Management:** create accounts, change role or status, reset passwords.
-- **Settings:** soft-delete retention, login lockout, password rules, backup toggle.
+- **Settings:** **Back up now** and **Restore**, soft-delete retention, login lockout, password rules, backup toggle.
 
-**Everyone:** login with account lockout, a session that survives a page refresh (it ends when the browser closes), and a notification bell.
+**Everyone:** one sign-in for all roles (the role comes from the account), forgot password by email with a 6-digit code and expiry timer, account lockout, a session that survives a page refresh (it ends when the browser closes), and a notification bell.
 
 ## Tech stack
 
@@ -63,8 +65,11 @@ Open **http://localhost:5173** and sign in with an account from the backend. The
 | `npm run build:demo` | Build a self-contained demo (sample data baked in) |
 | `npm run preview` | Serve the production build locally |
 | `npm run lint` | ESLint |
+| `npm run check` | Lint + production build. Run before pushing |
 
 ## Demo mode
+
+> **Dry run checklist:** [DEMO.md](DEMO.md) walks through every panel-feedback update. On Windows, double-click `start-demo.bat`.
 
 To look at or present the UI without setting up MySQL and the backend:
 
@@ -159,7 +164,7 @@ A few conventions if you're changing things:
 These buttons are in the Figma and show a "not connected yet" message:
 - Printable **Medical Certificate** (ISUE-UHS-MCR-007), **Parental Notification** (ISUE-UHS-PaN-006) and **checkout slip**
 - **Monthly Supply** and **Medicine Release Cycle** report templates
-- **Backup Now / Recover / Export SQL.** These need server-side tooling (`mysqldump`).
+- **Export SQL** needs server-side tooling (`mysqldump`).
 
 ## Troubleshooting
 

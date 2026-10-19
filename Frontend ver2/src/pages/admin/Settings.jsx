@@ -1,8 +1,22 @@
 import { useState } from 'react';
+import { useApp } from '../../context/useApp';
 import { useAsync } from '../../hooks/useAsync';
 import { getSettings, updateSettings } from '../../api/settings';
+import { createBackup, listBackups, restoreBackup } from '../../api/backups';
+import { formatDate, formatTime, parseApiDate } from '../../lib/time';
 import Icon from '../../components/Icon';
 import { notConnected } from '../../lib/notConnected';
+
+const when = (iso) => {
+  const at = parseApiDate(iso);
+  return `${formatDate(at)}, ${formatTime(at)}`;
+};
+
+function formatSize(bytes) {
+  if (bytes == null) return '';
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
 
 function Toggle({ on, onChange, disabled }) {
   return (
@@ -34,10 +48,13 @@ function Row({ title, detail, children }) {
 // softDeleteDays, failedLoginLimit, lockoutMinutes, passwordSymbolRequired and
 // autoBackupEnabled. The design also shows maintenance mode, a minimum password
 // length and an email-reset switch — those have no column behind them yet, so
-// they're called out rather than faked. Backup/restore/export need server-side
-// tooling (mysqldump) and sit outside the API.
+// they're called out rather than faked. Backup Now / Restore go through
+// /api/backups (see "Backup and recovery" in BACKEND_REQUIREMENTS.md).
 export default function Settings() {
+  const { navigate, openModal } = useApp();
   const settings = useAsync(() => getSettings(), []);
+  const backups = useAsync(() => listBackups(), []);
+  const [backingUp, setBackingUp] = useState(false);
   const [draft, setDraft] = useState(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
@@ -64,6 +81,43 @@ export default function Settings() {
   };
 
   const disabled = !current || saving;
+
+  const backupNow = async () => {
+    setBackingUp(true);
+    setMessage(null);
+    try {
+      const b = await createBackup();
+      backups.reload();
+      setMessage({ ok: true, text: `Backup created: ${b.fileName} (${formatSize(b.sizeBytes)}).` });
+    } catch (e) {
+      setMessage({ ok: false, text: `Backup failed: ${e.message}` });
+    } finally {
+      setBackingUp(false);
+    }
+  };
+
+  const confirmRestore = (b) => openModal('confirm', {
+    title: 'Restore this backup?',
+    danger: true,
+    confirmLabel: 'Restore backup',
+    busyLabel: 'Restoring…',
+    body: (
+      <>
+        The database will be rolled back to <strong>{when(b.createdAt)}</strong> ({b.fileName}).
+        Anything recorded after that time will be replaced. A safety backup of the current data is
+        taken first, so this can be undone.
+      </>
+    ),
+    onConfirm: () => restoreBackup(b.backupId),
+    onSuccess: () => {
+      backups.reload();
+      settings.reload();
+      setMessage({ ok: true, text: `Restored the backup from ${when(b.createdAt)}.` });
+    },
+  });
+
+  const backupList = backups.data || [];
+  const latest = backupList[0];
 
   return (
     <div className="view active">
@@ -92,22 +146,43 @@ export default function Settings() {
           <Row title="Automated backups" detail="Daily snapshot, kept for the retention window">
             <Toggle on={Boolean(current?.autoBackupEnabled)} onChange={(v) => change({ autoBackupEnabled: v })} disabled={disabled} />
           </Row>
-          <Row title="Manual backup" detail="Take a snapshot right now">
-            <button
-              className="btn btn-primary btn-sm no-print"
-              onClick={() => notConnected('Back up now', 'backups need server-side tooling (mysqldump) that isn\'t set up yet')}
-            >
-              Back up now
+          <Row title="Back up now" detail={latest ? `Last backup: ${when(latest.createdAt)}` : 'Take a snapshot right now'}>
+            <button className="btn btn-primary btn-sm no-print" onClick={backupNow} disabled={backingUp}>
+              <Icon name="cloudUp" size={16} /> {backingUp ? 'Backing up…' : 'Back up now'}
             </button>
           </Row>
-          <Row title="Restore from backup" detail="Roll the database back to an earlier snapshot">
-            <button
-              className="btn btn-ghost btn-sm no-print"
-              onClick={() => notConnected('Restore', 'restores need server-side tooling that isn\'t set up yet')}
-            >
-              Restore
-            </button>
-          </Row>
+
+          <div className="form-label" style={{ margin: '14px 0 8px' }}>Restore from a backup</div>
+          {backups.error ? (
+            <div className="info-note"><Icon name="alert" size={17} /><span>{backups.error}</span></div>
+          ) : backups.loading ? (
+            <div className="sub">Loading backups…</div>
+          ) : backupList.length === 0 ? (
+            <div className="sub">No backups yet. Take one with Back up now.</div>
+          ) : (
+            <div className="table-card bordered" style={{ maxHeight: 260, overflowY: 'auto' }}>
+              <table>
+                <thead><tr><th>Taken</th><th>Type</th><th className="num">Size</th><th /></tr></thead>
+                <tbody>
+                  {backupList.map((b) => (
+                    <tr key={b.backupId}>
+                      <td className="stack-cell">
+                        <div className="nm">{when(b.createdAt)}</div>
+                        <div className="lo">{b.createdByName ? `by ${b.createdByName}` : b.fileName}</div>
+                      </td>
+                      <td><span className={`pill ${b.kind === 'manual' ? 'teal' : 'grey'}`}>{b.kind === 'manual' ? 'Manual' : 'Automatic'}</span></td>
+                      <td className="num nowrap">{formatSize(b.sizeBytes)}</td>
+                      <td>
+                        <div className="cell-actions">
+                          <button className="btn btn-ghost btn-sm no-print" onClick={() => confirmRestore(b)}>Restore</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         <div className="card">
@@ -191,14 +266,12 @@ export default function Settings() {
       </div>
 
       <div className="card">
-        <h3>Activity log</h3>
-        <div className="card-sub">Every administrative action, kept for audit</div>
-        <div className="info-note">
-          <Icon name="alert" size={17} />
-          <span>
-            The audit trail is written server-side but isn&rsquo;t readable over the API yet. This card
-            lights up as soon as an activity-log endpoint exists.
-          </span>
+        <div className="card-head">
+          <div>
+            <h3>Audit log</h3>
+            <div className="sub">Every sign-in and every record added, edited or deleted</div>
+          </div>
+          <button className="btn btn-primary btn-sm no-print" onClick={() => navigate('audit-log')}>Open audit log</button>
         </div>
       </div>
     </div>

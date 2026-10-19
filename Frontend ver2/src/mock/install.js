@@ -47,7 +47,8 @@ export function installMockApi() {
     await sleep(LATENCY_MS);
 
     try {
-      const data = handle(method, path, query, body);
+      const auth = init.headers?.Authorization || init.headers?.authorization || '';
+      const data = handle(method, path, query, body, auth.replace(/^Bearer\s+/i, ''));
       return jsonResponse(200, data ?? null);
     } catch (e) {
       if (e instanceof HttpError) return jsonResponse(e.status, { detail: e.detail });

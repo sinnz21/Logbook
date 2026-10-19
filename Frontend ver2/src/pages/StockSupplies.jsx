@@ -249,7 +249,7 @@ export default function StockSupplies() {
                       <td className="nowrap">
                         {i.expiryDate ? i.expiryDate.slice(0, 7) : '—'}
                         {days != null && days <= 60 && (
-                          <div className="lo" style={{ color: 'var(--amber)', fontSize: 12 }}>
+                          <div className="lo" style={{ color: 'var(--amber)' }}>
                             {days < 0 ? 'expired' : `in ${days} days`}
                           </div>
                         )}

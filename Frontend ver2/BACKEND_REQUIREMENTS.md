@@ -131,6 +131,44 @@ Medicines and supplies live in separate tables but share one screen. They're add
 These buttons exist in the Figma and show a "not connected yet" message:
 
 - **Printable forms:** Medical Certificate (ISUE-UHS-MCR-007), Parental Notification (ISUE-UHS-PaN-006), checkout/excuse slip, Monthly Supply Report, Medicine Release Cycle Report. These are mostly frontend print templates. The Director co-signature workflow would also need a backend table.
-- **Backup Now / Recover / Export SQL:** needs server-side tooling (`mysqldump`) and is outside the API.
+- **Export SQL:** needs server-side tooling (`mysqldump`). Backup Now / Restore are now specified in section 7.
 
 Visit export to **CSV** and **Print / Save as PDF** already work in the frontend and need nothing from the backend.
+
+---
+
+## 7. New for the panel feedback
+
+The frontend now calls these endpoints. Demo mode (`src/mock/handlers.js`) implements all of them, so you can use it as a working reference.
+
+### Login role: no change
+The login screen no longer asks for a role. It uses `role` from the `POST /api/auth/login` response, which the backend already returns.
+
+### Password reset by email: NEW (`routes/auth.py`)
+| Method | Path | Body | Returns |
+|---|---|---|---|
+| POST | `/api/auth/forgot-password` | `{ email }` | `{ expiresInSeconds }` (e.g. 600). **Always 200**, even for unknown emails. Emails a random 6-digit code. Store only a hash of the code, with its expiry. |
+| POST | `/api/auth/verify-reset-code` | `{ email, code }` | `{ resetToken }` (short-lived, single use). 400 `detail` if the code is wrong or expired. Limit attempts, e.g. 5 per code. |
+| POST | `/api/auth/reset-password` | `{ resetToken, newPassword }` | `{ ok: true }`. Apply the same password rules as user creation, and write an audit entry. |
+
+Needs SMTP settings in `.env` and a `password_resets` table (user_id, code_hash, expires_at, attempts, used_at).
+
+### Audit log: NEW (`routes/audit.py`), admin only
+`GET /api/audit-logs?page=&per_page=&action=&user_id=&search=&date_from=&date_to=` → `Page[AuditLogOut]`, newest first.
+
+`AuditLogOut`: `{ logId, at (UTC), userId, username, fullName, role, action, entity, entityId, details }`
+- `action`: `login`, `login_failed`, `create`, `update`, `delete`, `backup`, `restore`
+- `entity`: `session`, `visit`, `patient`, `special_case`, `stock`, `stock_request`, `user`, `settings`, `backup`
+- `date_from` / `date_to` are clinic (Asia/Manila) calendar days, the same as `/api/visits`.
+
+Write a row on every login (success and failure) and on every POST/PATCH/DELETE. `details` is a short human sentence, e.g. "Added a visit for Santos, Maria R.". The KPI tiles read `total` with `per_page=1`, so `total` must respect the filters.
+
+### Backup and recovery: NEW (`routes/backups.py`), admin only
+| Method | Path | Returns |
+|---|---|---|
+| GET | `/api/backups` | `[{ backupId, fileName, createdAt, sizeBytes, kind: "manual" \| "automatic", createdByName }]`, newest first |
+| POST | `/api/backups` | the new backup (runs `mysqldump`, gzip, saved outside the web root) |
+| POST | `/api/backups/{id}/restore` | `{ ok, restoredAt }`. Take a safety backup first, then restore. Do **not** restore the audit-log table. |
+
+When `autoBackupEnabled` is on, a scheduled job (cron / Task Scheduler) should create `kind: "automatic"` backups daily.
+
