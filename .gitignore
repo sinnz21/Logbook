@@ -24,3 +24,6 @@ desktop.ini
 
 # Logs
 *.log
+
+# Database backups (contain patient data)
+BackendAndDatabase/backend/backups/

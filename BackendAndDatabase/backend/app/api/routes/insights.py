@@ -7,17 +7,17 @@ medicine actually dispensed (visit_medicines). Only complaints that appear in
 at least MIN_SUPPORT visits are considered, so one-off coincidences don't show.
 """
 from collections import Counter
-from datetime import date
+from datetime import date, timedelta, timezone
 from itertools import permutations
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.deps import get_current_user
-from app.core.timeutil import clinic_day_range_utc
+from app.core.deps import get_current_user, require_admin
+from app.core.timeutil import CLINIC_TZ, clinic_day_range_utc
 from app.db.session import get_db
-from app.models.user import User
+from app.models.user import LoginAttempt, User
 from app.models.visit import Visit
 from app.schemas.common import APIModel
 
@@ -65,3 +65,34 @@ def patterns(
             out.append(PatternOut(trigger=x, associated_with=y, match_rate=round(rate, 3), support=both))
     out.sort(key=lambda p: (-p.match_rate, -p.support, p.trigger))
     return out[:limit]
+
+
+# ── Sign-in activity (admin dashboard chart) ────────────────────────────────
+
+class SignInDayOut(APIModel):
+    day: date              # clinic calendar day (Asia/Manila)
+    successful: int
+    failed: int
+
+
+@router.get("/sign-ins", response_model=list[SignInDayOut])
+def sign_ins(
+    date_from: date,
+    date_to: date,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_admin),
+):
+    """Sign-in attempts per clinic day, one row per day in [date_from, date_to] (max 92 days)."""
+    if date_to < date_from or (date_to - date_from).days > 92:
+        raise HTTPException(status_code=422, detail="Date range must be 1 to 93 days")
+    start, end = clinic_day_range_utc(date_from, date_to)
+    rows = db.execute(
+        select(LoginAttempt.attempted_at, LoginAttempt.successful)
+        .where(LoginAttempt.attempted_at >= start, LoginAttempt.attempted_at < end)
+    ).all()
+    days = {date_from + timedelta(days=i): [0, 0] for i in range((date_to - date_from).days + 1)}
+    for at, ok in rows:
+        d = at.replace(tzinfo=timezone.utc).astimezone(CLINIC_TZ).date()
+        if d in days:
+            days[d][0 if ok else 1] += 1
+    return [SignInDayOut(day=d, successful=s, failed=f) for d, (s, f) in days.items()]

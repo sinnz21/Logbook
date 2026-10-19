@@ -19,6 +19,10 @@ FIELDS = {
     "lockout_minutes": ("lockout_minutes", "int", 15),
     "password_symbol_required": ("password_symbol_required", "bool", True),
     "auto_backup_enabled": ("auto_backup_enabled", "bool", True),
+    "maintenance_mode": ("maintenance_mode", "bool", False),
+    "maintenance_message": ("maintenance_message", "string",
+                            "System under maintenance, please try again later."),
+    "backup_retention_days": ("backup_retention", "int", 30),
 }
 
 
@@ -28,6 +32,9 @@ class SettingsOut(APIModel):
     lockout_minutes: int
     password_symbol_required: bool
     auto_backup_enabled: bool
+    maintenance_mode: bool
+    maintenance_message: str
+    backup_retention_days: int
 
 
 class SettingsUpdate(APIModel):
@@ -36,6 +43,9 @@ class SettingsUpdate(APIModel):
     lockout_minutes: int | None = Field(default=None, ge=1, le=1440)
     password_symbol_required: bool | None = None
     auto_backup_enabled: bool | None = None
+    maintenance_mode: bool | None = None
+    maintenance_message: str | None = Field(default=None, max_length=300)
+    backup_retention_days: int | None = Field(default=None, ge=1, le=3650)
 
 
 def _parse(raw: str | None, kind: str, default):
@@ -43,6 +53,8 @@ def _parse(raw: str | None, kind: str, default):
         return default
     if kind == "bool":
         return str(raw).lower() in ("1", "true", "yes", "on")
+    if kind == "string":
+        return str(raw) if str(raw).strip() else default
     try:
         return int(raw)
     except ValueError:

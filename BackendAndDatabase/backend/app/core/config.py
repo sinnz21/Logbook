@@ -18,6 +18,19 @@ class Settings(BaseSettings):
     CLINIC_TIMEZONE: str = "Asia/Manila"
     CORS_ORIGINS: str = "http://localhost:5173"
 
+    # Backups. Leave the tool paths empty to auto-detect (PATH, then C:\xampp\mysql\bin).
+    MYSQLDUMP_PATH: str = ""
+    MYSQL_PATH: str = ""
+    BACKUP_DIR: str = "backups"
+
+    # Gmail for forgot-password codes. SMTP_PASSWORD is a Gmail App Password.
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_NAME: str = "ISU Infirmary"
+    RESET_CODE_MINUTES: int = 5
+
     @property
     def database_url(self) -> str:
         pw = f":{self.DB_PASSWORD}" if self.DB_PASSWORD else ""
