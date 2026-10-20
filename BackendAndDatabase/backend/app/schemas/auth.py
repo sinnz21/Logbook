@@ -17,17 +17,18 @@ class TokenResponse(APIModel):
     role: str
 
 
+EMAIL = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+
+
 class ForgotRequest(APIModel):
-    username: str = Field(min_length=1, max_length=50)
+    email: str = Field(min_length=3, max_length=150, pattern=EMAIL)
 
 
 class VerifyCodeRequest(APIModel):
-    username: str = Field(min_length=1, max_length=50)
+    email: str = Field(min_length=3, max_length=150, pattern=EMAIL)
     code: str = Field(min_length=6, max_length=6, pattern=r"^\d{6}$")
 
 
 class ResetRequest(APIModel):
-    username: str = Field(min_length=1, max_length=50)
     reset_token: str = Field(min_length=10, max_length=100)
     new_password: str = Field(min_length=8, max_length=72)
-

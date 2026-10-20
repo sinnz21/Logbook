@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.security import create_access_token, hash_password, verify_password
 from app.db.session import get_db
-from app.models.user import LoginAttempt, SystemSetting, User
+from app.models.user import ActivityLog, LoginAttempt, SystemSetting, User
 from app.schemas.auth import ForgotRequest, LoginRequest, ResetRequest, TokenResponse, VerifyCodeRequest
 from app.api.routes.users import _check_password
 from app.services import mail_service
@@ -96,23 +96,34 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
 
 # ---- Forgot password: 6-digit code sent to the account's email ----------------
 #
+# Step 1  POST /forgot-password   {email}               -> {expiresInSeconds}
+# Step 2  POST /verify-reset-code {email, code}         -> {resetToken}
+# Step 3  POST /reset-password    {resetToken, newPassword} -> {ok: true}
+#
 # Codes live in memory only (single backend process). A restart just means the
-# user asks for a new code. Only a hash of the code is kept.
+# user asks for a new code. Only hashes of the code and the reset token are kept.
 
 log = logging.getLogger(__name__)
-_codes: dict[int, dict] = {}
+_codes: dict[int, dict] = {}          # user_id -> {hash, expires, tries, sent_at}
+_reset_tokens: dict[str, dict] = {}   # hash(reset token) -> {user_id, expires}
 _codes_lock = threading.Lock()
-RESEND_SECONDS = 60
+RESEND_SECONDS = 30                   # matches the "Resend code in 30s" timer on the login screen
 MAX_TRIES = 5
-GENERIC_SENT = "If that account has an email on file, a 6-digit code was sent to it."
+WRONG_CODE = "Wrong or expired code. Ask for a new one."
 
 
 def _code_hash(code: str) -> str:
     return hmac.new(settings.SECRET_KEY.encode(), code.encode(), hashlib.sha256).hexdigest()
 
 
-def _find_active_user(db: Session, username: str) -> User | None:
-    user = db.execute(select(User).where(User.username == username.strip())).scalar_one_or_none()
+def _expires_in() -> int:
+    return settings.RESET_CODE_MINUTES * 60
+
+
+def _find_by_email(db: Session, email: str) -> User | None:
+    user = db.execute(
+        select(User).where(func.lower(User.email) == email.strip().lower())
+    ).scalar_one_or_none()
     if user and user.deleted_at is None and user.status == "active":
         return user
     return None
@@ -126,9 +137,10 @@ def forgot_password(body: ForgotRequest, db: Session = Depends(get_db)):
             "Email reset isn't set up on this server. Ask the system admin to reset your password.",
         )
 
-    user = _find_active_user(db, body.username)
-    if not user or not user.email:
-        return {"detail": GENERIC_SENT}   # same answer: don't reveal which usernames exist
+    user = _find_by_email(db, body.email)
+    if not user:
+        # Same answer either way, so the form can't be used to find registered emails.
+        return {"expiresInSeconds": _expires_in()}
 
     now = time.time()
     with _codes_lock:
@@ -137,12 +149,7 @@ def forgot_password(body: ForgotRequest, db: Session = Depends(get_db)):
             wait = int(RESEND_SECONDS - (now - prev["sent_at"])) + 1
             raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, f"Please wait {wait} seconds before asking for another code.")
         code = f"{secrets.randbelow(1_000_000):06d}"
-        _codes[user.user_id] = {
-            "hash": _code_hash(code),
-            "expires": now + settings.RESET_CODE_MINUTES * 60,
-            "tries": 0,
-            "sent_at": now,
-        }
+        _codes[user.user_id] = {"hash": _code_hash(code), "expires": now + _expires_in(), "tries": 0, "sent_at": now}
 
     try:
         mail_service.send_mail(
@@ -162,58 +169,53 @@ def forgot_password(body: ForgotRequest, db: Session = Depends(get_db)):
             status.HTTP_502_BAD_GATEWAY,
             "Couldn't send the email. Check the server's internet connection, or ask the system admin.",
         )
-    return {"detail": GENERIC_SENT}
-
-
-def _check_code(user_id: int, code: str) -> dict:
-    """Validates a code under _codes_lock; counts wrong tries. Returns the entry."""
-    bad = HTTPException(status.HTTP_400_BAD_REQUEST, "Wrong or expired code. Ask for a new one.")
-    entry = _codes.get(user_id)
-    if entry and not entry.get("hash"):
-        raise bad                          # already verified; its reset token stays valid
-    if not entry or time.time() > entry["expires"] or entry["tries"] >= MAX_TRIES:
-        _codes.pop(user_id, None)
-        raise bad
-    if not hmac.compare_digest(entry["hash"], _code_hash(code.strip())):
-        entry["tries"] += 1
-        left = MAX_TRIES - entry["tries"]
-        if left <= 0:
-            _codes.pop(user_id, None)
-            raise bad
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Wrong code. {left} tries left.")
-    return entry
+    return {"expiresInSeconds": _expires_in()}
 
 
 @router.post("/verify-reset-code")
 def verify_reset_code(body: VerifyCodeRequest, db: Session = Depends(get_db)):
     """Step 2: checks the emailed code and hands back a one-time reset token."""
-    user = _find_active_user(db, body.username)
+    user = _find_by_email(db, body.email)
     if not user:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Wrong or expired code. Ask for a new one.")
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, WRONG_CODE)
     with _codes_lock:
-        entry = _check_code(user.user_id, body.code)
+        entry = _codes.get(user.user_id)
+        if not entry or time.time() > entry["expires"] or entry["tries"] >= MAX_TRIES:
+            _codes.pop(user.user_id, None)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, WRONG_CODE)
+        if not hmac.compare_digest(entry["hash"], _code_hash(body.code.strip())):
+            entry["tries"] += 1
+            left = MAX_TRIES - entry["tries"]
+            if left <= 0:
+                _codes.pop(user.user_id, None)
+                raise HTTPException(status.HTTP_400_BAD_REQUEST, WRONG_CODE)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Wrong code. {left} tries left.")
+        _codes.pop(user.user_id, None)        # the code can't be used again
         token = secrets.token_urlsafe(32)
-        entry["hash"] = None               # the code itself can't be used again
-        entry["reset_token"] = _code_hash(token)
-        entry["expires"] = time.time() + settings.RESET_CODE_MINUTES * 60
+        _reset_tokens[_code_hash(token)] = {"user_id": user.user_id, "expires": time.time() + _expires_in()}
     return {"resetToken": token}
 
 
 @router.post("/reset-password")
 def reset_password(body: ResetRequest, db: Session = Depends(get_db)):
     """Step 3: sets the new password using the token from verify-reset-code."""
-    bad = HTTPException(status.HTTP_400_BAD_REQUEST, "This reset has expired. Start again.")
-    user = _find_active_user(db, body.username)
-    if not user:
-        raise bad
+    expired = HTTPException(status.HTTP_400_BAD_REQUEST, "This reset has expired. Start again.")
+    key = _code_hash(body.reset_token)
+    with _codes_lock:
+        entry = _reset_tokens.get(key)
+        if not entry or time.time() > entry["expires"]:
+            _reset_tokens.pop(key, None)
+            raise expired
+    user = db.get(User, entry["user_id"])
+    if not user or user.deleted_at is not None or user.status != "active":
+        raise expired
     _check_password(db, body.new_password)   # same symbol rule as User Management
     with _codes_lock:
-        entry = _codes.get(user.user_id)
-        if (not entry or not entry.get("reset_token") or time.time() > entry["expires"]
-                or not hmac.compare_digest(entry["reset_token"], _code_hash(body.reset_token))):
-            raise bad
-        _codes.pop(user.user_id, None)   # one use only
+        if _reset_tokens.pop(key, None) is None:   # one use only
+            raise expired
 
     user.password_hash = hash_password(body.new_password)
+    db.add(ActivityLog(user_id=user.user_id, action="Password reset by email", entity_type="user",
+                       entity_id=user.user_id, log_type="security"))
     db.commit()
-    return {"detail": "Password changed. You can sign in now."}
+    return {"ok": True, "detail": "Password changed. You can sign in now."}

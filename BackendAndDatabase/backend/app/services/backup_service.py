@@ -17,6 +17,7 @@ from app.core.config import settings
 
 NAME_RE = re.compile(r"^isu_infirmary_\d{8}_\d{6}(_[a-z-]+)?\.sql$")
 _lock = threading.Lock()
+AUDIT_TABLES = ("activity_log", "login_attempts")
 
 
 class BackupError(RuntimeError):
@@ -96,7 +97,10 @@ def create_backup(suffix: str = "", retention_days: int | None = None) -> dict:
             with open(tmp, "wb") as fh:
                 r = subprocess.run(
                     [dump, *_conn_args(), "--single-transaction", "--routines", "--triggers",
-                     "--default-character-set=utf8mb4", "--databases", settings.DB_NAME],
+                     "--default-character-set=utf8mb4",
+                     # The audit trail is kept out of backups, so a restore never erases it.
+                     *[f"--ignore-table={settings.DB_NAME}.{t}" for t in AUDIT_TABLES],
+                     "--databases", settings.DB_NAME],
                     stdout=fh, stderr=subprocess.PIPE, env=_env(), timeout=600,
                 )
         except subprocess.TimeoutExpired:

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import activity, auth, backups, insights, lookups, patients, settings, stock, surveillance, trash, users, visits
+from app.api.routes import activity, audit_logs, auth, backups, insights, lookups, patients, settings, stock, surveillance, trash, users, visits
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(auth.router)
@@ -15,3 +15,4 @@ api_router.include_router(backups.router)
 api_router.include_router(trash.router)
 api_router.include_router(activity.router)
 api_router.include_router(surveillance.router)
+api_router.include_router(audit_logs.router)
