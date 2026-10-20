@@ -14,7 +14,7 @@ for example *"Viral Flu cluster in CCSICT: 7 cases this week, about 8.3× the no
 | 2. Model | **Poisson regression**: expected cases = exp(college + complaint + seasonal curve + break/exam week + trend) | `model.py` |
 | 3. Training | scikit-learn fits the model's coefficients on two school years of weekly counts | `train.py` → `model.json` |
 | 4. Alert rule | A week is flagged when P(cases ≥ observed) < 0.005 under the model **and** there are at least 4 cases. Checked for this week alone (sudden spike) and the last two weeks together (slow build-up). | `model.py` → `check_unit()` |
-| 5. Calibration | The real clinic is smaller or bigger than the training data, so the backend scales the model to the clinic's own last 12 weeks before comparing | `app/api/routes/surveillance.py` |
+| 5. Calibration | The real clinic is smaller or bigger than the training data, so the backend scales the model to the clinic's own last 12 weeks before comparing | `app/api/routes/health_surveillance.py` |
 
 Only spreadable complaints raise alerts: Fever, Viral Flu, Cough / Colds, Stomach Pain, Allergic Reaction.
 
@@ -63,11 +63,11 @@ once the clinic has a full year of real records.
 ## Commands (run from the `backend` folder)
 
 ```powershell
-pip install -r surveillance/requirements-surveillance.txt   # only needed for training
-python -m surveillance.generate_data      # make 3 years of synthetic data with hidden outbreaks
-python -m surveillance.train              # train, test, save model.json + report.md + example_alert.png
-python -m surveillance.evaluate           # full 5-dataset evaluation + tradeoff_curve.png (~10 s)
-python -m surveillance.experiments        # what-if experiments vs. a perfect model (~3 min)
+pip install -r health_surveillance/requirements-surveillance.txt   # only needed for training
+python -m health_surveillance.generate_data      # make 3 years of synthetic data with hidden outbreaks
+python -m health_surveillance.train              # train, test, save model.json + report.md + example_alert.png
+python -m health_surveillance.evaluate           # full 5-dataset evaluation + tradeoff_curve.png (~10 s)
+python -m health_surveillance.experiments        # what-if experiments vs. a perfect model (~3 min)
 ```
 
 The backend only needs `model.json` (no machine-learning libraries at run time).

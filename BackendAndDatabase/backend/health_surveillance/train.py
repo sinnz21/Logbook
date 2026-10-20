@@ -10,7 +10,7 @@ Steps
      simple baseline ("average of the last 4 weeks").
   6. Save the model (model.json), the scores (metrics.json, report.md) and a chart.
 
-usage:  python -m surveillance.train            (from the backend folder)
+usage:  python -m health_surveillance.train            (from the backend folder)
 """
 import argparse
 import datetime as dt
@@ -22,8 +22,8 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import PoissonRegressor
 
-from surveillance.config import ALPHA, COLLEGES, COMPLAINTS, MIN_CASES, WATCHED
-from surveillance.model import MODEL_FILE, Model, check_unit, feature_names, features
+from health_surveillance.config import ALPHA, COLLEGES, COMPLAINTS, MIN_CASES, WATCHED
+from health_surveillance.model import MODEL_FILE, Model, check_unit, feature_names, features
 
 HERE = Path(__file__).parent
 DATA = HERE / "data"

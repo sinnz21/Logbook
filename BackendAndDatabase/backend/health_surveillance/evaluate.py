@@ -8,7 +8,7 @@ alarms does it raise? A better method catches more at the same false-alarm rate.
 The experiment is repeated on 5 independently generated datasets (different
 random seeds) and the results are pooled, so one lucky dataset can't decide it.
 
-usage:  python -m surveillance.evaluate          (from the backend folder; ~1 minute)
+usage:  python -m health_surveillance.evaluate          (from the backend folder; ~1 minute)
 Writes: evaluation.json, evaluation.md, tradeoff_curve.png
 """
 import datetime as dt
@@ -22,9 +22,9 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import PoissonRegressor
 
-from surveillance.config import MIN_CASES, WATCHED
-from surveillance.model import Model, check_unit, feature_names
-from surveillance.train import baseline_expected, design_matrix
+from health_surveillance.config import MIN_CASES, WATCHED
+from health_surveillance.model import Model, check_unit, feature_names
+from health_surveillance.train import baseline_expected, design_matrix
 
 HERE = Path(__file__).parent
 SEEDS = [1, 2, 3, 4, 5]
@@ -33,7 +33,7 @@ TEST_FROM = dt.date(2025, 8, 4)
 
 
 def run_seed(seed: int):
-    subprocess.run([sys.executable, "-m", "surveillance.generate_data", "--seed", str(seed),
+    subprocess.run([sys.executable, "-m", "health_surveillance.generate_data", "--seed", str(seed),
                     "--outbreaks", "120"], check=True, capture_output=True)
     df = pd.read_csv(HERE / "data" / "weekly_counts.csv"); df["week"] = pd.to_datetime(df.week_start).dt.date
     key = pd.read_csv(HERE / "data" / "outbreaks.csv")

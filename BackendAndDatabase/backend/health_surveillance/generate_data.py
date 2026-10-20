@@ -14,7 +14,7 @@ The outbreaks are written to a separate answer key (outbreaks.csv) so the
 trainer can measure how many the model catches. The model itself never sees
 the answer key.
 
-usage:  python -m surveillance.generate_data            (from the backend folder)
+usage:  python -m health_surveillance.generate_data            (from the backend folder)
 """
 import argparse
 import csv
@@ -25,8 +25,8 @@ from pathlib import Path
 
 import numpy as np
 
-from surveillance.config import COLLEGES, COMPLAINTS
-from surveillance.model import school_calendar
+from health_surveillance.config import COLLEGES, COMPLAINTS
+from health_surveillance.model import school_calendar
 
 OUT = Path(__file__).parent / "data"
 

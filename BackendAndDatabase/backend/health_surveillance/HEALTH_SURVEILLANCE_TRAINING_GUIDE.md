@@ -48,7 +48,7 @@ are. They were **not** used to train the model in the system.
 
 ## 3. The files
 
-All inside `BackendAndDatabase\backend\surveillance\`:
+All inside `BackendAndDatabase\backend\health_surveillance\`:
 
 | File | What it is |
 |---|---|
@@ -61,7 +61,7 @@ All inside `BackendAndDatabase\backend\surveillance\`:
 | `model.json` | **The trained model** = the learned numbers (weights). This is what the system uses. |
 | `evaluate.py` | Repeats the test on 5 datasets, draws `tradeoff_curve.png`. |
 | `experiments.py` | "Can it be better?" tests, compared with a perfect model. |
-| `..\app\api\routes\surveillance.py` | The API endpoint that uses the model inside the system. |
+| `..\app\api\routes\health_surveillance.py` | The API endpoint that uses the model inside the system. |
 
 ---
 
@@ -125,7 +125,7 @@ Your prompt now starts with `(.venv)`.
 **Step 2: install the training libraries (only once)**
 
 ```powershell
-pip install -r surveillance\requirements-surveillance.txt
+pip install -r health_surveillance\requirements-surveillance.txt
 ```
 
 This installs numpy, pandas, scikit-learn and matplotlib.
@@ -133,7 +133,7 @@ This installs numpy, pandas, scikit-learn and matplotlib.
 **Step 3: make the data (optional, because it's already in `data\`)**
 
 ```powershell
-python -m surveillance.generate_data
+python -m health_surveillance.generate_data
 ```
 
 Expected output:
@@ -146,7 +146,7 @@ Expected output:
 **Step 4: train and test**
 
 ```powershell
-python -m surveillance.train
+python -m health_surveillance.train
 ```
 
 It takes about 4 seconds. Expected output:
@@ -171,20 +171,20 @@ If you see these numbers, you reproduced our training exactly.
 **Step 5: bigger tests (optional)**
 
 ```powershell
-python -m surveillance.evaluate       # 5 datasets, about 10 seconds
-python -m surveillance.experiments    # 20 datasets, about 3 minutes
+python -m health_surveillance.evaluate       # 5 datasets, about 10 seconds
+python -m health_surveillance.experiments    # 20 datasets, about 3 minutes
 ```
 
 **Step 6: put the data back if you changed it.** `evaluate` and `experiments` overwrite
 `data\` with other seeds while they run. To get the original data back:
 
 ```powershell
-python -m surveillance.generate_data
+python -m health_surveillance.generate_data
 ```
 
 (Seed 7 is the default, so this brings back the exact same files.)
 
-> **Note:** `python -m surveillance.train` overwrites `model.json`. With the seed-7
+> **Note:** `python -m health_surveillance.train` overwrites `model.json`. With the seed-7
 > data, it writes the same weights again, so nothing changes. Only the `trained_at`
 > date inside the file updates.
 
@@ -396,8 +396,8 @@ The two CSV files are plain tables. You can open them in **Excel**, **Google She
 
 ```python
 import pandas as pd
-df = pd.read_csv("surveillance/data/weekly_counts.csv")
-key = pd.read_csv("surveillance/data/outbreaks.csv")
+df = pd.read_csv("health_surveillance/data/weekly_counts.csv")
+key = pd.read_csv("health_surveillance/data/outbreaks.csv")
 train = df[df.week_start < "2025-08-04"]     # 10,296 rows
 test  = df[df.week_start >= "2025-08-04"]    #  5,148 rows
 print(train.head())
@@ -461,7 +461,7 @@ A: Section 9: it counts this week's visits, gets the expected count from `model.
 calibrates it to the clinic's size, runs the p-value test and shows the alert.
 
 **Q: Can you retrain it?**
-A: Yes. One command (`python -m surveillance.train`) in about 4 seconds. It produces a new
+A: Yes. One command (`python -m health_surveillance.train`) in about 4 seconds. It produces a new
 `model.json` and the system uses it after a restart.
 
 ---

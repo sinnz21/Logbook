@@ -5,7 +5,7 @@ Each experiment changes ONE thing and is scored the same way:
 Score = % of hidden outbreaks caught when each method is allowed at most
 0.5 and 1.0 false alarms per month (the fair comparison), plus prediction error.
 
-usage:  python -m surveillance.experiments        (from the backend folder, ~1–2 min)
+usage:  python -m health_surveillance.experiments        (from the backend folder, ~1–2 min)
 """
 import datetime as dt
 import math
@@ -18,9 +18,9 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import PoissonRegressor
 
-from surveillance.generate_data import expected as true_rate, year_index_of
-from surveillance.config import COLLEGES, COMPLAINTS, WATCHED
-from surveillance.model import check_unit, features as base_features, feature_names as base_names, is_alert
+from health_surveillance.generate_data import expected as true_rate, year_index_of
+from health_surveillance.config import COLLEGES, COMPLAINTS, WATCHED
+from health_surveillance.model import check_unit, features as base_features, feature_names as base_names, is_alert
 
 HERE = Path(__file__).parent
 SEEDS = list(range(1, 21))
@@ -83,7 +83,7 @@ DETECTORS = {"week+2wk (current)": det_two_week, "week only": det_week_only,
 
 
 def load(seed, start):
-    subprocess.run([sys.executable, "-m", "surveillance.generate_data", "--seed", str(seed), "--start", start,
+    subprocess.run([sys.executable, "-m", "health_surveillance.generate_data", "--seed", str(seed), "--start", start,
                     "--outbreaks", str(int(120 * (TEST_FROM - dt.date.fromisoformat(start)).days / 728 + 40))],
                    check=True, capture_output=True)
     df = pd.read_csv(HERE / "data" / "weekly_counts.csv"); df["week"] = pd.to_datetime(df.week_start).dt.date

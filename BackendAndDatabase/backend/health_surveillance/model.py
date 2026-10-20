@@ -18,7 +18,7 @@ import json
 import math
 from pathlib import Path
 
-from surveillance.config import ALPHA, COLLEGES, COMPLAINTS, MIN_CASES
+from health_surveillance.config import ALPHA, COLLEGES, COMPLAINTS, MIN_CASES
 
 MODEL_FILE = Path(__file__).parent / "model.json"
 EPOCH = dt.date(2023, 8, 7)   # trend is measured in years since this date

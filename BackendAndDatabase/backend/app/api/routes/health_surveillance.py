@@ -5,7 +5,7 @@ GET /api/surveillance/alerts
   what the trained model expects for that college, complaint and time of year,
   and returns the ones that are unusually high.
 
-The model (surveillance/model.json) learns the SHAPE of normal clinic traffic:
+The model (health_surveillance/model.json) learns the SHAPE of normal clinic traffic:
 which colleges send more patients, which complaints rise in the rainy season,
 the dip during breaks. A clinic's overall volume differs from the training
 data, so each request calibrates the model to this clinic's own last 12 weeks
@@ -22,8 +22,8 @@ from app.core.deps import get_current_user
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.common import APIModel
-from surveillance.config import COLLEGES, COMPLAINTS, WATCHED, college_of
-from surveillance.model import MODEL_FILE, Model, check_unit
+from health_surveillance.config import COLLEGES, COMPLAINTS, WATCHED, college_of
+from health_surveillance.model import MODEL_FILE, Model, check_unit
 
 router = APIRouter(prefix="/surveillance", tags=["surveillance"])
 
@@ -97,7 +97,7 @@ def get_model() -> Model:
     global _model
     if _model is None:
         if not MODEL_FILE.exists():
-            raise HTTPException(503, "The surveillance model hasn't been trained yet. Run: python -m surveillance.train")
+            raise HTTPException(503, "The surveillance model hasn't been trained yet. Run: python -m health_surveillance.train")
         _model = Model.load()
     return _model
 
