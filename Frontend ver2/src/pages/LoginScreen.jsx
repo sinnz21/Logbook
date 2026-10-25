@@ -3,6 +3,9 @@ import { useApp } from '../context/useApp';
 import { requestPasswordReset, resetPassword, verifyResetCode } from '../api/auth';
 import Icon from '../components/Icon';
 import OtpInput from '../components/OtpInput';
+import PasswordField from '../components/PasswordField';
+import PasswordRules from '../components/PasswordRules';
+import { meetsPasswordRules } from '../lib/password';
 
 const CODE_LENGTH = 6;
 const RESEND_AFTER_S = 30;
@@ -86,11 +89,8 @@ function ForgotPassword({ onBack }) {
     setStep('password');
   });
 
-  const passwordProblem =
-    password.length < 8 ? 'Use at least 8 characters.'
-      : !/[^A-Za-z0-9]/.test(password) ? 'Add at least one symbol, such as ! or #.'
-        : confirm && confirm !== password ? 'The two passwords don’t match.'
-          : null;
+  // The live checklist under the boxes shows which rule is still missing.
+  const passwordProblem = !meetsPasswordRules(password) || confirm !== password;
 
   const savePassword = () => run(async () => {
     await resetPassword(resetToken, password);
@@ -163,18 +163,12 @@ function ForgotPassword({ onBack }) {
       {step === 'password' && (
         <>
           <h2 className="login-step-title">Choose a new password</h2>
-          <p className="login-step-text">At least 8 characters, with at least one symbol.</p>
+          <p className="login-step-text">Each rule below turns green once your new password meets it.</p>
           <label htmlFor="reset-new">New password</label>
-          <div className="input-wrap">
-            <Icon name="lock" size={17} className="ic" />
-            <input id="reset-new" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" autoFocus />
-          </div>
+          <PasswordField id="reset-new" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" autoFocus />
           <label htmlFor="reset-confirm">Confirm new password</label>
-          <div className="input-wrap">
-            <Icon name="lock" size={17} className="ic" />
-            <input id="reset-confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" />
-          </div>
-          {password && passwordProblem && <div className="login-hint warn">{passwordProblem}</div>}
+          <PasswordField id="reset-confirm" value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" />
+          <PasswordRules password={password} confirm={confirm} />
           {error && <div className="login-error">{error}</div>}
           <button className="go" type="submit" disabled={busy || Boolean(passwordProblem) || !confirm}>
             {busy ? 'Saving…' : 'Save new password'}
@@ -230,17 +224,13 @@ export default function LoginScreen() {
           </div>
 
           <label htmlFor="login-password">Password</label>
-          <div className="input-wrap">
-            <Icon name="lock" size={17} className="ic" />
-            <input
-              id="login-password"
-              type="password"
-              placeholder="Minimum 8 characters, 1 symbol"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-            />
-          </div>
+          <PasswordField
+            id="login-password"
+            placeholder="Your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+          />
 
           <button type="button" className="login-forgot" onClick={() => setMode('forgot')}>
             Forgot password?

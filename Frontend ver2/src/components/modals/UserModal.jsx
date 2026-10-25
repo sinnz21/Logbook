@@ -2,9 +2,10 @@ import { useState } from 'react';
 import Modal from '../Modal';
 import { useApp } from '../../context/useApp';
 import { createUser, updateUser } from '../../api/users';
+import PasswordField from '../PasswordField';
+import PasswordRules from '../PasswordRules';
+import { meetsPasswordRules, PASSWORD_EXAMPLE } from '../../lib/password';
 
-// Mirrors the login screen's stated policy and system_settings.password_symbol_required.
-const PASSWORD_RULE = /^(?=.*[^A-Za-z0-9]).{8,}$/;
 
 // modal.data: { user?: UserOut, onSuccess? } — no user → Add user, with user → Edit user.
 export default function UserModal() {
@@ -30,8 +31,8 @@ export default function UserModal() {
     if (!form.firstName.trim() || !form.lastName.trim()) return setError('First and last name are required.');
     if (!editing && !/^[a-z0-9._-]{3,50}$/i.test(form.username)) return setError('Username: 3 to 50 letters, numbers, dots, dashes or underscores.');
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return setError('Email looks invalid.');
-    if ((!editing || form.password) && !PASSWORD_RULE.test(form.password)) {
-      return setError('Password: at least 8 characters with 1 symbol.');
+    if ((!editing || form.password) && !meetsPasswordRules(form.password)) {
+      return setError('Password: at least 8 characters with 1 capital letter, 1 number and 1 symbol.');
     }
 
     const payload = {
@@ -109,13 +110,14 @@ export default function UserModal() {
       </div>
       <div className="field full">
         <label>{editing ? 'New password' : 'Temporary password'} {editing && <span className="opt">(leave blank to keep)</span>}</label>
-        <input
-          type="password"
-          placeholder="At least 8 characters with 1 symbol"
+        <PasswordField
+          lockIcon={false}
+          placeholder={`e.g. ${PASSWORD_EXAMPLE}`}
           value={form.password}
           onChange={set('password')}
           autoComplete="new-password"
         />
+        {(!editing || form.password) && <PasswordRules password={form.password} />}
       </div>
 
       {isSelf && <div className="warn-note" style={{ marginTop: 14 }}>You can&rsquo;t change your own role or status.</div>}

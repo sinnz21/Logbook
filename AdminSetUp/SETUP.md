@@ -1,7 +1,7 @@
 # ISU Infirmary Log Book — Full Setup Guide
 
 Backend + frontend + nurse laptop, step by step, on Windows.
-Tested end to end on 21 September 2026.
+Tested end to end on 20 October 2026 with Jaziel's new Frontend ver2 (pushed Oct 19).
 
 Do one command at a time: paste it, press Enter, read what it says, then the next.
 
@@ -34,7 +34,7 @@ Wait for `Application startup complete`. Leave this window open.
 **3. Frontend — PowerShell window #2** (Windows key → `powershell` → Enter again):
 
 ```powershell
-cd "C:\Users\com sci\Logbook-git\Frontend"
+cd "C:\Users\com sci\Logbook-git\Frontend ver2"
 ```
 ```powershell
 npm run dev -- --host
@@ -53,6 +53,77 @@ It prints two addresses:
 - On the nurse laptop: the **Network** address from step 3, e.g. **http://192.168.8.34:5173**
 
 **To stop:** click each PowerShell window and press **Ctrl + C**.
+
+### Getting your teammates' latest changes
+
+When someone pushes to GitHub, run these once (backend and frontend stopped):
+
+```powershell
+cd "C:\Users\com sci\Logbook-git"
+```
+```powershell
+git pull
+```
+```powershell
+cd BackendAndDatabase\backend; .\.venv\Scripts\Activate.ps1; pip install -r requirements.txt
+```
+```powershell
+cd "C:\Users\com sci\Logbook-git\Frontend ver2"; npm install
+```
+
+Then start both again (steps 2 and 3 above).
+
+### Accounts for testing
+
+The database on this laptop has the **test data** loaded (40 patients, 100 visits).
+Full list with passwords: `AdminSetUp\ADMIN ACC` and `AdminSetUp\nurse acc jaziel`.
+
+| Username | Role | Password |
+|---|---|---|
+| `acruz` | Admin | `Passw0rd!` |
+| `nsantos`, `jreyes`, `lmercado` | Nurse | `Passw0rd!` |
+| `rdomingo` | Nurse, **inactive** (sign-in must fail) | `Passw0rd!` |
+| `Cyrille` | Nurse, has the real Gmail (use for Forgot password) | `Cyrille2122#` |
+
+`Passw0rd!` has a **zero**, not the letter O. There is no role picker: the
+system opens the right dashboard from the account itself.
+
+**Load the test data on a new laptop** (a teammate's, or after a fresh install).
+It's in the repo at `BackendAndDatabase\test_data\isu_infirmary_test_data.sql`.
+This **replaces** everything in the `isu_infirmary` database, so only do it on a
+laptop with no real records. XAMPP MySQL must be green:
+
+```powershell
+cd "C:\Users\com sci\Logbook-git\BackendAndDatabase\test_data"
+$env:Path += ";C:\xampp\mysql\bin"
+cmd /c "mysql -u root < isu_infirmary_test_data.sql"
+```
+
+Then sign in with the accounts above. (On your own laptop you can also use
+**Settings → Restore from a backup → `isu_infirmary_20261012_120000_test-data.sql`**.)
+
+### Test run checklist (about 15 minutes)
+
+Sign in as **admin** (`acruz`):
+
+1. The **Admin dashboard** opens by itself. Sign-in activity and Account activity show numbers.
+2. **User management → Add user**: make a nurse account with your Gmail as Email.
+3. **Audit log**: your sign-in is at the top. The tiles count sign-ins, failed sign-ins, and records added, edited and deleted.
+4. **Settings → Back up now**: "Backup created" appears and the backup is listed under **Restore from a backup**.
+5. **Settings → Maintenance mode** on, type a message → **Save changes**. Sign out, try a nurse: blocked with your message. Sign in as admin again, turn it off, **Save changes**.
+
+Sign in as **nurse** (`nsantos`):
+
+6. **Dashboard**: numbers and charts. A red **Possible outbreak** banner appears only when a complaint is unusually high this week (usually there is none).
+7. **Patient records → Add visit record**: register a new patient, BP 120/80, temp 36.8, a chief complaint, give 2 Paracetamol, choose "Back to Class/Work", save. Stock goes down by 2.
+8. Try giving more medicine than is on hand: nothing saves, the shortage shows.
+9. **Priority & special cases**: flag the patient with Allergy.
+10. **Stock & supplies**: a low item → **Request**; then as admin approve it in **Stock requests**; as nurse **Confirm delivery**: stock goes up.
+11. **Reports**: switch to the table view. On the dashboard, **View full list** shows every complaint, not only the top 5.
+12. Sign out → **Forgot password?** → type the account's **email** → the 6-digit code arrives in Gmail (expires in 5:00) → type it in the boxes → set a new password → sign in.
+13. Sign in as `rdomingo`: it must fail (inactive account).
+
+If every step works, the system is ready for the demo.
 
 ### If it doesn't start
 
@@ -84,7 +155,7 @@ Paste with **Ctrl + V** or **right-click**.
 |---|---|
 | **repo folder** | `C:\Users\com sci\Logbook-git` |
 | **backend folder** | `C:\Users\com sci\Logbook-git\BackendAndDatabase\backend` |
-| **frontend folder** | `C:\Users\com sci\Logbook-git\Frontend` |
+| **frontend folder** | `C:\Users\com sci\Logbook-git\Frontend ver2` |
 
 To get yours: open the folder in File Explorer, click the address bar, **Ctrl + C**.
 Keep the quotes around paths — they contain a space.
@@ -148,7 +219,9 @@ MySQL Server separately.
 ## A2. Create the backend `.env`
 
 Holds the database login and secret key. It's gitignored, so **every teammate
-makes their own** — cloning isn't enough.
+makes their own** — cloning isn't enough. `.env.example` in the same folder lists
+every setting with an explanation (copy it to `.env` and fill it in), or use the
+command below.
 
 ```powershell
 cd "C:\Users\com sci\Logbook-git\BackendAndDatabase\backend"
@@ -247,8 +320,8 @@ uvicorn app.main:app --reload
 ```
 
 Wait for `Application startup complete`, then open **http://localhost:8000/docs**.
-You should see about 31 endpoints grouped as auth, lookups, patients, visits,
-stock, users, settings, insights.
+You should see the endpoints grouped as auth, lookups, patients, visits,
+stock, users, settings, insights, activity, audit, backups, trash, surveillance.
 
 Press **Ctrl + C** to stop it before moving on, or leave it running and open a
 second PowerShell window for Part B.
@@ -275,7 +348,7 @@ one** — the old window won't see Node until you do.
 ## B2. Install the frontend packages
 
 ```powershell
-cd "C:\Users\com sci\Logbook-git\Frontend"
+cd "C:\Users\com sci\Logbook-git\Frontend ver2"
 ```
 ```powershell
 npm install
@@ -291,7 +364,7 @@ The frontend works with **no `.env` at all**. Its API address is left empty on
 purpose, so every request goes through the built-in forwarding to the backend
 on the same machine.
 
-Only create `Frontend\.env` if you ever split the frontend and backend onto
+Only create `Frontend ver2\.env` if you ever split the frontend and backend onto
 different computers. Don't do that for this setup.
 
 ## B4. Test it
@@ -423,13 +496,64 @@ the old version.
 
 ## What's built
 
-**Working:** login and lockout, patients and special-case flags, visits with
-automatic stock deduction, stock and restock requests (request → approve →
-receive), user management, system settings, clinical insights. 31 endpoints,
-verified with 60 end-to-end checks against MariaDB.
+**Working:** login with automatic role (no role picker) and lockout, patients
+and special-case flags, visits with automatic stock deduction, stock and restock
+requests (request → approve → receive), user management, system settings,
+dashboards with charts and numbers, Reports with a table view and full lists,
+the **Audit log** (every sign-in, failed sign-in, add, edit, delete, backup and
+restore), **Backup now / Restore** (a safety backup is taken first, and a restore
+never erases the audit log), a daily automatic backup, **maintenance mode**
+(nurses are blocked and see the admin's message), **forgot password by email**
+with a 6-digit code, and the **health surveillance** outbreak banner on the
+nurse dashboard (`BackendAndDatabase\backend\health_surveillance\`).
+
+**Backend ready, button not connected yet in the new frontend:** Export .SQL
+(`GET /api/backups/export`) and Open trash (`GET /api/trash`).
 
 **Not built yet:** printable Medical Certificate and Parental Notification with
-the Director co-signature workflow; Backup Now / Restore / Export SQL.
+the Director co-signature workflow.
+
+### Backups
+
+Backups use XAMPP's `mysqldump` and `mysql`. They are found automatically in
+`C:\xampp\mysql\bin`. If XAMPP is somewhere else, add these to `.env`:
+
+```
+MYSQLDUMP_PATH=D:\xampp\mysql\bin\mysqldump.exe
+MYSQL_PATH=D:\xampp\mysql\bin\mysql.exe
+```
+
+Backup files go to `BackendAndDatabase/backend/backups/` (ignored by git).
+Copy them to a flash drive now and then. After pulling new backend code,
+stop the backend (Ctrl+C) and start it again with
+`uvicorn app.main:app --reload`.
+
+### Forgot password by Gmail code
+
+"Forgot password?" works in 3 screens: (1) type the **email** saved on the
+account and a 6-digit code is emailed to it; (2) type the code in the 6 boxes
+(valid **5 minutes**, works once, 5 wrong tries cancel it; "Resend code" unlocks
+after 30 seconds); (3) only then the new-password boxes appear. The server
+laptop needs internet when a code is sent. Every reset shows in the Audit log.
+
+One-time setup, using the Gmail that sends the codes:
+
+1. Go to **myaccount.google.com → Security** and turn on **2-Step Verification**.
+2. Go to **myaccount.google.com/apppasswords**, type `ISU Infirmary`, click
+   **Create**, and copy the 16-letter password it shows.
+3. Add these two lines to the backend `.env` (put your Gmail and that
+   16-letter password; never your normal Gmail password):
+
+```
+SMTP_USER=yourgmail@gmail.com
+SMTP_PASSWORD=abcd efgh ijkl mnop
+```
+
+4. Restart the backend.
+5. In **User management**, edit each account and fill in its **Email**.
+   Accounts with no email can't use this; the admin resets them instead.
+
+Without these lines, "Forgot password?" says email reset isn't set up.
 
 ### Rules when changing the backend
 

@@ -7,6 +7,7 @@ import { isOpenVisit, initialsOf, VISIT_STATUS } from '../lib/format';
 import { REFERRAL_DISPOSITIONS } from '../api/lookups';
 import { listStock } from '../api/stock';
 import { getPatterns } from '../api/insights';
+import { getOutbreakAlerts } from '../api/surveillance';
 import { summarize } from '../lib/insights';
 import { LineChart } from '../components/Charts';
 import {
@@ -86,6 +87,11 @@ export default function NurseDashboard() {
   }, [todayQ.visits, queueSort]);
 
   const stock = useAsync(() => listStock({ perPage: 200 }), []);
+  // Health surveillance: this week's possible outbreaks. If the check fails
+  // (no model on the server, demo mode), the dashboard simply shows no banner.
+  const outbreaks = useAsync(() => getOutbreakAlerts(), []);
+  const outbreakList = outbreaks.data?.alerts || [];
+  const [showOutbreaks, setShowOutbreaks] = useState(false);
   const stockItems = stock.data?.items || [];
   const lowStock = stockItems.filter((i) => i.stockStatus === 'low');
   const outStock = stockItems.filter((i) => i.stockStatus === 'out_of_stock');
@@ -138,6 +144,33 @@ export default function NurseDashboard() {
             <strong>Couldn&rsquo;t reach the server</strong>
             <span>{rangeQ.error}</span>
           </div>
+        </div>
+      )}
+
+      {outbreakList.length > 0 && (
+        <div className="alert-banner danger outbreak-banner no-print">
+          <div className="ic-wrap"><Icon name="alert" size={20} /></div>
+          <div className="txt">
+            <strong>
+              {outbreakList[0].headline}
+              {outbreakList.length > 1 ? ` (+${outbreakList.length - 1} more)` : ''}
+            </strong>
+            <span>{outbreakList[0].detail}</span>
+            {showOutbreaks && (
+              <ul className="outbreak-list">
+                {outbreakList.map((a) => (
+                  <li key={`${a.college}-${a.complaint}`}>
+                    {outbreakList.length > 1 && <><b>{a.complaint} in {a.college}:</b> {a.detail}. </>}
+                    Last week: {a.previousWeekCases} {a.complaint} case{a.previousWeekCases === 1 ? '' : 's'} in {a.college}.
+                  </li>
+                ))}
+                <li>Check this week&rsquo;s visits in Search &amp; history.</li>
+              </ul>
+            )}
+          </div>
+          <button className="go" onClick={() => setShowOutbreaks((v) => !v)}>
+            {showOutbreaks ? 'Hide' : 'View'}
+          </button>
         </div>
       )}
 

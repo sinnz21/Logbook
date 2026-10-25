@@ -3,7 +3,7 @@
 The CS component of the **ISU Infirmary Logbook Management and Health Surveillance System**.
 
 The system learns how many clinic visits are **normal** for each college and complaint
-at each time of the school year, and warns the admin when a week is **unusually high**,
+at each time of the school year, and warns the nurses on duty when a week is **unusually high**,
 for example *"Viral Flu cluster in CCSICT: 7 cases this week, about 8.3× the normal 0.8."*
 
 ## How it works

@@ -356,7 +356,7 @@ counts alone.
 ```
 Nurse logs a visit  →  database (visits + complaint tag + patient's department)
                                    │
-Admin opens the alerts  →  GET /api/surveillance/alerts
+Nurse opens the dashboard  →  GET /api/surveillance/alerts
                                    │
         1. Count this week's visits per college × complaint
            (if a visit has no complaint tag, keywords like "lagnat", "ubo",

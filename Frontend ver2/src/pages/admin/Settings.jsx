@@ -46,9 +46,8 @@ function Row({ title, detail, children }) {
 
 // Everything editable here reads/writes system_settings via GET/PATCH /api/settings:
 // softDeleteDays, failedLoginLimit, lockoutMinutes, passwordSymbolRequired and
-// autoBackupEnabled. The design also shows maintenance mode, a minimum password
-// length and an email-reset switch — those have no column behind them yet, so
-// they're called out rather than faked. Backup Now / Restore go through
+// autoBackupEnabled, plus maintenanceMode and maintenanceMessage (POST
+// /api/auth/login answers 503 with that message to nurses while it's on). Backup Now / Restore go through
 // /api/backups (see "Backup and recovery" in BACKEND_REQUIREMENTS.md).
 export default function Settings() {
   const { navigate, openModal } = useApp();
@@ -255,13 +254,34 @@ export default function Settings() {
         <div className="card">
           <h3>Maintenance mode</h3>
           <div className="card-sub">Blocks sign-in while the database is being worked on</div>
-          <div className="info-note">
-            <Icon name="alert" size={17} />
-            <span>
-              Maintenance mode, the scheduled window and the staff notice have no system_settings
-              rows behind them yet. Once the backend adds those fields they drop straight into this card.
-            </span>
-          </div>
+          <Row
+            title="Maintenance mode"
+            detail={current?.maintenanceMode
+              ? 'On: nurses can’t sign in. Admins still can, to finish the work and switch it off.'
+              : 'Off: everyone can sign in'}
+          >
+            <Toggle on={Boolean(current?.maintenanceMode)} onChange={(v) => change({ maintenanceMode: v })} disabled={disabled} />
+          </Row>
+          <label className="form-label" htmlFor="maintenance-message" style={{ display: 'block', margin: '14px 0 8px' }}>
+            Message nurses see when they try to sign in
+          </label>
+          <textarea
+            id="maintenance-message"
+            maxLength={300}
+            placeholder="System under maintenance, please try again later."
+            value={current?.maintenanceMessage ?? ''}
+            onChange={(e) => change({ maintenanceMessage: e.target.value })}
+            disabled={disabled}
+            style={{ width: '100%' }}
+          />
+          {draft && (draft.maintenanceMode !== settings.data?.maintenanceMode
+            || draft.maintenanceMessage !== settings.data?.maintenanceMessage) ? (
+            <div className="warn-note" style={{ marginTop: 12 }}>Click Save changes at the top to apply this.</div>
+          ) : settings.data?.maintenanceMode ? (
+            <div className="warn-note" style={{ marginTop: 12 }}>
+              Maintenance mode is on. Nurses can&rsquo;t sign in until you switch it off.
+            </div>
+          ) : null}
         </div>
       </div>
 

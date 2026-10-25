@@ -1,3 +1,17 @@
+CURRENT DATABASE (test data, restored Oct 12, 2026)
+All passwords: Passw0rd!  (zero, not the letter O; ends with an exclamation mark)
+
+"username": "nsantos",   "fullName": "Santos, Maria",   "role": "nurse"
+"username": "jreyes",    "fullName": "Reyes, Jose",     "role": "nurse"
+"username": "lmercado",  "fullName": "Mercado, Liza",   "role": "nurse"
+"username": "rdomingo",  "fullName": "Domingo, Rosa",   "role": "nurse"   (INACTIVE: can't sign in, for testing)
+
+"username": "Cyrille",   "fullName": "Gaffud, Cyrille", "role": "nurse"
+"password": "Cyrille2122#"
+(has the real Gmail, so use this one to test Forgot password)
+
+
+OLDER DATABASE (before the test data; works only if you restore a backup from before Oct 12)
 "username": "DJ",
   "fullName": "Nicolas, Jaziel",
   "role": "nurse"

@@ -1,5 +1,12 @@
+CURRENT DATABASE (test data, restored Oct 12, 2026)
+"username": "acruz",
+  "fullName": "Cruz, Ana",
+  "role": "admin"
+"password": "Passw0rd!"
+(zero, not the letter O; ends with an exclamation mark)
 
 
+OLDER DATABASE (before the test data; works only if you restore a backup from before Oct 12)
 "username": "Cy",
   "fullName": ", Cyrille Gaffud",
   "role": "admin"

@@ -56,6 +56,11 @@ def classify(tag: str | None, chief_complaint: str | None) -> str:
     return "Other"
 
 
+def _times(ratio: float) -> str:
+    """4.4 -> "4×", 1.46 -> "1.5×": whole numbers read easier once it's at least double."""
+    return f"{ratio:.0f}×" if ratio >= 2 else f"{ratio:.1f}×"
+
+
 def week_start(day: dt.date) -> dt.date:
     return day - dt.timedelta(days=day.weekday())
 
@@ -69,7 +74,9 @@ class AlertOut(APIModel):
     previous_week_cases: int
     p_value: float
     test: str            # "week" = sudden spike, "two_weeks" = building up over 2 weeks
-    message: str
+    headline: str        # "Possible outbreak: Viral Flu in CCSICT"
+    detail: str          # "7 cases this week, about 4× the normal rate"
+    message: str         # headline + detail in one sentence
 
 
 class CollegeOut(APIModel):
@@ -150,14 +157,17 @@ def alerts(
             per_college[c][0] += n; per_college[c][1] += e
             fired, p, test = check_unit(n, e, n_prev, e_prev)
             if fired:
-                ratio = n / e if e > 0 else float(n)
+                if test == "week":
+                    ratio = n / e if e > 0 else float(n)
+                    detail = f"{n} cases this week, about {_times(ratio)} the normal rate"
+                else:
+                    ratio = (n_prev + n) / max(e + e_prev, 0.1)
+                    detail = f"{n_prev + n} cases in the last 2 weeks, about {_times(ratio)} the normal rate"
+                headline = f"Possible outbreak: {k} in {c}"
                 out_alerts.append(AlertOut(
                     college=c, complaint=k, cases=n, expected=round(e, 1), times_normal=round(ratio, 1),
                     previous_week_cases=n_prev, p_value=round(p, 5), test=test,
-                    message=(f"{k} cluster in {c}: {n} cases this week, about {ratio:.1f}× the normal {e:.1f}"
-                             if test == "week" else
-                             f"{k} rising in {c}: {n_prev + n} cases over 2 weeks, about "
-                             f"{(n_prev + n) / max(e + e_prev, 0.1):.1f}× normal")))
+                    headline=headline, detail=detail, message=f"{headline}. {detail}."))
     out_alerts.sort(key=lambda a: a.p_value)
     colleges = sorted((CollegeOut(college=c, cases=v[0], expected=round(v[1], 1),
                                   times_normal=round(v[0] / v[1], 2) if v[1] > 0 else 0.0)

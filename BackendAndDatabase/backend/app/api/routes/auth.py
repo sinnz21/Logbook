@@ -209,7 +209,7 @@ def reset_password(body: ResetRequest, db: Session = Depends(get_db)):
     user = db.get(User, entry["user_id"])
     if not user or user.deleted_at is not None or user.status != "active":
         raise expired
-    _check_password(db, body.new_password)   # same symbol rule as User Management
+    _check_password(db, body.new_password)   # same rules as User Management
     with _codes_lock:
         if _reset_tokens.pop(key, None) is None:   # one use only
             raise expired

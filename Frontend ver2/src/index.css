@@ -408,6 +408,10 @@ tr.rowlink:hover{background:var(--teal-softer);}
 .alert-banner.danger{background:var(--red-bg);color:var(--red);}
 .alert-banner.danger .ic-wrap{background:#fadbd7;color:var(--red);}
 .alert-banner.danger .go{border:1px solid var(--red-line);color:var(--red);}
+.outbreak-banner{align-items:flex-start;}
+.outbreak-banner .go{margin-top:2px;}
+.outbreak-list{margin:8px 0 0;padding-left:18px;font-size:14.5px;line-height:1.55;}
+.outbreak-list b{font-weight:700;}
 .alert-banner.warn{background:var(--amber-bg);color:var(--amber);}
 .alert-banner.warn .ic-wrap{background:#f8e5c9;color:var(--amber);}
 .alert-banner.warn .go{border:1px solid var(--amber-line);color:var(--amber);}
@@ -738,3 +742,22 @@ tfoot td{font-weight:800;color:var(--head);border-top:2px solid var(--card-line)
   .card,.kpi{break-inside:avoid;}
   .chart-row.three{display:block;}
 }
+
+/* Password boxes: eye button to show or hide what was typed */
+.pw-wrap input{width:100%;padding-right:44px;}
+.pw-wrap.no-lock input{padding-left:13px;}
+.pw-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border:none;border-radius:8px;background:none;color:var(--muted);cursor:pointer;}
+.pw-toggle:hover{color:var(--ink);background:var(--teal-soft);}
+.pw-toggle:focus-visible{outline:2px solid var(--teal);outline-offset:1px;}
+
+/* New-password checklist: each rule turns green when met */
+.pw-rules{margin:10px 0 4px;padding:12px 14px;border:1px solid var(--line-soft);border-radius:var(--r-md);background:#fff;text-align:left;}
+.pw-rules ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;}
+.pw-rules li{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);}
+.pw-rules li svg{flex-shrink:0;color:var(--faint);}
+.pw-rules li.ok{color:var(--green);font-weight:600;}
+.pw-rules li.ok svg{color:var(--green);}
+.pw-rules .pw-example{margin-top:8px;padding-top:8px;border-top:1px solid var(--line-soft);font-size:14px;color:var(--muted);}
+.pw-rules .pw-example strong{color:var(--ink);font-family:ui-monospace,Consolas,monospace;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}

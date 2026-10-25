@@ -21,6 +21,12 @@ def _check_password(db: Session, password: str) -> None:
         select(SystemSetting).where(SystemSetting.setting_name == "password_symbol_required")
     ).scalar_one_or_none()
     symbol_required = row is None or str(row.setting_value).lower() in ("1", "true")
+    # Same rules the frontend checklist shows (Frontend ver2/src/lib/password.js).
+    # The 8-character minimum is in the schemas (Field(min_length=8)).
+    if not re.search(r"[A-Z]", password):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Password needs at least 1 capital letter")
+    if not re.search(r"[0-9]", password):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Password needs at least 1 number")
     if symbol_required and not re.search(r"[^A-Za-z0-9]", password):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Password needs at least 1 symbol")
 
