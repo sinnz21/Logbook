@@ -60,6 +60,14 @@ export function complaintCounts(visits) {
   return counts;
 }
 
+/** The visits counted under `name` by complaintCounts(): its tags, or the chief complaint when untagged. */
+export function visitsWithComplaint(visits, name) {
+  return visits.filter((visit) => {
+    const tags = visit.complaints?.length ? visit.complaints : [visit.chiefComplaint];
+    return tags.includes(name);
+  });
+}
+
 export function topComplaintsFrom(visits, { limit = 5, others = true } = {}) {
   return rowsFrom(complaintCounts(visits), { limit, others });
 }
@@ -98,6 +106,37 @@ export function visitsPerMonth(visits, months = 8) {
     .map(([key, value]) => ({ key, label: MONTH.format(new Date(`${key}-15T00:00:00Z`)), value }));
 }
 
+/** A visit's arrival time shifted to clinic time, read with the getUTC* methods. */
+const clinicClock = (v) => new Date(parseApiDate(v.startedAt).getTime() + 8 * 3600000);
+
+const hourLabel = (h) => `${h % 12 || 12}${h < 12 ? 'AM' : 'PM'}`;
+
+/**
+ * [{ key, label: '7AM', value }] — arrivals per clinic-time hour. Clinic hours
+ * (7 AM to 6 PM) are always shown, plus any other hour that has visits.
+ */
+export function visitsByHour(visits) {
+  const counts = new Map();
+  for (const v of visits) {
+    const h = clinicClock(v).getUTCHours();
+    counts.set(h, (counts.get(h) || 0) + 1);
+  }
+  const bars = [];
+  for (let h = 0; h < 24; h++) {
+    if ((h >= 7 && h <= 18) || counts.has(h)) bars.push({ key: h, label: hourLabel(h), value: counts.get(h) || 0 });
+  }
+  return bars;
+}
+
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+/** [{ key, label: 'Mon', value }] — visits per clinic-time day of the week, Monday first. */
+export function visitsByWeekday(visits) {
+  const counts = new Array(7).fill(0);
+  for (const v of visits) counts[(clinicClock(v).getUTCDay() + 6) % 7] += 1;
+  return WEEKDAYS.map((label, i) => ({ key: i, label, value: counts[i] }));
+}
+
 /** Departments by visit count, with each one's most common complaint. */
 export function departmentsFrom(visits) {
   const rows = rowsFrom(tally(visits, 'department'));
@@ -126,6 +165,8 @@ export function summarize(visits) {
   return {
     total: visits.length,
     perMonth: visitsPerMonth(visits),
+    byHour: visitsByHour(visits),
+    byWeekday: visitsByWeekday(visits),
     complaints: rowsFrom(complaintCounts(visits)),
     medicines: rowsFrom(medicineCounts(visits)),
     clients: rowsFrom(tally(visits, 'patientTypeName')),

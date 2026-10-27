@@ -2,16 +2,15 @@ import { useMemo, useState } from 'react';
 import { useAsync } from '../hooks/useAsync';
 import { useVisitsInRange } from '../hooks/useVisits';
 import { getPatterns } from '../api/insights';
-import { addDays, clinicDay } from '../lib/time';
+import { addDays, clinicDay, formatDate } from '../lib/time';
 import { summarize } from '../lib/insights';
 import { formatQty } from '../lib/format';
 import { downloadCsv, toCsv } from '../lib/csv';
 import {
-  ClientBreakdownCard, ComplaintsCard, DepartmentsCard, DispositionsCard, MedicinesCard,
-  MonthlyVisitsCard, PairingsCard, StaffAgesCard, StudentDemographicsCard,
+  BusiestHoursCard, ClientBreakdownCard, ComplaintsCard, DepartmentsCard, DispositionsCard, MedicinesCard,
+  MonthlyVisitsCard, PairingsCard, StaffAgesCard, StudentDemographicsCard, WeekdayCard,
 } from '../components/InsightCards';
 import Icon from '../components/Icon';
-import MonthlySupplyReport from '../components/MonthlySupplyReport';
 
 const MONTH_LONG = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'long', year: 'numeric' });
 
@@ -20,16 +19,6 @@ const PRESETS = {
   '30d': { label: 'Past 30 days', days: 29 },
   semester: { label: 'Semester', days: 179 },
 };
-
-const VIEW_KEY = 'isu-infirmary.reports-view';
-
-function savedView() {
-  try {
-    return localStorage.getItem(VIEW_KEY) === 'table' ? 'table' : 'charts';
-  } catch {
-    return 'charts';
-  }
-}
 
 // Standard columns for a { name, count, pct } ranking.
 const rankColumns = (nameLabel, countLabel = 'Visits', fmt = (n) => n) => [
@@ -97,22 +86,16 @@ function ReportTable({ title, sub, rows, columns, filename }) {
   );
 }
 
-export default function Reports() {
+/**
+ * The Reports sub-pages that work from visit records: mode 'charts' is
+ * Reports / Analytics, mode 'table' is Reports / Report tables (see ReportPages.jsx).
+ */
+export default function Reports({ mode = 'charts' }) {
   const [today] = useState(() => clinicDay(new Date()));
-  const [view, setView] = useState(savedView);
   const [preset, setPreset] = useState('semester');
   const [committed, setCommitted] = useState(() => ({ from: addDays(clinicDay(new Date()), -179), to: clinicDay(new Date()) }));
   const [draft, setDraft] = useState(committed);
   const [filters, setFilters] = useState({ sex: '', yearLevel: '', program: '', department: '' });
-
-  const changeView = (next) => {
-    setView(next);
-    try {
-      localStorage.setItem(VIEW_KEY, next);
-    } catch {
-      // storage blocked — the choice just won't be remembered
-    }
-  };
 
   const applyPreset = (key) => {
     const next = { from: addDays(today, -PRESETS[key].days), to: today };
@@ -138,6 +121,7 @@ export default function Reports() {
   const s = useMemo(() => summarize(visits), [visits]);
   const loading = source.loading;
   const suffix = `${committed.from}_to_${committed.to}`;
+  const rangeLabel = `${formatDate(new Date(`${committed.from}T00:00:00Z`))} – ${formatDate(new Date(`${committed.to}T00:00:00Z`))}`;
 
   const monthRows = useMemo(() => {
     const total = s.perMonth.reduce((sum, m) => sum + m.value, 0) || 1;
@@ -155,27 +139,15 @@ export default function Reports() {
     <div className="view active">
       <div className="page-head">
         <div>
-          <h1>Reports</h1>
+          <h1>{mode === 'table' ? 'Report tables' : 'Analytics'}</h1>
           <div className="sub">Clinic trends from the visit records, {s.total} visits in this range</div>
         </div>
         <div className="head-actions no-print">
-          <div className="segmented">
-            <button className={view === 'charts' ? 'active' : ''} onClick={() => changeView('charts')}>
-              <Icon name="chart" size={15} /> Charts
-            </button>
-            <button className={view === 'table' ? 'active' : ''} onClick={() => changeView('table')}>
-              <Icon name="table" size={15} /> Table
-            </button>
-          </div>
           <button className="btn btn-ghost" onClick={() => window.print()}>
             <Icon name="printer" size={17} /> Print report
           </button>
         </div>
       </div>
-
-      {/* Always a table, in both the Charts and Table views, with its own month
-          picker. It sits above the visit filters because they don't apply to it. */}
-      <MonthlySupplyReport />
 
       <div className="filter-card no-print">
         <div className="filter-row">
@@ -213,12 +185,14 @@ export default function Reports() {
 
       {source.error && <div className="login-error" style={{ marginBottom: 14 }}>{source.error}</div>}
 
-      {view === 'charts' ? (
+      {mode === 'charts' ? (
         <>
           {/* chart-flow packs the cards into columns so a short card never leaves a gap. */}
           <div className="chart-flow">
             <MonthlyVisitsCard perMonth={s.perMonth} loading={loading} />
-            <ComplaintsCard title="Frequent complaints" rows={s.complaints} loading={loading} />
+            <BusiestHoursCard bars={s.byHour} loading={loading} />
+            <WeekdayCard bars={s.byWeekday} loading={loading} />
+            <ComplaintsCard title="Frequent complaints" rows={s.complaints} loading={loading} visits={visits} rangeLabel={rangeLabel} />
             <MedicinesCard rows={s.medicines} loading={loading} />
             <PairingsCard patterns={patterns.data} loading={patterns.loading} error={patterns.error} />
             <ClientBreakdownCard rows={s.clients} loading={loading} />

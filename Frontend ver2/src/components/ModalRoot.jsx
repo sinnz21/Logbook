@@ -6,7 +6,7 @@ import StockItemModal from './modals/StockItemModal';
 import SoftDeleteModal from './modals/SoftDeleteModal';
 import FlagPatientModal from './modals/FlagPatientModal';
 import UserModal from './modals/UserModal';
-import FullListModal from './modals/FullListModal';
+import ComplaintPatientsModal from './modals/ComplaintPatientsModal';
 import ConfirmModal from './modals/ConfirmModal';
 
 // Each modal is only mounted while it's the active one (see Modal.jsx), so it
@@ -19,7 +19,7 @@ const MODALS = {
   softDelete: SoftDeleteModal,
   flagPatient: FlagPatientModal,
   user: UserModal,
-  fullList: FullListModal,
+  complaintPatients: ComplaintPatientsModal,
   confirm: ConfirmModal,
 };
 

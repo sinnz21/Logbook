@@ -445,11 +445,13 @@ export const auditLogs = buildAuditLogs();
 
 // ───────────────────────────── backups ─────────────────────────────
 
+// The server's nightly job runs at 11:59 PM clinic time, so the last six
+// automatic backups are from 23:59 on each of the previous six days.
 export const backups = [
   ...Array.from({ length: 6 }, (_, i) => ({
     backupId: 6 - i,
-    fileName: `isu_infirmary_${addDays(TODAY, -i).replace(/-/g, '')}_0200.sql.gz`,
-    createdAt: manilaIso(addDays(TODAY, -i), '02:00'),
+    fileName: `isu_infirmary_${addDays(TODAY, -(i + 1)).replace(/-/g, '')}_2359.sql.gz`,
+    createdAt: manilaIso(addDays(TODAY, -(i + 1)), '23:59'),
     sizeBytes: 4_800_000 - i * 23_000,
     kind: 'automatic',
     createdByName: null,

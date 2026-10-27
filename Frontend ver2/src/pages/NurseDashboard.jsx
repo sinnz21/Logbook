@@ -11,13 +11,23 @@ import { getOutbreakAlerts } from '../api/surveillance';
 import { summarize } from '../lib/insights';
 import { LineChart } from '../components/Charts';
 import {
-  ClientBreakdownCard, ComplaintsCard, DepartmentsCard, DispositionsCard, MedicinesCard,
+  BusiestHoursCard, ClientBreakdownCard, ComplaintsCard, DepartmentsCard, DispositionsCard, MedicinesCard,
   MonthlyVisitsCard, PairingsCard, StaffAgesCard, StudentDemographicsCard,
 } from '../components/InsightCards';
 import Icon from '../components/Icon';
+import QuickLinks from '../components/QuickLinks';
 
 const today = clinicDay(new Date());
 const shortDay = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' });
+
+const QUICK_LINKS = [
+  { view: 'patient-records', label: 'Patient records', icon: 'clipboard' },
+  { view: 'flag-cases', label: 'Priority & special cases', icon: 'flag' },
+  { view: 'search-history', label: 'Search & history', icon: 'search' },
+  { view: 'stock', label: 'Stock & supplies', icon: 'box' },
+  { view: 'reports', label: 'Reports', icon: 'chart' },
+  { view: 'full-lists', label: 'Full lists', icon: 'list' },
+];
 
 const TREND_WINDOWS = {
   '7 days': 7,
@@ -224,6 +234,8 @@ export default function NurseDashboard() {
         </div>
       </div>
 
+      <QuickLinks links={QUICK_LINKS} />
+
       <div className="chart-row even">
         <div className="card">
           <div className="card-head">
@@ -242,7 +254,7 @@ export default function NurseDashboard() {
           {trendQ.loading ? <div className="sub">Loading…</div> : <LineChart points={trend} />}
         </div>
 
-        <ComplaintsCard rows={stats.complaints} loading={rangeQ.loading} />
+        <ComplaintsCard rows={stats.complaints} loading={rangeQ.loading} visits={rangeQ.visits} rangeLabel={rangeLabel} />
       </div>
 
       {/* Full width: the queue table needs the room, and a card beside it left a gap. */}
@@ -323,6 +335,7 @@ export default function NurseDashboard() {
 
       <div className="chart-flow">
         <MedicinesCard rows={stats.medicines} loading={rangeQ.loading} />
+        <BusiestHoursCard bars={stats.byHour} loading={rangeQ.loading} />
         <ClientBreakdownCard rows={stats.clients} loading={rangeQ.loading} />
         <DispositionsCard rows={stats.dispositions} loading={rangeQ.loading} />
         <StaffAgesCard rows={stats.staffAges} loading={rangeQ.loading} />

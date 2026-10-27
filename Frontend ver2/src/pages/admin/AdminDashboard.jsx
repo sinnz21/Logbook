@@ -11,12 +11,23 @@ import { rowsFrom, summarize, tally } from '../../lib/insights';
 import { AUDIT_ACTIONS } from '../../lib/audit';
 import { BarChart, DonutLegend } from '../../components/Charts';
 import {
-  ClientBreakdownCard, ComplaintsCard, DepartmentsCard, MedicinesCard, MonthlyVisitsCard,
+  BusiestHoursCard, ClientBreakdownCard, ComplaintsCard, DepartmentsCard, MedicinesCard, MonthlyVisitsCard,
+  WeekdayCard,
 } from '../../components/InsightCards';
 import Icon from '../../components/Icon';
+import QuickLinks from '../../components/QuickLinks';
 
 const today = clinicDay(new Date());
 const shortDay = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', weekday: 'short', day: 'numeric' });
+
+const QUICK_LINKS = [
+  { view: 'stock-requests', label: 'Stock requests', icon: 'clipboardCheck' },
+  { view: 'users', label: 'User management', icon: 'users' },
+  { view: 'reports', label: 'Reports', icon: 'chart' },
+  { view: 'audit-log', label: 'Audit log', icon: 'history' },
+  { view: 'full-lists', label: 'Full lists', icon: 'list' },
+  { view: 'settings', label: 'Backup & recovery', icon: 'cloudUp' },
+];
 
 const STOCK_COLORS = { high: '#107a6b', low: '#d9a13b', out_of_stock: '#c0392b' };
 const STOCK_LABELS = { high: 'In stock', low: 'Low', out_of_stock: 'Out of stock' };
@@ -51,6 +62,7 @@ export default function AdminDashboard() {
   const needsAttention = stockItems.filter((i) => i.stockStatus !== 'high').length;
 
   const stats = useMemo(() => summarize(visits.visits), [visits.visits]);
+  const rangeLabel = `${formatDate(new Date(`${range.from}T00:00:00Z`))} – ${formatDate(new Date(`${range.to}T00:00:00Z`))}`;
   const semester = useMemo(() => summarize(semesterQ.visits), [semesterQ.visits]);
 
   const stockRows = useMemo(
@@ -138,6 +150,8 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      <QuickLinks links={QUICK_LINKS} />
+
       <div className="chart-row">
         <div className="card">
           <div className="card-head">
@@ -176,7 +190,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="chart-row">
-        <ComplaintsCard title="Campus complaint summary" rows={stats.complaints} loading={visits.loading} />
+        <ComplaintsCard title="Campus complaint summary" rows={stats.complaints} loading={visits.loading} visits={visits.visits} rangeLabel={rangeLabel} />
 
         <div className="card">
           <h3>Stock status</h3>
@@ -189,12 +203,14 @@ export default function AdminDashboard() {
 
       <div className="section-title">
         <h2>Clinic insights</h2>
-        <span>{formatDate(new Date(`${range.from}T00:00:00Z`))} – {formatDate(new Date(`${range.to}T00:00:00Z`))} · {stats.total} visits</span>
+        <span>{rangeLabel} · {stats.total} visits</span>
       </div>
 
       <div className="chart-flow">
         <MonthlyVisitsCard perMonth={semester.perMonth} loading={semesterQ.loading} />
         <ClientBreakdownCard rows={stats.clients} loading={visits.loading} />
+        <BusiestHoursCard bars={stats.byHour} loading={visits.loading} />
+        <WeekdayCard bars={stats.byWeekday} loading={visits.loading} />
         <DepartmentsCard rows={stats.departments} loading={visits.loading} />
         <MedicinesCard rows={stats.medicines} loading={visits.loading} />
       </div>

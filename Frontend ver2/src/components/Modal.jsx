@@ -16,7 +16,7 @@ export default function Modal({ wide, narrow, maxWidth, title, badge, subtitle, 
     >
       <div
         className={`modal${wide ? ' wide' : ''}${narrow ? ' narrow' : ''}`}
-        style={maxWidth ? { maxWidth } : undefined}
+        style={maxWidth ? { width: maxWidth } : undefined}
         role="dialog"
         aria-modal="true"
       >

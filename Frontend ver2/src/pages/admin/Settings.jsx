@@ -3,7 +3,7 @@ import { useApp } from '../../context/useApp';
 import { useAsync } from '../../hooks/useAsync';
 import { getSettings, updateSettings } from '../../api/settings';
 import { createBackup, listBackups, restoreBackup } from '../../api/backups';
-import { formatDate, formatTime, parseApiDate } from '../../lib/time';
+import { addDays, clinicDay, formatDate, formatTime, parseApiDate } from '../../lib/time';
 import Icon from '../../components/Icon';
 import { notConnected } from '../../lib/notConnected';
 
@@ -11,6 +11,17 @@ const when = (iso) => {
   const at = parseApiDate(iso);
   return `${formatDate(at)}, ${formatTime(at)}`;
 };
+
+/**
+ * The clinic day of the next automatic backup: the server takes one every day
+ * at 11:59 PM Asia/Manila, so it's today until 23:59 has passed, then tomorrow.
+ */
+function nextBackupDay(at) {
+  const manila = new Date(at.getTime() + 8 * 3600000); // the Philippines has no DST
+  const minutes = manila.getUTCHours() * 60 + manila.getUTCMinutes();
+  const today = clinicDay(at);
+  return minutes < 23 * 60 + 59 ? today : addDays(today, 1);
+}
 
 function formatSize(bytes) {
   if (bytes == null) return '';
@@ -57,6 +68,7 @@ export default function Settings() {
   const [draft, setDraft] = useState(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
+  const [now] = useState(() => new Date());
 
   const current = draft || settings.data;
   const change = (patch) => {
@@ -115,8 +127,9 @@ export default function Settings() {
     },
   });
 
-  const backupList = backups.data || [];
+  const backupList = [...(backups.data || [])].sort((a, b) => parseApiDate(b.createdAt) - parseApiDate(a.createdAt));
   const latest = backupList[0];
+  const nextBackup = formatDate(new Date(`${nextBackupDay(now)}T00:00:00Z`));
 
   return (
     <div className="view active">
@@ -142,10 +155,15 @@ export default function Settings() {
         <div className="card">
           <h3>Backup and recovery</h3>
           <div className="card-sub">Snapshots are taken server-side</div>
-          <Row title="Automated backups" detail="Daily snapshot, kept for the retention window">
+          <Row
+            title="Automatic daily backup at 11:59 PM"
+            detail={current?.autoBackupEnabled
+              ? `Next automatic backup: ${nextBackup}, 11:59 PM`
+              : 'Off. No automatic backups will be taken.'}
+          >
             <Toggle on={Boolean(current?.autoBackupEnabled)} onChange={(v) => change({ autoBackupEnabled: v })} disabled={disabled} />
           </Row>
-          <Row title="Back up now" detail={latest ? `Last backup: ${when(latest.createdAt)}` : 'Take a snapshot right now'}>
+          <Row title="Back up now" detail={latest ? `Last backup: ${when(latest.createdAt)} (${latest.kind === 'manual' ? 'manual' : 'automatic'})` : 'Take a snapshot right now'}>
             <button className="btn btn-primary btn-sm no-print" onClick={backupNow} disabled={backingUp}>
               <Icon name="cloudUp" size={16} /> {backingUp ? 'Backing up…' : 'Back up now'}
             </button>

@@ -20,13 +20,23 @@ const db = {
   audit: seed.auditLogs.map((e) => ({ ...e })),
   backups: seed.backups.map((b) => ({ ...b })),
   snapshots: new Map(), // backupId → records, for backups taken during this session
-  resetCodes: new Map(), // email → { code, userId, expiresAt }
+  resetCodes: new Map(), // email → { code, userId, expiresAt, attempts }
+  resetRequests: new Map(), // email → timestamps (ms) of recent code requests
   resetTokens: new Map(), // token → userId
   nextIds: { visit: 9000, patient: 900, specialCase: 900, request: 900, user: 900, audit: 90000, backup: 100 },
 };
 
 const RECORD_KEYS = ['users', 'patients', 'visits', 'stock', 'requests', 'settings'];
 const RESET_CODE_SECONDS = 600;
+// The same limits BACKEND_REQUIREMENTS.md asks the real server to enforce.
+const RESET_REQUEST_LIMIT = 3; // code requests per email…
+const RESET_REQUEST_WINDOW_MS = 15 * 60 * 1000; // …per 15 minutes
+const RESET_MAX_WRONG = 5; // wrong guesses before a code is cancelled
+
+const mmss = (ms) => {
+  const total = Math.max(1, Math.ceil(ms / 1000));
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+};
 
 /** The signed-in user for this request, from the demo token's payload. */
 let currentUser = null;
@@ -153,10 +163,24 @@ const routes = [
   // ── password reset by email ──
   ['POST', /^\/auth\/forgot-password$/, (_m, _q, body) => {
     const email = (body.email || '').trim().toLowerCase();
+    // Rate limit per email, registered or not, so the limit itself can't tell
+    // anyone which emails have accounts.
+    const at = Date.now();
+    const recent = (db.resetRequests.get(email) || []).filter((t) => at - t < RESET_REQUEST_WINDOW_MS);
+    if (recent.length >= RESET_REQUEST_LIMIT) {
+      db.resetRequests.set(email, recent);
+      throw new HttpError(429, `Too many code requests for this email. Try again in ${mmss(recent[0] + RESET_REQUEST_WINDOW_MS - at)}.`);
+    }
+    db.resetRequests.set(email, [...recent, at]);
+
     const user = db.users.find((u) => u.email?.toLowerCase() === email && u.status === 'active');
-    if (!user) return { expiresInSeconds: RESET_CODE_SECONDS }; // same answer either way
+    if (!user) {
+      // No code can match, but wrong guesses are still counted the same way.
+      db.resetCodes.set(email, { code: null, userId: null, expiresAt: at + RESET_CODE_SECONDS * 1000, attempts: 0 });
+      return { expiresInSeconds: RESET_CODE_SECONDS }; // same answer either way
+    }
     const code = String(Math.floor(Math.random() * 1_000_000)).padStart(6, '0');
-    db.resetCodes.set(email, { code, userId: user.userId, expiresAt: Date.now() + RESET_CODE_SECONDS * 1000 });
+    db.resetCodes.set(email, { code, userId: user.userId, expiresAt: at + RESET_CODE_SECONDS * 1000, attempts: 0 });
     // A real backend emails the code. Demo mode has no mail server, so it hands
     // the code back for the login screen to show.
     return { expiresInSeconds: RESET_CODE_SECONDS, demoCode: code };
@@ -164,8 +188,17 @@ const routes = [
   ['POST', /^\/auth\/verify-reset-code$/, (_m, _q, body) => {
     const email = (body.email || '').trim().toLowerCase();
     const entry = db.resetCodes.get(email);
-    if (!entry || entry.code !== body.code) throw new HttpError(400, 'That code is incorrect. Check the email and try again.');
+    if (!entry) throw new HttpError(400, 'That code is incorrect. Check the email and try again.');
     if (Date.now() > entry.expiresAt) throw new HttpError(400, 'That code has expired. Send a new one.');
+    if (!entry.code || entry.code !== body.code) {
+      entry.attempts += 1;
+      if (entry.attempts >= RESET_MAX_WRONG) {
+        db.resetCodes.delete(email);
+        throw new HttpError(429, 'Too many wrong attempts. This code was cancelled. Request a new code.');
+      }
+      const left = RESET_MAX_WRONG - entry.attempts;
+      throw new HttpError(400, `That code is incorrect. ${left} attempt${left === 1 ? '' : 's'} left.`);
+    }
     db.resetCodes.delete(email);
     const token = `reset-${Math.random().toString(36).slice(2)}`;
     db.resetTokens.set(token, entry.userId);

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useApp } from '../context/useApp';
 import { useAsync } from '../hooks/useAsync';
 import { listStock, listStockRequests } from '../api/stock';
@@ -8,6 +9,9 @@ import Icon from './Icon';
 export default function Sidebar() {
   const { role, userName, currentView, navigate, logout } = useApp();
   const items = NAVS[role];
+  // group label → open/closed, once the user has clicked its header. Until then
+  // a group is open exactly when one of its pages is the current view.
+  const [toggled, setToggled] = useState({});
 
   // The two counters the design shows on the sidebar. They fail quietly: a
   // missing endpoint just means no badge, never a broken nav.
@@ -23,6 +27,42 @@ export default function Sidebar() {
   const badges = {
     lowStock: (stock.data?.items || []).filter((i) => i.stockStatus !== 'high').length,
     pendingRequests: requests.data?.total ?? (requests.data?.items || []).length,
+  };
+
+  const link = (item) => (
+    <a
+      className={currentView === item.id ? 'active' : ''}
+      onClick={() => navigate(item.id)}
+    >
+      {item.icon && <Icon name={item.icon} size={19} />}
+      {item.label}
+      {item.badge && badges[item.badge] > 0 && (
+        <span className="count">{badges[item.badge]}</span>
+      )}
+    </a>
+  );
+
+  const group = (item) => {
+    const current = item.children.some((c) => c.id === currentView);
+    const open = toggled[item.group] ?? current;
+    return (
+      <li key={`group-${item.group}`}>
+        <a
+          className={`group-head${open ? ' open' : ''}${current ? ' current' : ''}`}
+          onClick={() => setToggled({ ...toggled, [item.group]: !open })}
+          aria-expanded={open}
+        >
+          <Icon name={item.icon} size={19} />
+          {item.group}
+          <Icon name="chevronRight" size={17} className="chev" />
+        </a>
+        {open && (
+          <ul className="sub-nav">
+            {item.children.map((c) => <li key={c.id}>{link(c)}</li>)}
+          </ul>
+        )}
+      </li>
+    );
   };
 
   return (
@@ -49,19 +89,10 @@ export default function Sidebar() {
         {items.map((item, i) =>
           item.section ? (
             <li className="sec" key={`sec-${item.section}`}>{item.section}</li>
+          ) : item.group ? (
+            group(item)
           ) : (
-            <li key={item.id || i}>
-              <a
-                className={currentView === item.id ? 'active' : ''}
-                onClick={() => navigate(item.id)}
-              >
-                <Icon name={item.icon} size={19} />
-                {item.label}
-                {item.badge && badges[item.badge] > 0 && (
-                  <span className="count">{badges[item.badge]}</span>
-                )}
-              </a>
-            </li>
+            <li key={item.id || i}>{link(item)}</li>
           ),
         )}
       </ul>

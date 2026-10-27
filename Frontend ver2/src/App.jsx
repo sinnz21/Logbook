@@ -9,7 +9,8 @@ import PatientRecords from './pages/PatientRecords';
 import SearchHistory from './pages/SearchHistory';
 import PriorityCases from './pages/PriorityCases';
 import StockSupplies from './pages/StockSupplies';
-import Reports from './pages/Reports';
+import { AnalyticsPage, ReportTablesPage, SupplyReportPage } from './pages/ReportPages';
+import FullLists from './pages/FullLists';
 import PatientProfile from './pages/PatientProfile';
 import MedicalCertificate from './pages/docs/MedicalCertificate';
 import ParentalNotification from './pages/docs/ParentalNotification';
@@ -31,7 +32,10 @@ const VIEWS = {
     'flag-cases': PriorityCases,
     'search-history': SearchHistory,
     stock: StockSupplies,
-    reports: Reports,
+    reports: AnalyticsPage,
+    'supply-report': SupplyReportPage,
+    'report-tables': ReportTablesPage,
+    'full-lists': FullLists,
     profile: PatientProfile,
     'medical-certificate': MedicalCertificate,
     'parental-notification': ParentalNotification,
@@ -40,7 +44,10 @@ const VIEWS = {
     dashboard: AdminDashboard,
     'stock-requests': StockRequests,
     users: UserManagement,
-    reports: Reports,
+    reports: AnalyticsPage,
+    'supply-report': SupplyReportPage,
+    'report-tables': ReportTablesPage,
+    'full-lists': FullLists,
     'audit-log': AuditLog,
     settings: Settings,
   },

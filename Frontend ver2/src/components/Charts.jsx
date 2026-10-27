@@ -95,7 +95,10 @@ function TipBubble({ x, y, text, width }) {
 
 /* ── Donut — "Top complaints" ─────────────────────────────────────────── */
 
-export function Donut({ slices, size = 172, thickness = 26, centerValue, centerLabel }) {
+/** With onSelect, every slice except the folded "Others" can be clicked. */
+const selectable = (onSelect, name) => Boolean(onSelect) && name !== 'Others';
+
+export function Donut({ slices, size = 172, thickness = 26, centerValue, centerLabel, onSelect }) {
   const r = (size - thickness) / 2;
   const c = size / 2;
   const circumference = 2 * Math.PI * r;
@@ -115,21 +118,28 @@ export function Donut({ slices, size = 172, thickness = 26, centerValue, centerL
     <div className="donut" style={{ width: size, height: size }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label="Breakdown">
         <circle cx={c} cy={c} r={r} fill="none" stroke="var(--line-soft)" strokeWidth={thickness} />
-        {arcs.map((s) => (
-          <circle
-            key={s.name}
-            cx={c}
-            cy={c}
-            r={r}
-            fill="none"
-            stroke={s.color}
-            strokeWidth={thickness}
-            strokeDasharray={`${s.dash} ${circumference - s.dash}`}
-            strokeDashoffset={-s.offset}
-            strokeLinecap="butt"
-            transform={`rotate(-90 ${c} ${c})`}
-          />
-        ))}
+        {arcs.map((s) => {
+          const clickable = selectable(onSelect, s.name);
+          return (
+            <circle
+              key={s.name}
+              className={clickable ? 'slice-link' : undefined}
+              onClick={clickable ? () => onSelect(s.name) : undefined}
+              cx={c}
+              cy={c}
+              r={r}
+              fill="none"
+              stroke={s.color}
+              strokeWidth={thickness}
+              strokeDasharray={`${s.dash} ${circumference - s.dash}`}
+              strokeDashoffset={-s.offset}
+              strokeLinecap="butt"
+              transform={`rotate(-90 ${c} ${c})`}
+            >
+              {clickable && <title>{`${s.name}: show patients`}</title>}
+            </circle>
+          );
+        })}
       </svg>
       {centerValue != null && (
         <div className="donut-center">
@@ -143,13 +153,14 @@ export function Donut({ slices, size = 172, thickness = 26, centerValue, centerL
 
 /* ── Vertical bars — "Visits per month", "Sign-in activity" ───────────── */
 
-export function BarChart({ bars, height = 230 }) {
+/** `dense` tightens the spacing for charts with many bars (e.g. one per hour). */
+export function BarChart({ bars, height = 230, dense = false }) {
   if (!bars.length) return <div className="sub">No data in this range.</div>;
   const max = Math.max(1, ...bars.map((b) => b.value));
   const peak = bars.reduce((best, b, i) => (b.value > bars[best].value ? i : best), 0);
 
   return (
-    <div className="bars" style={{ height }}>
+    <div className={`bars${dense ? ' dense' : ''}`} style={{ height }}>
       {bars.map((b, i) => (
         <div className={`bar-col${i === peak ? ' peak' : ''}`} key={b.label + i}>
           <span className="num">{b.value}</span>
@@ -194,20 +205,35 @@ export function HBars({ rows, showValue = (r) => <CountPct count={r.count} pct={
 
 /* ── Donut + legend with counts and shares ────────────────────────────── */
 
-export function DonutLegend({ rows, centerValue, centerLabel, size }) {
+export function DonutLegend({ rows, centerValue, centerLabel, size, onSelect }) {
   if (!rows.length) return <div className="sub">Nothing to show yet.</div>;
   const total = rows.reduce((sum, r) => sum + r.count, 0);
   return (
     <div className="donut-wrap">
-      <Donut slices={rows} size={size} centerValue={centerValue ?? total} centerLabel={centerLabel} />
+      <Donut slices={rows} size={size} centerValue={centerValue ?? total} centerLabel={centerLabel} onSelect={onSelect} />
       <div className="donut-legend">
-        {rows.map((r) => (
-          <div className="legend-row" key={r.name}>
-            <span className="sw" style={{ background: r.color }} />
-            <span className="name">{r.name}</span>
-            <span className="pct"><CountPct count={r.count} pct={r.pct} /></span>
-          </div>
-        ))}
+        {rows.map((r) => {
+          const inner = (
+            <>
+              <span className="sw" style={{ background: r.color }} />
+              <span className="name">{r.name}</span>
+              <span className="pct"><CountPct count={r.count} pct={r.pct} /></span>
+            </>
+          );
+          return selectable(onSelect, r.name) ? (
+            <button
+              type="button"
+              className="legend-row legend-link"
+              key={r.name}
+              title={`Show patients with ${r.name}`}
+              onClick={() => onSelect(r.name)}
+            >
+              {inner}
+            </button>
+          ) : (
+            <div className="legend-row" key={r.name}>{inner}</div>
+          );
+        })}
       </div>
     </div>
   );

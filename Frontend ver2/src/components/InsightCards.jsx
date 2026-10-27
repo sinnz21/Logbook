@@ -1,10 +1,11 @@
 /**
  * The Insights content as dashboard chart cards. Each card takes rows from
  * summarize() (lib/insights.js), shows the top few as a chart with counts and
- * percentages, and opens the complete ranking in the "View full list" modal.
+ * percentages, and links to the complete ranking on the Full lists page.
  */
 import { useApp } from '../context/useApp';
-import { rowsFrom, totalOf } from '../lib/insights';
+import { rowsFrom, totalOf, visitsWithComplaint } from '../lib/insights';
+import { openFullListTab } from '../lib/fullListTab';
 import { formatQty } from '../lib/format';
 import { BarChart, CountPct, DonutLegend, HBars } from './Charts';
 
@@ -12,13 +13,17 @@ import { BarChart, CountPct, DonutLegend, HBars } from './Charts';
 const topWithOthers = (rows, limit) =>
   rowsFrom(new Map(rows.map((r) => [r.name, r.count])), { limit, others: true });
 
-function FullListButton({ title, rows, nameLabel, countLabel, formatCount, limit }) {
-  const { openModal } = useApp();
+/** Opens Full lists on the matching tab ('complaints' | 'medicines' | 'departments'). */
+function FullListButton({ tab, rows, limit }) {
+  const { navigate } = useApp();
   if (rows.length <= limit) return null;
   return (
     <button
       className="btn btn-soft btn-sm no-print"
-      onClick={() => openModal('fullList', { title, rows, nameLabel, countLabel, formatCount })}
+      onClick={() => {
+        openFullListTab(tab);
+        navigate('full-lists');
+      }}
     >
       View full list ({rows.length})
     </button>
@@ -55,16 +60,26 @@ export function MonthlyVisitsCard({ perMonth, loading }) {
   );
 }
 
-export function ComplaintsCard({ rows, loading, title = 'Top complaints', limit = 5 }) {
+/**
+ * With `visits` (the same visits `rows` was counted from), each illness on the
+ * donut opens the list of patients who had it.
+ */
+export function ComplaintsCard({ rows, loading, title = 'Top complaints', limit = 5, visits, rangeLabel }) {
+  const { openModal } = useApp();
+  const onSelect = visits
+    ? (name) => openModal('complaintPatients', { complaint: name, visits: visitsWithComplaint(visits, name), rangeLabel })
+    : undefined;
   return (
     <ChartCard
       title={title}
-      sub={rows.length ? `${totalOf(rows)} complaint tags, ${rows.length} kinds` : 'Across the selected range'}
+      sub={rows.length
+        ? `${totalOf(rows)} complaint tags, ${rows.length} kinds${visits ? '. Click an illness to see the patients.' : ''}`
+        : 'Across the selected range'}
       loading={loading}
       empty={!rows.length && 'No complaints recorded in this range.'}
-      action={<FullListButton title="All complaints / illnesses" rows={rows} nameLabel="Complaint" countLabel="Visits" limit={limit} />}
+      action={<FullListButton tab="complaints" rows={rows} limit={limit} />}
     >
-      <DonutLegend rows={topWithOthers(rows, limit)} centerLabel="tags" />
+      <DonutLegend rows={topWithOthers(rows, limit)} centerLabel="tags" onSelect={onSelect} />
     </ChartCard>
   );
 }
@@ -77,9 +92,46 @@ export function MedicinesCard({ rows, loading, limit = 5 }) {
       sub={rows.length ? `${fmt(totalOf(rows))} units dispensed, ${rows.length} medicines` : 'Units dispensed in the range'}
       loading={loading}
       empty={!rows.length && 'Nothing dispensed in this range yet.'}
-      action={<FullListButton title="All medicines dispensed" rows={rows} nameLabel="Medicine" countLabel="Units" formatCount={fmt} limit={limit} />}
+      action={<FullListButton tab="medicines" rows={rows} limit={limit} />}
     >
       <HBars rows={rows.slice(0, limit)} showValue={(r) => <CountPct count={fmt(r.count)} pct={r.pct} unit="units" />} />
+    </ChartCard>
+  );
+}
+
+const pctOf = (n, total) => (total ? Math.round((n / total) * 1000) / 10 : 0);
+const peakOf = (bars) => bars.reduce((best, b) => (b.value > best.value ? b : best), bars[0]);
+
+/** Arrivals per clinic-time hour, from summarize().byHour. */
+export function BusiestHoursCard({ bars, loading }) {
+  const total = bars.reduce((sum, b) => sum + b.value, 0);
+  const peak = total ? peakOf(bars) : null;
+  return (
+    <ChartCard
+      title="Busiest hours"
+      sub={peak ? `Arrivals by hour. Peak: ${peak.label}, ${peak.value} of ${total} visits (${pctOf(peak.value, total)}%)` : 'Arrivals by hour'}
+      loading={loading}
+      empty={!total && 'No visits in this range.'}
+    >
+      <BarChart bars={bars} height={200} dense />
+    </ChartCard>
+  );
+}
+
+const DAY_NAMES = { Mon: 'Monday', Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday', Fri: 'Friday', Sat: 'Saturday', Sun: 'Sunday' };
+
+/** Visits per day of the week, from summarize().byWeekday. */
+export function WeekdayCard({ bars, loading }) {
+  const total = bars.reduce((sum, b) => sum + b.value, 0);
+  const peak = total ? peakOf(bars) : null;
+  return (
+    <ChartCard
+      title="Visits by day of the week"
+      sub={peak ? `${total} visits. Busiest: ${DAY_NAMES[peak.label] || peak.label}, ${peak.value} (${pctOf(peak.value, total)}%)` : 'Monday to Sunday'}
+      loading={loading}
+      empty={!total && 'No visits in this range.'}
+    >
+      <BarChart bars={bars} />
     </ChartCard>
   );
 }
@@ -107,7 +159,7 @@ export function DepartmentsCard({ rows, loading, limit = 5 }) {
       sub="Visits and share of the total"
       loading={loading}
       empty={!rows.length && 'No department data in this range.'}
-      action={<FullListButton title="All departments" rows={rows} nameLabel="Department or college" countLabel="Visits" limit={limit} />}
+      action={<FullListButton tab="departments" rows={rows} limit={limit} />}
     >
       <HBars rows={rows.slice(0, limit)} />
     </ChartCard>

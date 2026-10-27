@@ -8,7 +8,7 @@ import PasswordRules from '../components/PasswordRules';
 import { meetsPasswordRules } from '../lib/password';
 
 const CODE_LENGTH = 6;
-const RESEND_AFTER_S = 30;
+const RESEND_AFTER_S = 60;
 
 const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
@@ -55,6 +55,10 @@ function ForgotPassword({ onBack }) {
   const [demoCode, setDemoCode] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  // Set when the server cancels the code after too many wrong tries (429).
+  const [codeCancelled, setCodeCancelled] = useState(false);
+  // Bumped after a wrong code, so the boxes remount empty with the first one focused.
+  const [otpKey, setOtpKey] = useState(0);
 
   const secondsLeft = useCountdown(expiresAt, codeSeconds);
   const sinceSent = useCountdown(sentAt ? sentAt + RESEND_AFTER_S * 1000 : null, RESEND_AFTER_S);
@@ -80,14 +84,34 @@ function ForgotPassword({ onBack }) {
     setSentAt(Date.now());
     setDemoCode(res?.demoCode || null); // only demo mode sends this back
     setCode('');
+    setCodeCancelled(false);
     setStep('code');
   });
 
-  const checkCode = () => run(async () => {
-    const res = await verifyResetCode(email.trim(), code);
-    setResetToken(res.resetToken);
-    setStep('password');
-  });
+  const checkCode = async (value = code) => {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await verifyResetCode(email.trim(), value);
+      setResetToken(res.resetToken);
+      setStep('password');
+    } catch (e) {
+      // Wrong code: empty the boxes for another try and show the server's
+      // message ("N attempts left"). A 429 means the code was cancelled.
+      setCode('');
+      setOtpKey((k) => k + 1);
+      if (e.status === 429) setCodeCancelled(true);
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Typing or pasting the last digit checks the code straight away.
+  const changeCode = (value) => {
+    setCode(value);
+    if (value.length === CODE_LENGTH && !busy && !expired && !codeCancelled) checkCode(value);
+  };
 
   // The live checklist under the boxes shows which rule is still missing.
   const passwordProblem = !meetsPasswordRules(password) || confirm !== password;
@@ -101,7 +125,7 @@ function ForgotPassword({ onBack }) {
     e.preventDefault();
     if (busy) return;
     if (step === 'email' && email.trim()) sendCode();
-    else if (step === 'code' && code.length === CODE_LENGTH && !expired) checkCode();
+    else if (step === 'code' && code.length === CODE_LENGTH && !expired && !codeCancelled) checkCode();
     else if (step === 'password' && !passwordProblem && confirm) savePassword();
   };
 
@@ -145,17 +169,33 @@ function ForgotPassword({ onBack }) {
           {demoCode && (
             <div className="demo-hint">Demo mode: no email is sent. Your code is <strong>{demoCode}</strong>.</div>
           )}
-          <OtpInput length={CODE_LENGTH} value={code} onChange={setCode} disabled={busy || expired} invalid={Boolean(error)} autoFocus />
-          <div className={`code-timer${expired ? ' expired' : secondsLeft <= 60 ? ' soon' : ''}`}>
+          <OtpInput
+            key={otpKey}
+            length={CODE_LENGTH}
+            value={code}
+            onChange={changeCode}
+            disabled={busy || expired || codeCancelled}
+            invalid={Boolean(error)}
+            autoFocus
+          />
+          <div className={`code-timer${expired || codeCancelled ? ' expired' : secondsLeft <= 60 ? ' soon' : ''}`}>
             <Icon name="clock" size={16} />
-            {expired ? 'This code has expired. Send a new one.' : <>Code expires in <strong>{mmss(secondsLeft)}</strong></>}
+            {codeCancelled
+              ? 'This code was cancelled. Send a new one.'
+              : expired ? 'This code has expired. Send a new one.' : <>Code expires in <strong>{mmss(secondsLeft)}</strong></>}
           </div>
           {error && <div className="login-error">{error}</div>}
-          <button className="go" type="submit" disabled={busy || expired || code.length !== CODE_LENGTH}>
+          <button className="go" type="submit" disabled={busy || expired || codeCancelled || code.length !== CODE_LENGTH}>
             {busy ? 'Checking…' : 'Verify code'}
           </button>
-          <button type="button" className="login-forgot center" onClick={sendCode} disabled={busy || (!expired && sinceSent > 0)}>
-            {!expired && sinceSent > 0 ? `Resend code in ${sinceSent}s` : 'Resend code'}
+          <div className="login-hint center">The code is checked automatically once all {CODE_LENGTH} digits are in.</div>
+          <button
+            type="button"
+            className="login-forgot center"
+            onClick={sendCode}
+            disabled={busy || (!expired && !codeCancelled && sinceSent > 0)}
+          >
+            {!expired && !codeCancelled && sinceSent > 0 ? `Resend code in ${mmss(sinceSent)}` : 'Resend code'}
           </button>
         </>
       )}
