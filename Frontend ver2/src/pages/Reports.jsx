@@ -2,19 +2,22 @@ import { useMemo, useState } from 'react';
 import { useAsync } from '../hooks/useAsync';
 import { useVisitsInRange } from '../hooks/useVisits';
 import { getPatterns } from '../api/insights';
+import { getOutbreakAlerts, getOutbreakTrend } from '../api/surveillance';
+import { SECTION_INFO } from '../config/reportSections';
 import { addDays, clinicDay, formatDate } from '../lib/time';
 import { summarize } from '../lib/insights';
-import { formatQty } from '../lib/format';
 import { downloadCsv, toCsv } from '../lib/csv';
 import {
   BusiestHoursCard, ClientBreakdownCard, ComplaintsCard, DepartmentsCard, DispositionsCard, MedicinesCard,
   MonthlyVisitsCard, PairingsCard, StaffAgesCard, StudentDemographicsCard, WeekdayCard,
 } from '../components/InsightCards';
+import { OutbreakTableCard, OutbreakWatchCard } from '../components/OutbreakWatch';
 import Icon from '../components/Icon';
 
 const MONTH_LONG = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'long', year: 'numeric' });
 
 const PRESETS = {
+  today: { label: 'Today', days: 0 },
   '7d': { label: 'Past 7 days', days: 6 },
   '30d': { label: 'Past 30 days', days: 29 },
   semester: { label: 'Semester', days: 179 },
@@ -87,10 +90,13 @@ function ReportTable({ title, sub, rows, columns, filename }) {
 }
 
 /**
- * The Reports sub-pages that work from visit records: mode 'charts' is
- * Reports / Analytics, mode 'table' is Reports / Report tables (see ReportPages.jsx).
+ * One Reports page: mode 'charts' is a Reports / Analytics page, mode 'table'
+ * a Reports / Tables page, and `section` picks the chart or table (see
+ * config/reportSections.js and config/reportViews.jsx).
  */
-export default function Reports({ mode = 'charts' }) {
+export default function Reports({ mode = 'charts', section }) {
+  const info = SECTION_INFO[mode][section] || { label: 'Reports' };
+  const isOutbreak = section === 'outbreak';
   const [today] = useState(() => clinicDay(new Date()));
   const [preset, setPreset] = useState('semester');
   const [committed, setCommitted] = useState(() => ({ from: addDays(clinicDay(new Date()), -179), to: clinicDay(new Date()) }));
@@ -104,7 +110,16 @@ export default function Reports({ mode = 'charts' }) {
     setDraft(next);
   };
 
-  const patterns = useAsync(() => getPatterns({ dateFrom: committed.from, dateTo: committed.to }), [committed.from, committed.to]);
+  const patterns = useAsync(
+    () => (section === 'pairings' ? getPatterns({ dateFrom: committed.from, dateTo: committed.to }) : Promise.resolve(null)),
+    [section, committed.from, committed.to],
+  );
+  // Outbreak watch always covers the last 8 weeks, whatever the range above says.
+  const trend = useAsync(() => (isOutbreak ? getOutbreakTrend(8) : Promise.resolve(null)), [isOutbreak]);
+  const alerts = useAsync(
+    () => (isOutbreak && mode === 'charts' ? getOutbreakAlerts() : Promise.resolve(null)),
+    [isOutbreak, mode],
+  );
   const source = useVisitsInRange(committed.from, committed.to);
 
   const visits = useMemo(() => source.visits.filter((v) => {
@@ -135,12 +150,92 @@ export default function Reports({ mode = 'charts' }) {
   const sumCount = (fmt = (n) => n) => (rows) => fmt(rows.reduce((sum, r) => sum + r.count, 0));
   const withTotal = (cols, fmt) => cols.map((c, i) => (i === 2 ? { ...c, total: sumCount(fmt) } : i === 3 ? { ...c, total: () => '100%' } : c));
 
+  // Reports / Analytics: exactly one card for the section.
+  const chart = () => {
+    switch (section) {
+      case 'months': return <MonthlyVisitsCard perMonth={s.perMonth} loading={loading} />;
+      case 'weekday': return <WeekdayCard bars={s.byWeekday} loading={loading} />;
+      case 'hours': return <BusiestHoursCard bars={s.byHour} loading={loading} />;
+      case 'outcomes': return <DispositionsCard rows={s.dispositions} loading={loading} />;
+      case 'complaints':
+        return (
+          <ComplaintsCard title="Frequent complaints" limit={10} rows={s.complaints} loading={loading}
+            visits={visits} range={committed} rangeLabel={rangeLabel} />
+        );
+      case 'medicines': return <MedicinesCard rows={s.medicines} loading={loading} limit={10} />;
+      case 'pairings': return <PairingsCard patterns={patterns.data} loading={patterns.loading} error={patterns.error} />;
+      case 'clients': return <ClientBreakdownCard rows={s.clients} loading={loading} />;
+      case 'departments': return <DepartmentsCard rows={s.departments} loading={loading} limit={10} />;
+      case 'students': return <StudentDemographicsCard years={s.studentYears} sex={s.studentSex} loading={loading} />;
+      case 'staffAges': return <StaffAgesCard rows={s.staffAges} loading={loading} />;
+      case 'outbreak':
+        return <OutbreakWatchCard trend={trend.data} alerts={alerts.data} loading={trend.loading} error={trend.error} />;
+      default: return null;
+    }
+  };
+
+  // Reports / Tables: exactly one table for the section.
+  const table = () => {
+    if (isOutbreak) return <OutbreakTableCard trend={trend.data} loading={trend.loading} error={trend.error} />;
+    if (loading || (section === 'pairings' && patterns.loading)) return <div className="card"><div className="sub">Loading…</div></div>;
+    switch (section) {
+      case 'months':
+        return (
+          <ReportTable title="Visits per month" rows={monthRows} filename={`visits-per-month_${suffix}`}
+            columns={withTotal(rankColumns('Month'))} />
+        );
+      case 'outcomes':
+        return (
+          <ReportTable title="Visit outcomes" rows={s.dispositions} filename={`visit-outcomes_${suffix}`}
+            columns={withTotal(rankColumns('Disposition'))} />
+        );
+      case 'pairings':
+        return (
+          <ReportTable
+            title="Common treatment pairings"
+            sub={patterns.error || undefined}
+            rows={(patterns.data || []).map((p) => ({ ...p, name: `${p.trigger} → ${p.associatedWith}` }))}
+            filename={`treatment-pairings_${suffix}`}
+            columns={[
+              { header: 'Complaint', value: (r) => r.trigger, className: 'nm' },
+              { header: 'Commonly receives', value: (r) => r.associatedWith },
+              { header: 'Match rate', value: (r) => `${Math.round(r.matchRate * 100)}%`, csv: (r) => Math.round(r.matchRate * 100), csvHeader: 'Match rate (%)', num: true },
+              { header: 'Visits', value: (r) => r.support, num: true },
+            ]}
+          />
+        );
+      case 'clients':
+        return (
+          <ReportTable title="Client breakdown" rows={s.clients} filename={`client-breakdown_${suffix}`}
+            columns={withTotal(rankColumns('Client type'))} />
+        );
+      case 'studentYears':
+        return (
+          <ReportTable title="Students by year level" rows={s.studentYears} filename={`student-years_${suffix}`}
+            columns={withTotal(rankColumns('Year level'))} />
+        );
+      case 'studentGender':
+        return (
+          <ReportTable title="Students by gender" rows={s.studentSex} filename={`student-gender_${suffix}`}
+            columns={withTotal(rankColumns('Gender'))} />
+        );
+      case 'staffAges':
+        return (
+          <ReportTable title="Faculty & staff by age" rows={s.staffAges} filename={`staff-ages_${suffix}`}
+            columns={withTotal(rankColumns('Age group'))} />
+        );
+      default: return null;
+    }
+  };
+
+  const sub = mode === 'table' ? 'Rows and columns with CSV export' : info.sub;
+
   return (
     <div className="view active">
       <div className="page-head">
         <div>
-          <h1>{mode === 'table' ? 'Report tables' : 'Analytics'}</h1>
-          <div className="sub">Clinic trends from the visit records, {s.total} visits in this range</div>
+          <h1>{info.label}</h1>
+          <div className="sub">{sub}{isOutbreak ? '' : `, ${s.total} visits in this range`}</div>
         </div>
         <div className="head-actions no-print">
           <button className="btn btn-ghost" onClick={() => window.print()}>
@@ -183,66 +278,16 @@ export default function Reports({ mode = 'charts' }) {
         </div>
       </div>
 
-      {source.error && <div className="login-error" style={{ marginBottom: 14 }}>{source.error}</div>}
+      {source.error && !isOutbreak && <div className="login-error" style={{ marginBottom: 14 }}>{source.error}</div>}
 
-      {mode === 'charts' ? (
-        <>
-          {/* chart-flow packs the cards into columns so a short card never leaves a gap. */}
-          <div className="chart-flow">
-            <MonthlyVisitsCard perMonth={s.perMonth} loading={loading} />
-            <BusiestHoursCard bars={s.byHour} loading={loading} />
-            <WeekdayCard bars={s.byWeekday} loading={loading} />
-            <ComplaintsCard title="Frequent complaints" rows={s.complaints} loading={loading} visits={visits} rangeLabel={rangeLabel} />
-            <MedicinesCard rows={s.medicines} loading={loading} />
-            <PairingsCard patterns={patterns.data} loading={patterns.loading} error={patterns.error} />
-            <ClientBreakdownCard rows={s.clients} loading={loading} />
-            <DispositionsCard rows={s.dispositions} loading={loading} />
-            <StaffAgesCard rows={s.staffAges} loading={loading} />
-            <DepartmentsCard rows={s.departments} loading={loading} />
-            <StudentDemographicsCard years={s.studentYears} sex={s.studentSex} loading={loading} />
-          </div>
-        </>
-      ) : loading ? (
-        <div className="card"><div className="sub">Loading…</div></div>
-      ) : (
-        <>
-          <div className="chart-row even">
-            <ReportTable title="Visits per month" rows={monthRows} filename={`visits-per-month_${suffix}`}
-              columns={withTotal(rankColumns('Month'))} />
-            <ReportTable title="Client breakdown" rows={s.clients} filename={`client-breakdown_${suffix}`}
-              columns={withTotal(rankColumns('Client type'))} />
-          </div>
-          <ReportTable title="Complaints / illnesses" sub="A visit can carry more than one complaint tag" rows={s.complaints}
-            filename={`complaints_${suffix}`} columns={withTotal(rankColumns('Complaint', 'Tags'))} />
-          <ReportTable title="Medicines dispensed" rows={s.medicines} filename={`medicines_${suffix}`}
-            columns={withTotal(rankColumns('Medicine', 'Units', formatQty), formatQty)} />
-          <ReportTable title="Departments" rows={s.departments} filename={`departments_${suffix}`}
-            columns={[...withTotal(rankColumns('Department or college')), { header: 'Most common complaint', value: (r) => r.topComplaint }]} />
-          <div className="chart-row even">
-            <ReportTable title="Visit outcomes" rows={s.dispositions} filename={`visit-outcomes_${suffix}`}
-              columns={withTotal(rankColumns('Disposition'))} />
-            <ReportTable title="Faculty and staff by age" rows={s.staffAges} filename={`staff-ages_${suffix}`}
-              columns={withTotal(rankColumns('Age group'))} />
-          </div>
-          <div className="chart-row even">
-            <ReportTable title="Students by year level" rows={s.studentYears} filename={`student-years_${suffix}`}
-              columns={withTotal(rankColumns('Year level'))} />
-            <ReportTable title="Students by gender" rows={s.studentSex} filename={`student-gender_${suffix}`}
-              columns={withTotal(rankColumns('Gender'))} />
-          </div>
-          <ReportTable
-            title="Common treatment pairings"
-            rows={(patterns.data || []).map((p) => ({ ...p, name: `${p.trigger} → ${p.associatedWith}` }))}
-            filename={`treatment-pairings_${suffix}`}
-            columns={[
-              { header: 'Complaint', value: (r) => r.trigger, className: 'nm' },
-              { header: 'Commonly receives', value: (r) => r.associatedWith },
-              { header: 'Match rate', value: (r) => `${Math.round(r.matchRate * 100)}%`, csv: (r) => Math.round(r.matchRate * 100), csvHeader: 'Match rate (%)', num: true },
-              { header: 'Visits', value: (r) => r.support, num: true },
-            ]}
-          />
-        </>
+      {isOutbreak && (
+        <div className="info-note">
+          <Icon name="alert" size={18} />
+          <span>Outbreak watch always shows the last 8 weeks, so the date range and filters above don&rsquo;t change it.</span>
+        </div>
       )}
+
+      {mode === 'charts' ? chart() : table()}
     </div>
   );
 }

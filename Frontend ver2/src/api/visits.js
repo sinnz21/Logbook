@@ -8,7 +8,7 @@ const MAX_PER_PAGE = 200; // backend limit (le=200)
  *
  * Only page/per_page/status/sort_by/order exist on the backend today. The
  * other filters (search, sex, year_level, program, department, patient_id,
- * date_from, date_to) are specified in BACKEND_REQUIREMENTS.md — until they
+ * date_from, date_to, complaint, medicine, referred) are specified in BACKEND_REQUIREMENTS.md — until they
  * ship, FastAPI ignores unknown query params, so callers also filter the
  * returned rows client-side.
  */
@@ -22,6 +22,9 @@ export function listVisits({
   yearLevel,
   program,
   department,
+  complaint,
+  medicine,
+  referred,
   dateFrom,
   dateTo,
   sortBy = 'started_at',
@@ -38,6 +41,9 @@ export function listVisits({
       year_level: yearLevel,
       program,
       department,
+      complaint,
+      medicine,
+      referred,
       date_from: dateFrom,
       date_to: dateTo,
       sort_by: sortBy,

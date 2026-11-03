@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../context/useApp';
 import { useAsync } from '../hooks/useAsync';
 import { listStock, listStockRequests, receiveStockRequest } from '../api/stock';
@@ -6,6 +6,7 @@ import Pagination from '../components/Pagination';
 import Icon from '../components/Icon';
 import { formatDate, parseApiDate } from '../lib/time';
 import { formatQty, STOCK_STATUS } from '../lib/format';
+import { clearStockSearch, peekStockSearch } from '../lib/stockFilter';
 
 const dash = (v) => v || '—';
 const requestDate = (r) => r.requestDate || r.requestedAt || r.createdAt || null;
@@ -26,7 +27,8 @@ export default function StockSupplies() {
   const stock = useAsync(() => listStock({ perPage: 200 }), []);
   const requests = useAsync(() => listStockRequests({ perPage: 100 }), []);
 
-  const [filters, setFilters] = useState({ search: '', kind: '', category: '', status: '', expiry: '' });
+  // Clicking a medicine on a chart opens this page searched to it (lib/stockFilter.js).
+  const [filters, setFilters] = useState(() => ({ search: peekStockSearch(), kind: '', category: '', status: '', expiry: '' }));
   const [tab, setTab] = useState('all');
   const [sort, setSort] = useState('name-asc');
   const [committed, setCommitted] = useState({ dateFrom: '', dateTo: '' });
@@ -34,6 +36,9 @@ export default function StockSupplies() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(50);
   const [receiving, setReceiving] = useState(null);
+
+  // Read once: opening Stock from the sidebar later shows the full list again.
+  useEffect(() => clearStockSearch(), []);
 
   const items = useMemo(() => stock.data?.items || [], [stock.data]);
   const categories = useMemo(() => [...new Set(items.map((i) => i.categoryName).filter(Boolean))].sort(), [items]);

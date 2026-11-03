@@ -360,6 +360,96 @@ export const patterns = [
   { trigger: 'Viral Flu', associatedWith: 'rest and hydration', matchRate: 0.61, support: 41 },
 ];
 
+// ───────────────────────────── health surveillance ─────────────────────────────
+// Twelve weeks of the watched illnesses, ending with the week that contains
+// today, so the Outbreak watch charts and the dashboard banner always have data.
+// Viral Flu is alerting this week; Stomach Pain had an alert three weeks ago.
+
+const SURVEILLANCE_WEEKS = 12;
+const todayIndex = (new Date(`${TODAY}T00:00:00Z`).getUTCDay() + 6) % 7; // Mon = 0
+const THIS_MONDAY = addDays(TODAY, -todayIndex);
+const surveillanceWeeks = Array.from({ length: SURVEILLANCE_WEEKS }, (_, i) => addDays(THIS_MONDAY, -7 * (SURVEILLANCE_WEEKS - 1 - i)));
+
+const WATCHED = [
+  {
+    complaint: 'Viral Flu',
+    cases: [2, 3, 4, 3, 3, 4, 2, 5, 4, 3, 6, 14],
+    expected: [3.1, 3.0, 3.3, 3.2, 3.2, 3.4, 3.1, 3.6, 3.5, 3.3, 3.6, 3.5],
+    alerts: [11],
+  },
+  {
+    complaint: 'Cough / Colds',
+    cases: [3, 4, 5, 4, 4, 5, 3, 4, 6, 4, 5, 6],
+    expected: [3.9, 4.0, 4.1, 4.0, 4.1, 4.0, 4.3, 4.2, 4.4, 4.3, 4.5, 4.4],
+    alerts: [],
+  },
+  {
+    complaint: 'Fever',
+    cases: [2, 3, 2, 3, 2, 3, 2, 2, 3, 1, 3, 4],
+    expected: [2.3, 2.4, 2.4, 2.5, 2.4, 2.5, 2.3, 2.6, 2.5, 2.4, 2.6, 2.5],
+    alerts: [],
+  },
+  {
+    complaint: 'Stomach Pain',
+    cases: [2, 2, 1, 2, 2, 1, 3, 2, 8, 3, 2, 2],
+    expected: [2.0, 2.1, 2.0, 2.0, 2.0, 2.1, 2.0, 2.2, 2.1, 2.0, 2.2, 2.1],
+    alerts: [8],
+  },
+  {
+    complaint: 'Allergic Reaction',
+    cases: [1, 1, 2, 1, 1, 2, 1, 1, 2, 2, 1, 2],
+    expected: [1.3, 1.4, 1.4, 1.4, 1.4, 1.5, 1.4, 1.6, 1.5, 1.4, 1.6, 1.5],
+    alerts: [],
+  },
+];
+
+/** GET /surveillance/trend?weeks=N — the last N weeks, oldest first. */
+export function surveillanceTrend(weeks = 8) {
+  const n = Math.min(Math.max(Number(weeks) || 8, 1), SURVEILLANCE_WEEKS);
+  const from = SURVEILLANCE_WEEKS - n;
+  return {
+    weeks: surveillanceWeeks.slice(from),
+    currentWeekProgress: (todayIndex + 1) / 7,
+    complaints: WATCHED.map((w) => ({
+      complaint: w.complaint,
+      points: surveillanceWeeks.slice(from).map((weekStart, j) => ({
+        weekStart,
+        cases: w.cases[from + j],
+        expected: w.expected[from + j],
+        alert: w.alerts.includes(from + j),
+      })),
+    })),
+  };
+}
+
+/** GET /surveillance/alerts — this week's possible outbreaks, plus cases per college. */
+export function surveillanceAlerts() {
+  return {
+    week: THIS_MONDAY,
+    alerts: [
+      {
+        college: 'CCSICT',
+        complaint: 'Viral Flu',
+        cases: 7,
+        timesNormal: 4.1,
+        previousWeekCases: 2,
+        test: 'poisson',
+        headline: 'Possible outbreak: Viral Flu in CCSICT',
+        detail: '7 cases this week, about 4× the normal rate',
+        message: 'Possible outbreak: Viral Flu in CCSICT. 7 cases this week, about 4× the normal rate for this time of year (2 last week).',
+      },
+    ],
+    colleges: [
+      { college: 'CCSICT', cases: 11, expected: 3.4 },
+      { college: 'College of Education', cases: 5, expected: 3.1 },
+      { college: 'College of Nursing', cases: 4, expected: 2.8 },
+      { college: 'College of Agriculture', cases: 4, expected: 3.0 },
+      { college: 'College of Engineering', cases: 3, expected: 2.6 },
+      { college: 'College of Criminology', cases: 1, expected: 1.4 },
+    ],
+  };
+}
+
 // ───────────────────────────── audit log ─────────────────────────────
 // Sixty days of account activity: a sign-in per staff member per clinic day,
 // a "visit added" entry for every visit, plus the edits, deletions, failed

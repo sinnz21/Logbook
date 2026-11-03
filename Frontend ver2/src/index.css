@@ -416,7 +416,7 @@ tr.rowlink:hover{background:var(--teal-softer);}
 .alert-banner.warn .ic-wrap{background:#f8e5c9;color:var(--amber);}
 .alert-banner.warn .go{border:1px solid var(--amber-line);color:var(--amber);}
 
-.info-note{background:var(--teal-soft);border-radius:var(--r-md);padding:12px 15px;font-size:16px;color:var(--teal-dark);display:flex;align-items:flex-start;gap:10px;}
+.info-note{display:flex;align-items:center;gap:10px;background:var(--teal-softer);color:var(--teal);border:1px solid var(--teal-soft);border-radius:12px;padding:11px 16px;margin-bottom:14px;font-size:16px;}
 .warn-note{background:var(--amber-bg);border-radius:var(--r-md);padding:12px 15px;font-size:16px;color:var(--amber);}
 .danger-note{background:var(--red-bg);border-radius:var(--r-md);padding:12px 15px;font-size:16px;color:var(--red);display:flex;align-items:flex-start;gap:9px;font-weight:600;}
 .ok-note{background:var(--green-bg);border-radius:var(--r-md);padding:12px 15px;font-size:16px;color:var(--green);font-weight:600;margin-bottom:14px;}
@@ -762,14 +762,6 @@ tfoot td{font-weight:700;color:var(--head);border-top:2px solid var(--card-line)
 .pw-rules .pw-example strong{color:var(--ink);font-family:ui-monospace,Consolas,monospace;}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
 
-/* Quick links under the dashboard KPI row */
-.quick-links{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 14px;}
-.quick-links-label{font-size:14px;font-weight:600;color:var(--muted);margin-right:4px;}
-
-/* Full lists: tab menu */
-.tabs-menu{margin:0 0 14px;flex-wrap:wrap;}
-.tabs-menu button{font-size:16px;padding:9px 16px;}
-
 /* Sidebar groups (Reports) with indented sub-menus */
 .nav .group-head .chev{margin-left:auto;color:var(--muted);transition:transform .15s;}
 .nav .group-head.open .chev{transform:rotate(90deg);}
@@ -777,6 +769,10 @@ tfoot td{font-weight:700;color:var(--head);border-top:2px solid var(--card-line)
 .sub-nav{list-style:none;margin:2px 0 4px;padding:0 0 0 30px;}
 .sub-nav li{margin-bottom:2px;}
 .nav .sub-nav a{font-size:16px;}
+/* Sub-menus inside sub-menus (Reports → Analytics / Tables) */
+.sub-nav .sub-nav{padding-left:12px;margin-left:10px;border-left:2px solid var(--teal-soft);}
+.nav .sub-nav .group-head.nested{font-weight:600;}
+.nav .sub-nav .sub-nav a{font-size:15.5px;padding-top:7px;padding-bottom:7px;}
 
 /* Forgot password: auto-submit hint */
 .login-hint.center{text-align:center;}
@@ -804,3 +800,55 @@ button.legend-link:focus-visible{outline:2px solid var(--teal);outline-offset:1p
 .bars.dense .bar-col .lbl{font-size:13px;white-space:nowrap;}
 
 .link-btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:4px;}
+
+/* Clickable bars: a medicine opens Stock & supplies */
+.hbar.hbar-link{
+  display:block;width:100%;background:none;border:0;padding:4px 6px;margin:-4px -6px;border-radius:8px;
+  font:inherit;color:inherit;text-align:left;cursor:pointer;box-sizing:content-box;
+}
+.hbar.hbar-link:hover{background:var(--teal-softer);}
+.hbar.hbar-link:hover .name{color:var(--teal);text-decoration:underline;}
+.hbar.hbar-link:focus-visible{outline:2px solid var(--teal);}
+
+/* Patient records: filters set from the dashboard, as removable chips */
+.active-filters{align-items:center;gap:8px;flex-wrap:wrap;}
+.filter-chip{
+  display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--teal);background:var(--teal-soft);
+  color:var(--teal-dark);border-radius:var(--r-pill);padding:5px 12px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;
+}
+.filter-chip:hover{background:var(--teal-softer);}
+
+/* Outbreak watch (Reports → Analytics / Tables) */
+.ow-legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--muted);}
+.ow-key{display:inline-flex;align-items:center;gap:7px;}
+.ow-grid-charts{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;}
+.ow-chart{border:1px solid var(--line);border-radius:12px;padding:12px 14px 6px;min-width:0;}
+.ow-chart.alert{border-color:var(--red-line);background:#fffafa;}
+.ow-chart-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.ow-chart-head h4{margin:0;font-size:16px;font-weight:700;color:var(--head);}
+.ow-now{font-size:14px;color:var(--muted);margin:4px 0 6px;}
+.ow-chart.alert .ow-now{color:var(--red);font-weight:600;}
+.ow-chart svg{display:block;width:100%;height:auto;overflow:visible;}
+.ow-cases{fill:none;stroke:var(--teal);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;}
+.ow-normal{fill:none;stroke:#8a9a96;stroke-width:1.5;stroke-dasharray:4 4;}
+.ow-dot{fill:var(--teal);}
+.ow-dot.alert{fill:var(--red);}
+.ow-axis{font-size:11px;fill:var(--muted);font-family:var(--font);}
+.ow-val{font-size:11px;font-weight:700;fill:var(--head);font-family:var(--font);}
+.ow-val.alert{fill:var(--red);}
+.ow-colleges{margin-top:20px;}
+.ow-colleges h4{margin:0 0 8px;font-size:16px;font-weight:700;color:var(--head);}
+.ow-colleges h4 .sub{font-weight:400;}
+.ow-college{display:grid;grid-template-columns:minmax(120px,190px) 1fr auto;gap:12px;align-items:center;padding:6px 0;font-size:16px;}
+.ow-name{display:inline-flex;align-items:center;gap:6px;min-width:0;}
+.ow-track{position:relative;display:block;height:10px;background:#e7eeec;border-radius:var(--r-pill);}
+.ow-fill{position:absolute;left:0;top:0;bottom:0;background:#3ea892;border-radius:var(--r-pill);}
+.ow-tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:#4b5b57;}
+.ow-count{font-size:14px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;}
+.ow-college.alert .ow-name,.ow-college.alert .ow-count{color:var(--red);font-weight:700;}
+.ow-college.alert .ow-fill{background:var(--red);}
+.ow-flag{letter-spacing:.04em;}
+td.ow-alert-cell{color:var(--red);font-weight:700;}
+@media(max-width:720px){
+  .ow-college{grid-template-columns:1fr;gap:6px;}
+}

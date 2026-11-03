@@ -97,6 +97,8 @@ function patientOut(p) {
   return { ...p, visitCount: db.visits.filter((v) => v.patientId === p.patientId).length };
 }
 
+const REFERRED = new Set(['Hospital Admission', 'Referred to Doctor']);
+
 function matchesVisit(v, q) {
   const search = (q.search || '').trim().toLowerCase();
   if (search && ![v.patientName, v.patientNumber, v.chiefComplaint, ...(v.complaints || [])]
@@ -107,6 +109,9 @@ function matchesVisit(v, q) {
   if (q.year_level && v.yearLevel !== q.year_level) return false;
   if (q.program && v.program !== q.program) return false;
   if (q.department && v.department !== q.department) return false;
+  if (q.complaint && !(v.complaints?.length ? v.complaints : [v.chiefComplaint]).includes(q.complaint)) return false;
+  if (q.medicine && !(v.medicines || []).some((m) => m.medicineName === q.medicine)) return false;
+  if (q.referred && !REFERRED.has(v.dispositionName)) return false;
   const day = v.startedAt.slice(0, 10);
   // startedAt is UTC; the clinic day is +8, so compare on the local calendar day.
   const localDay = seed.clinicDay(new Date(`${v.startedAt}Z`));
@@ -253,6 +258,10 @@ const routes = [
   ['PATCH', /^\/settings$/, (_m, _q, body) => Object.assign(db.settings, body)],
 
   ['GET', /^\/insights\/patterns$/, () => seed.patterns],
+
+  // ── health surveillance ──
+  ['GET', /^\/surveillance\/alerts$/, () => seed.surveillanceAlerts()],
+  ['GET', /^\/surveillance\/trend$/, (_m, q) => seed.surveillanceTrend(q.weeks)],
 
   // ── visits ──
   ['GET', /^\/visits$/, (_m, q) => {

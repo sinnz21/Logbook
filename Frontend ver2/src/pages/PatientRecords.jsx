@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../context/useApp';
 import { useAsync } from '../hooks/useAsync';
+import { useLookups } from '../hooks/useLookups';
 import { useVisitsInRange } from '../hooks/useVisits';
 import { deleteVisit, listAllVisits, listVisits } from '../api/visits';
+import { REFERRAL_DISPOSITIONS } from '../api/lookups';
 import Pagination from '../components/Pagination';
 import Icon from '../components/Icon';
 import {
@@ -12,8 +14,12 @@ import {
   dispensedSummary, isOpenVisit, SPECIAL_CASE_CLASS, specialCaseCategory, VISIT_STATUS, vitalsSummary,
 } from '../lib/format';
 import { downloadCsv, toCsv } from '../lib/csv';
+import { clearRecordsFilter, peekRecordsFilter } from '../lib/recordsFilter';
 
 const YEAR_LEVELS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'];
+const DEFAULT_FILTERS = {
+  search: '', sex: '', yearLevel: '', program: '', department: '', complaint: '', medicine: '', referred: '', dateFrom: '', dateTo: '',
+};
 const dash = (v) => v || '—';
 const shortStamp = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 const stamp = (iso) => (iso ? shortStamp.format(parseApiDate(iso)) : '—');
@@ -37,6 +43,9 @@ function matches(v, f) {
   if (f.yearLevel && v.yearLevel !== f.yearLevel) return false;
   if (f.program && v.program !== f.program) return false;
   if (f.department && v.department !== f.department) return false;
+  if (f.complaint && !(v.complaints?.length ? v.complaints : [v.chiefComplaint]).includes(f.complaint)) return false;
+  if (f.medicine && !(v.medicines || []).some((m) => m.medicineName === f.medicine)) return false;
+  if (f.referred && !REFERRAL_DISPOSITIONS.has(v.dispositionName)) return false;
   const at = parseApiDate(v.startedAt);
   if (f.dateFrom && at < startOfClinicDay(f.dateFrom)) return false;
   if (f.dateTo && at >= startOfClinicDay(addDays(f.dateTo, 1))) return false;
@@ -74,11 +83,16 @@ export default function PatientRecords() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(50);
   const [sort, setSort] = useState('date-desc');
-  const [filters, setFilters] = useState({ search: '', sex: '', yearLevel: '', program: '', department: '', dateFrom: '', dateTo: '' });
+  // A dashboard tile or an illness may have opened this page pre-filtered (lib/recordsFilter.js).
+  const [filters, setFilters] = useState(() => ({ ...DEFAULT_FILTERS, ...peekRecordsFilter() }));
   // The design's date range commits on "Apply" rather than filtering as you type.
-  const [draftRange, setDraftRange] = useState({ dateFrom: '', dateTo: '' });
+  const [draftRange, setDraftRange] = useState(() => ({ dateFrom: filters.dateFrom, dateTo: filters.dateTo }));
   const [exporting, setExporting] = useState(false);
   const [queue, setQueue] = useState({ search: '', sort: 'time-in', tab: 'all' });
+  const lookups = useLookups();
+
+  // Read once: opening Patient records from the sidebar later shows everything again.
+  useEffect(() => clearRecordsFilter(), []);
 
   const [sortBy, order] = sort === 'name-asc' ? ['patient_name', 'asc'] : ['started_at', sort === 'date-asc' ? 'asc' : 'desc'];
 
@@ -92,7 +106,8 @@ export default function PatientRecords() {
   };
   const table = useAsync(
     () => listVisits({ ...query, page, perPage }),
-    [page, perPage, sortBy, order, filters.search, filters.sex, filters.yearLevel, filters.program, filters.department, filters.dateFrom, filters.dateTo],
+    [page, perPage, sortBy, order, filters.search, filters.sex, filters.yearLevel, filters.program, filters.department,
+      filters.complaint, filters.medicine, filters.referred, filters.dateFrom, filters.dateTo],
   );
   const todayQ = useVisitsInRange(today, today);
 
@@ -108,9 +123,15 @@ export default function PatientRecords() {
 
   // Dropdown options: what the data actually contains (the design's lists were samples).
   const optionsFor = (field) => [...new Set(items.map((v) => v[field]).filter(Boolean))].sort();
+  const complaintOptions = [...new Set([...(lookups.complaints || []).map((c) => c.complaintName), filters.complaint].filter(Boolean))].sort();
 
   const setFilter = (key) => (e) => {
     setFilters({ ...filters, [key]: e.target.value });
+    setPage(1);
+  };
+
+  const clearFilter = (key) => {
+    setFilters({ ...filters, [key]: '' });
     setPage(1);
   };
 
@@ -164,6 +185,22 @@ export default function PatientRecords() {
       <div className="layout-split">
         <div>
           <div className="filter-card no-print">
+            {(filters.medicine || filters.referred) && (
+              <div className="filter-row active-filters">
+                <span className="sub">Showing only:</span>
+                {filters.medicine && (
+                  <button type="button" className="filter-chip" onClick={() => clearFilter('medicine')} title="Remove this filter">
+                    Given {filters.medicine} ✕
+                  </button>
+                )}
+                {filters.referred && (
+                  <button type="button" className="filter-chip" onClick={() => clearFilter('referred')} title="Remove this filter">
+                    Referred to hospital or doctor ✕
+                  </button>
+                )}
+              </div>
+            )}
+
             <div className="filter-row">
               <div className="search-field">
                 <Icon name="search" size={17} className="ic" />
@@ -186,6 +223,10 @@ export default function PatientRecords() {
               <select className="auto" value={filters.department} onChange={setFilter('department')}>
                 <option value="">Department: all</option>
                 {optionsFor('department').map((d) => <option key={d} value={d}>{d}</option>)}
+              </select>
+              <select className="auto" aria-label="Illness" value={filters.complaint} onChange={setFilter('complaint')}>
+                <option value="">Illness: all</option>
+                {complaintOptions.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
               <div className="date-range">
                 <span>From</span>

@@ -6,28 +6,17 @@ import { addDays, clinicDay, formatDate, formatTime, parseApiDate, presetRange }
 import { isOpenVisit, initialsOf, VISIT_STATUS } from '../lib/format';
 import { REFERRAL_DISPOSITIONS } from '../api/lookups';
 import { listStock } from '../api/stock';
-import { getPatterns } from '../api/insights';
 import { getOutbreakAlerts } from '../api/surveillance';
 import { summarize } from '../lib/insights';
+import { openRecords } from '../lib/showComplaint';
 import { LineChart } from '../components/Charts';
 import {
-  BusiestHoursCard, ClientBreakdownCard, ComplaintsCard, DepartmentsCard, DispositionsCard, MedicinesCard,
-  MonthlyVisitsCard, PairingsCard, StaffAgesCard, StudentDemographicsCard,
+  BusiestHoursCard, ClientBreakdownCard, ComplaintsCard, DispositionsCard, MedicinesCard,
 } from '../components/InsightCards';
 import Icon from '../components/Icon';
-import QuickLinks from '../components/QuickLinks';
 
 const today = clinicDay(new Date());
 const shortDay = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' });
-
-const QUICK_LINKS = [
-  { view: 'patient-records', label: 'Patient records', icon: 'clipboard' },
-  { view: 'flag-cases', label: 'Priority & special cases', icon: 'flag' },
-  { view: 'search-history', label: 'Search & history', icon: 'search' },
-  { view: 'stock', label: 'Stock & supplies', icon: 'box' },
-  { view: 'reports', label: 'Reports', icon: 'chart' },
-  { view: 'full-lists', label: 'Full lists', icon: 'list' },
-];
 
 const TREND_WINDOWS = {
   '7 days': 7,
@@ -54,7 +43,8 @@ function dailyTrend(visits, days) {
 }
 
 export default function NurseDashboard() {
-  const { navigate } = useApp();
+  const app = useApp();
+  const { navigate } = app;
   const [preset, setPreset] = useState('month');
   const [range, setRange] = useState(() => presetRange('month', today));
   const [draft, setDraft] = useState(() => presetRange('month', today));
@@ -74,18 +64,12 @@ export default function NurseDashboard() {
   // The trend line has its own window, independent of the range picker above.
   const trendDays = TREND_WINDOWS[trendWindow];
   const trendQ = useVisitsInRange(addDays(today, -(trendDays - 1)), today);
-  // Monthly bars and treatment pairings need more than a week of history, so
-  // they always look back over the semester.
-  const semesterFrom = addDays(today, -179);
-  const semesterQ = useVisitsInRange(semesterFrom, today);
-  const patterns = useAsync(() => getPatterns({ dateFrom: semesterFrom, dateTo: today }), [semesterFrom]);
 
   const inCare = todayQ.visits.filter(isOpenVisit).length;
   const referredToday = todayQ.visits.filter((v) => REFERRAL_DISPOSITIONS.has(v.dispositionName)).length;
 
   const trend = useMemo(() => dailyTrend(trendQ.visits, trendDays), [trendQ.visits, trendDays]);
   const stats = useMemo(() => summarize(rangeQ.visits), [rangeQ.visits]);
-  const semester = useMemo(() => summarize(semesterQ.visits), [semesterQ.visits]);
   const rangeLabel = `${formatDate(new Date(`${range.from}T00:00:00Z`))} – ${formatDate(new Date(`${range.to}T00:00:00Z`))}`;
 
   const queue = useMemo(() => {
@@ -106,6 +90,9 @@ export default function NurseDashboard() {
   const lowStock = stockItems.filter((i) => i.stockStatus === 'low');
   const outStock = stockItems.filter((i) => i.stockStatus === 'out_of_stock');
   const needsAttention = lowStock.length + outStock.length;
+
+  // KPI tiles open Patient records already filtered to what they count.
+  const openToday = (extra = {}) => openRecords(app, { dateFrom: today, dateTo: today, ...extra });
 
   return (
     <div className="view active">
@@ -200,7 +187,7 @@ export default function NurseDashboard() {
       )}
 
       <div className="kpi-row">
-        <div className="kpi with-icon clickable" onClick={() => navigate('patient-records')}>
+        <div className="kpi with-icon clickable" onClick={() => openToday()} title="Show today's visits in Patient records">
           <div className="ic-badge"><Icon name="activity" size={24} /></div>
           <div>
             <div className="value">{todayQ.loading ? '…' : todayQ.visits.length}</div>
@@ -208,7 +195,11 @@ export default function NurseDashboard() {
             <div className="foot">As of {formatTime(now)}</div>
           </div>
         </div>
-        <div className="kpi with-icon clickable" onClick={() => navigate('patient-records')}>
+        <div
+          className="kpi with-icon clickable"
+          onClick={() => openRecords(app, { dateFrom: range.from, dateTo: range.to })}
+          title="Show these visits in Patient records"
+        >
           <div className="ic-badge blue"><Icon name="calendar" size={24} /></div>
           <div>
             <div className="value">{rangeQ.loading ? '…' : rangeQ.visits.length}</div>
@@ -216,7 +207,7 @@ export default function NurseDashboard() {
             <div className="foot">{rangeLabel}</div>
           </div>
         </div>
-        <div className="kpi with-icon clickable" onClick={() => navigate('patient-records')}>
+        <div className="kpi with-icon clickable" onClick={() => openToday({ referred: '1' })} title="Show today's referrals in Patient records">
           <div className="ic-badge amber"><Icon name="trendUp" size={24} /></div>
           <div>
             <div className="value">{todayQ.loading ? '…' : referredToday}</div>
@@ -233,8 +224,6 @@ export default function NurseDashboard() {
           </div>
         </div>
       </div>
-
-      <QuickLinks links={QUICK_LINKS} />
 
       <div className="chart-row even">
         <div className="card">
@@ -254,7 +243,7 @@ export default function NurseDashboard() {
           {trendQ.loading ? <div className="sub">Loading…</div> : <LineChart points={trend} />}
         </div>
 
-        <ComplaintsCard rows={stats.complaints} loading={rangeQ.loading} visits={rangeQ.visits} rangeLabel={rangeLabel} />
+        <ComplaintsCard rows={stats.complaints} loading={rangeQ.loading} visits={rangeQ.visits} range={range} rangeLabel={rangeLabel} />
       </div>
 
       {/* Full width: the queue table needs the room, and a card beside it left a gap. */}
@@ -328,29 +317,14 @@ export default function NurseDashboard() {
 
       </div>
 
-      <div className="section-title">
-        <h2>Insights</h2>
-        <span>{rangeLabel} · {stats.total} visits</span>
-      </div>
-
-      <div className="chart-flow">
+      <div className="chart-row even">
         <MedicinesCard rows={stats.medicines} loading={rangeQ.loading} />
         <BusiestHoursCard bars={stats.byHour} loading={rangeQ.loading} />
-        <ClientBreakdownCard rows={stats.clients} loading={rangeQ.loading} />
-        <DispositionsCard rows={stats.dispositions} loading={rangeQ.loading} />
-        <StaffAgesCard rows={stats.staffAges} loading={rangeQ.loading} />
-        <DepartmentsCard rows={stats.departments} loading={rangeQ.loading} />
-        <StudentDemographicsCard years={stats.studentYears} sex={stats.studentSex} loading={rangeQ.loading} />
-      </div>
-
-      <div className="section-title">
-        <h2>This semester</h2>
-        <span>Last 180 days · {semester.total} visits</span>
       </div>
 
       <div className="chart-row even">
-        <MonthlyVisitsCard perMonth={semester.perMonth} loading={semesterQ.loading} />
-        <PairingsCard patterns={patterns.data} loading={patterns.loading} error={patterns.error} />
+        <ClientBreakdownCard rows={stats.clients} loading={rangeQ.loading} />
+        <DispositionsCard rows={stats.dispositions} loading={rangeQ.loading} />
       </div>
     </div>
   );

@@ -1,14 +1,6 @@
-// The three Reports sub-menu pages (see the Reports group in config/navs.js).
-import Reports from './Reports';
+// Reports / Monthly supply report (see the Reports group in config/navs.js).
+// The Analytics and Tables pages are built in config/reportViews.jsx.
 import MonthlySupplyReport from '../components/MonthlySupplyReport';
-
-export function AnalyticsPage() {
-  return <Reports mode="charts" />;
-}
-
-export function ReportTablesPage() {
-  return <Reports mode="table" />;
-}
 
 export function SupplyReportPage() {
   return (

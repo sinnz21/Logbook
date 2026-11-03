@@ -1,11 +1,11 @@
 /**
  * The Insights content as dashboard chart cards. Each card takes rows from
  * summarize() (lib/insights.js), shows the top few as a chart with counts and
- * percentages, and links to the complete ranking on the Full lists page.
+ * percentages, and links to the complete ranking on its Reports / Tables page.
  */
 import { useApp } from '../context/useApp';
-import { rowsFrom, totalOf, visitsWithComplaint } from '../lib/insights';
-import { openFullListTab } from '../lib/fullListTab';
+import { rowsFrom, totalOf } from '../lib/insights';
+import { openStock, showComplaint } from '../lib/showComplaint';
 import { formatQty } from '../lib/format';
 import { BarChart, CountPct, DonutLegend, HBars } from './Charts';
 
@@ -13,18 +13,12 @@ import { BarChart, CountPct, DonutLegend, HBars } from './Charts';
 const topWithOthers = (rows, limit) =>
   rowsFrom(new Map(rows.map((r) => [r.name, r.count])), { limit, others: true });
 
-/** Opens Full lists on the matching tab ('complaints' | 'medicines' | 'departments'). */
+/** Opens the complete ranked list ('complaints' | 'medicines' | 'departments') under Reports / Tables. */
 function FullListButton({ tab, rows, limit }) {
   const { navigate } = useApp();
   if (rows.length <= limit) return null;
   return (
-    <button
-      className="btn btn-soft btn-sm no-print"
-      onClick={() => {
-        openFullListTab(tab);
-        navigate('full-lists');
-      }}
-    >
+    <button className="btn btn-soft btn-sm no-print" onClick={() => navigate(`list-${tab}`)}>
       View full list ({rows.length})
     </button>
   );
@@ -62,12 +56,13 @@ export function MonthlyVisitsCard({ perMonth, loading }) {
 
 /**
  * With `visits` (the same visits `rows` was counted from), each illness on the
- * donut opens the list of patients who had it.
+ * donut is clickable: nurses open Patient records filtered to it and `range`
+ * ({ from, to }), admins get the list of patients who had it.
  */
-export function ComplaintsCard({ rows, loading, title = 'Top complaints', limit = 5, visits, rangeLabel }) {
-  const { openModal } = useApp();
+export function ComplaintsCard({ rows, loading, title = 'Top complaints', limit = 5, visits, range, rangeLabel }) {
+  const app = useApp();
   const onSelect = visits
-    ? (name) => openModal('complaintPatients', { complaint: name, visits: visitsWithComplaint(visits, name), rangeLabel })
+    ? (name) => showComplaint(app, { name, visits, range, rangeLabel })
     : undefined;
   return (
     <ChartCard
@@ -84,17 +79,27 @@ export function ComplaintsCard({ rows, loading, title = 'Top complaints', limit 
   );
 }
 
+/** Nurses can click a medicine to see how many are left in Stock & supplies. */
 export function MedicinesCard({ rows, loading, limit = 5 }) {
+  const app = useApp();
   const fmt = (n) => formatQty(n);
+  const onSelect = app.role === 'nurse' ? (name) => openStock(app, name) : undefined;
   return (
     <ChartCard
       title={`Top ${limit} most requested medicines`}
-      sub={rows.length ? `${fmt(totalOf(rows))} units dispensed, ${rows.length} medicines` : 'Units dispensed in the range'}
+      sub={rows.length
+        ? `${fmt(totalOf(rows))} units dispensed, ${rows.length} medicines${onSelect ? '. Click a medicine to check its stock.' : ''}`
+        : 'Units dispensed in the range'}
       loading={loading}
       empty={!rows.length && 'Nothing dispensed in this range yet.'}
       action={<FullListButton tab="medicines" rows={rows} limit={limit} />}
     >
-      <HBars rows={rows.slice(0, limit)} showValue={(r) => <CountPct count={fmt(r.count)} pct={r.pct} unit="units" />} />
+      <HBars
+        rows={rows.slice(0, limit)}
+        showValue={(r) => <CountPct count={fmt(r.count)} pct={r.pct} unit="units" />}
+        onSelect={onSelect}
+        selectTitle={(name) => `Check stock of ${name}`}
+      />
     </ChartCard>
   );
 }

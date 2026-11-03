@@ -87,7 +87,7 @@ Then restart: `uvicorn app.main:app --reload`, and open http://localhost:8000/do
 ### Visits: CHANGED (`routes/visits.py`, `services/visit_service.py`)
 | Method | Path | Who | Change |
 |---|---|---|---|
-| GET | `/api/visits` | any | New filters: `patient_id, search, sex, year_level, program, department, date_from, date_to`; new sort `sort_by=patient_name` |
+| GET | `/api/visits` | any | New filters: `patient_id, search, sex, year_level, program, department, date_from, date_to, complaint, medicine, referred`; new sort `sort_by=patient_name`. `complaint` matches an exact complaint tag (or the chief complaint when a visit has no tags), `medicine` matches a dispensed medicine's name, and `referred=1` keeps visits whose disposition is Hospital Admission or Referred to Doctor. |
 | POST | `/api/visits` | nurse | Transaction bug fixed. `medicines[]` / `supplies[]` deduct stock (409 if there isn't enough, and the whole visit rolls back). |
 | PATCH | `/api/visits/{id}` | nurse | **NEW.** Edit vitals, complaint, notes, and tags. Dispensed items are not editable (the ledger is append-only). |
 | DELETE | `/api/visits/{id}` | nurse | **NEW.** Soft delete. |
@@ -147,11 +147,19 @@ The login screen no longer asks for a role. It uses `role` from the `POST /api/a
 ### Password reset by email: NEW (`routes/auth.py`)
 | Method | Path | Body | Returns |
 |---|---|---|---|
-| POST | `/api/auth/forgot-password` | `{ email }` | `{ expiresInSeconds }` (e.g. 600). **Always 200**, even for unknown emails. Emails a random 6-digit code. Store only a hash of the code, with its expiry. |
-| POST | `/api/auth/verify-reset-code` | `{ email, code }` | `{ resetToken }` (short-lived, single use). 400 `detail` if the code is wrong or expired. Limit attempts, e.g. 5 per code. |
+| POST | `/api/auth/forgot-password` | `{ email }` | `{ expiresInSeconds }` (e.g. 600). **Always 200** for unknown emails too (until the rate limit below). Emails a random 6-digit code. Store only a hash of the code, with its expiry. |
+| POST | `/api/auth/verify-reset-code` | `{ email, code }` | `{ resetToken }` (short-lived, single use). 400 `detail` if the code is wrong or expired. Wrong attempts are limited per code (below). |
 | POST | `/api/auth/reset-password` | `{ resetToken, newPassword }` | `{ ok: true }`. Apply the same password rules as user creation, and write an audit entry. |
 
 Needs SMTP settings in `.env` and a `password_resets` table (user_id, code_hash, expires_at, attempts, used_at).
+
+**Rate limits (required).** The login screen relies on these exact status codes and messages:
+
+- **Code requests:** at most **3 `forgot-password` requests per email per 15 minutes**, counted the same way whether or not the email is registered (so the limit can't reveal which emails have accounts). The 4th request answers **429** `"Too many code requests for this email. Try again in mm:ss."` with the time until the oldest request leaves the 15-minute window. Track this per email (e.g. a `password_reset_requests` table or an in-memory/Redis counter).
+- **Wrong codes:** count wrong attempts **per code**. A wrong code answers **400** `"That code is incorrect. N attempts left."`. The **5th** wrong code deletes (or marks used) the code and answers **429** `"Too many wrong attempts. This code was cancelled. Request a new code."`. The screen then locks the boxes until a new code is sent. A newly sent code starts at 0 attempts.
+- An expired code answers 400 `"That code has expired. Send a new one."` and doesn't count as a wrong attempt.
+
+The screen checks the code automatically as soon as the 6th digit is typed, and lets the user resend after 60 seconds.
 
 ### Audit log: NEW (`routes/audit.py`), admin only
 `GET /api/audit-logs?page=&per_page=&action=&user_id=&search=&date_from=&date_to=` → `Page[AuditLogOut]`, newest first.
@@ -170,5 +178,20 @@ Write a row on every login (success and failure) and on every POST/PATCH/DELETE.
 | POST | `/api/backups` | the new backup (runs `mysqldump`, gzip, saved outside the web root) |
 | POST | `/api/backups/{id}/restore` | `{ ok, restoredAt }`. Take a safety backup first, then restore. Do **not** restore the audit-log table. |
 
-When `autoBackupEnabled` is on, a scheduled job (cron / Task Scheduler) should create `kind: "automatic"` backups daily.
+**Automatic daily backup at 11:59 PM.** The server runs a scheduled job every day at **23:59 Asia/Manila** (cron `59 23 * * *` with `CRON_TZ=Asia/Manila`, an APScheduler `CronTrigger(hour=23, minute=59, timezone="Asia/Manila")`, or a Windows Task Scheduler task at 11:59 PM on a server set to Philippine time). The job:
 
+1. Reads `autoBackupEnabled` from `system_settings`. When it's off, it **skips** the run and takes no backup.
+2. Runs `mysqldump` (gzipped, saved outside the web root) and saves it as `kind: "automatic"` with `createdByName: null`. File name: `isu_infirmary_YYYYMMDD_2359.sql.gz`.
+3. Writes an audit log entry: `action: "backup"`, `entity: "backup"`, no user, `details: "Automatic daily backup (isu_infirmary_YYYYMMDD_2359.sql.gz)"`.
+
+Settings shows "Next automatic backup: <date>, 11:59 PM" (today until 23:59 Manila time, then tomorrow) and "Last backup: <date, time> (automatic|manual)" from the newest row of `GET /api/backups`.
+
+### Health surveillance: CHANGED (`routes/surveillance.py`), any signed-in user
+The nurse dashboard's outbreak banner and the **Outbreak watch** pages under Reports → Analytics and Reports → Tables use these.
+
+| Method | Path | Returns |
+|---|---|---|
+| GET | `/api/surveillance/alerts?week=` | `{ week, alerts[], colleges[] }`. `alerts[]`: `{ college, complaint, cases, timesNormal, previousWeekCases, test, headline, detail, message }`, as before. **New:** `colleges[]`: `{ college, cases, expected }`, this week's cases of the watched illnesses combined, per college, with the normal (expected) level. |
+| GET | `/api/surveillance/trend?weeks=8` | **NEW.** `{ weeks, currentWeekProgress, complaints[] }`. `weeks`: the Monday (`YYYY-MM-DD`, clinic time) of each of the last N weeks, oldest first, ending with the current week. `currentWeekProgress`: how much of the current week has passed, 0–1 (Monday = 1/7 … Sunday = 1). `complaints[]`: `{ complaint, points: [{ weekStart, cases, expected, alert }] }`, one point per week in `weeks`, where `expected` is the normal level for that week of the year and `alert` is true when that week triggered an outbreak alert. |
+
+Demo mode (`src/mock/data.js`, `surveillanceTrend()` and `surveillanceAlerts()`) returns 12 weeks of sample data in this shape.

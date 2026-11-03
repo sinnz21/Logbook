@@ -42,23 +42,36 @@ export default function Sidebar() {
     </a>
   );
 
-  const group = (item) => {
-    const current = item.children.some((c) => c.id === currentView);
-    const open = toggled[item.group] ?? current;
+  /** Is the current view this link, or anywhere inside this group? */
+  const contains = (item) => (item.children ? item.children.some(contains) : item.id === currentView);
+  const isOpen = (item) => toggled[item.group] ?? contains(item);
+
+  // Sibling sub-groups work like an accordion: opening Tables closes Analytics.
+  const toggle = (item, siblings) => {
+    const next = { ...toggled, [item.group]: !isOpen(item) };
+    if (next[item.group]) {
+      for (const s of siblings) if (s.group && s !== item) next[s.group] = false;
+    }
+    setToggled(next);
+  };
+
+  const group = (item, siblings, nested = false) => {
+    const current = contains(item);
+    const open = isOpen(item);
     return (
       <li key={`group-${item.group}`}>
         <a
-          className={`group-head${open ? ' open' : ''}${current ? ' current' : ''}`}
-          onClick={() => setToggled({ ...toggled, [item.group]: !open })}
+          className={`group-head${nested ? ' nested' : ''}${open ? ' open' : ''}${current ? ' current' : ''}`}
+          onClick={() => toggle(item, siblings)}
           aria-expanded={open}
         >
-          <Icon name={item.icon} size={19} />
+          {!nested && <Icon name={item.icon} size={19} />}
           {item.group}
-          <Icon name="chevronRight" size={17} className="chev" />
+          <Icon name="chevronRight" size={nested ? 15 : 17} className="chev" />
         </a>
         {open && (
           <ul className="sub-nav">
-            {item.children.map((c) => <li key={c.id}>{link(c)}</li>)}
+            {item.children.map((c) => (c.children ? group(c, item.children, true) : <li key={c.id}>{link(c)}</li>))}
           </ul>
         )}
       </li>
@@ -90,7 +103,7 @@ export default function Sidebar() {
           item.section ? (
             <li className="sec" key={`sec-${item.section}`}>{item.section}</li>
           ) : item.group ? (
-            group(item)
+            group(item, items)
           ) : (
             <li key={item.id || i}>{link(item)}</li>
           ),

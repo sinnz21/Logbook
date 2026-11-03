@@ -1,14 +1,26 @@
 // Nav metadata per role — drives the sidebar AND the topbar breadcrumb.
 // Keep 'id' values in sync with the view switch in App.jsx.
 // Grouping, labels and icons follow the Figma v2 sidebar. A `group` entry is a
-// collapsible menu whose `children` are the real links.
+// collapsible menu whose `children` are the real links, or further groups.
+import { ANALYTICS_SECTIONS, TABLE_SECTIONS } from './reportSections';
+
+const ANALYTICS_GROUP = {
+  group: 'Analytics',
+  children: ANALYTICS_SECTIONS.map(({ id, label }) => ({ id, label })),
+};
+
+const TABLES_GROUP = {
+  group: 'Tables',
+  children: TABLE_SECTIONS.map(({ id, label }) => ({ id, label })),
+};
+
 const REPORTS_GROUP = {
   group: 'Reports',
   icon: 'chart',
   children: [
-    { id: 'reports', label: 'Analytics' },
+    ANALYTICS_GROUP,
+    TABLES_GROUP,
     { id: 'supply-report', label: 'Monthly supply report' },
-    { id: 'report-tables', label: 'Report tables' },
   ],
 };
 
@@ -22,7 +34,6 @@ export const NAVS = {
     { section: 'Supplies & reports' },
     { id: 'stock', label: 'Stock & supplies', icon: 'box', badge: 'lowStock' },
     REPORTS_GROUP,
-    { id: 'full-lists', label: 'Full lists', icon: 'list' },
   ],
   admin: [
     { section: 'Overview' },
@@ -31,15 +42,24 @@ export const NAVS = {
     { id: 'stock-requests', label: 'Stock requests', icon: 'clipboardCheck', badge: 'pendingRequests' },
     { id: 'users', label: 'User management', icon: 'users' },
     REPORTS_GROUP,
-    { id: 'full-lists', label: 'Full lists', icon: 'list' },
     { section: 'System' },
     { id: 'audit-log', label: 'Audit log', icon: 'history' },
     { id: 'settings', label: 'Settings', icon: 'settings' },
   ],
 };
 
-/** Just the real links: section headers dropped, group children flattened. */
-export const linksOf = (role) => NAVS[role].flatMap((n) => n.children || (n.id ? [n] : []));
+/** Real links under a list of nav items: section headers dropped, groups flattened at any depth. */
+const flatten = (items) => items.flatMap((n) => (n.children ? flatten(n.children) : n.id ? [n] : []));
+
+/** Just the real links for a role. */
+export const linksOf = (role) => flatten(NAVS[role]);
+
+/** "Reports / Analytics / Busiest hours" for every page under the Reports group. */
+function reportCrumbs(items, path) {
+  return Object.fromEntries(items.flatMap((n) => (n.children
+    ? Object.entries(reportCrumbs(n.children, [...path, n.group]))
+    : [[n.id, [...path, n.label].join(' / ')]])));
+}
 
 // Views reachable outside the sidebar (drill-down and print pages) still need a
 // breadcrumb label. Add visit record is opened from the button on Patient
@@ -50,7 +70,5 @@ export const EXTRA_VIEW_LABELS = {
   profile: 'Patient records / Patient profile',
   'medical-certificate': 'Medical certificate',
   'parental-notification': 'Parental notification',
-  reports: 'Reports / Analytics',
-  'supply-report': 'Reports / Monthly supply report',
-  'report-tables': 'Reports / Report tables',
+  ...reportCrumbs(REPORTS_GROUP.children, [REPORTS_GROUP.group]),
 };

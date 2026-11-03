@@ -176,29 +176,46 @@ export function BarChart({ bars, height = 230, dense = false }) {
 
 /** "12 · 34.5%" — the count first, then its share, so every bar has real numbers. */
 export function CountPct({ count, pct, unit }) {
+  // "1 unit", not "1 units".
+  const label = unit && Number(count) === 1 && unit.endsWith('s') ? unit.slice(0, -1) : unit;
   return (
     <>
-      {count}{unit ? ` ${unit}` : ''}
+      {count}{label ? ` ${label}` : ''}
       {pct != null && <span className="share"> · {pct}%</span>}
     </>
   );
 }
 
-export function HBars({ rows, showValue = (r) => <CountPct count={r.count} pct={r.pct} /> }) {
+/** With onSelect, every row is a button; selectTitle(name) is its tooltip. */
+export function HBars({
+  rows,
+  showValue = (r) => <CountPct count={r.count} pct={r.pct} />,
+  onSelect,
+  selectTitle = (name) => `Show patients for ${name}`,
+}) {
   if (!rows.length) return <div className="sub">Nothing to show yet.</div>;
   return (
     <div className="hbar-list">
-      {rows.map((r) => (
-        <div className="hbar" key={r.name}>
-          <div className="top">
-            <span className="name">{r.name}</span>
-            <span className="pct">{showValue(r)}</span>
-          </div>
-          <span className="track">
-            <span className="fill" style={{ width: `${Math.max(r.width ?? r.pct, 1)}%`, background: r.color || 'var(--teal)' }} />
-          </span>
-        </div>
-      ))}
+      {rows.map((r) => {
+        const inner = (
+          <>
+            <span className="top">
+              <span className="name">{r.name}</span>
+              <span className="pct">{showValue(r)}</span>
+            </span>
+            <span className="track">
+              <span className="fill" style={{ width: `${Math.max(r.width ?? r.pct, 1)}%`, background: r.color || 'var(--teal)' }} />
+            </span>
+          </>
+        );
+        return onSelect ? (
+          <button type="button" className="hbar hbar-link" key={r.name} title={selectTitle(r.name)} onClick={() => onSelect(r.name)}>
+            {inner}
+          </button>
+        ) : (
+          <div className="hbar" key={r.name}>{inner}</div>
+        );
+      })}
     </div>
   );
 }

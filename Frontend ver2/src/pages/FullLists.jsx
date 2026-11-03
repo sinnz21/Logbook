@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { useApp } from '../context/useApp';
 import { useVisitsInRange } from '../hooks/useVisits';
 import { addDays, clinicDay, formatDate, presetRange } from '../lib/time';
-import { summarize, visitsWithComplaint } from '../lib/insights';
-import { getFullListTab, openFullListTab } from '../lib/fullListTab';
+import { summarize } from '../lib/insights';
+import { openStock, showComplaint } from '../lib/showComplaint';
 import { formatQty } from '../lib/format';
 import { downloadCsv, toCsv } from '../lib/csv';
 import Icon from '../components/Icon';
@@ -27,22 +27,17 @@ const rangeFor = (preset, today) =>
 const round1 = (n) => Math.round(n * 10) / 10;
 
 /**
- * The complete rankings behind the dashboard's top-5 cards, one tab each.
- * "View full list" on a card opens this page on its tab (lib/fullListTab.js).
+ * The complete rankings behind the top-5 cards: one Reports / Tables page per
+ * `tab` (see config/reportViews.jsx). "View full list" on a card opens it.
  */
-export default function FullLists() {
-  const { openModal } = useApp();
+export default function FullLists({ tab = 'complaints' }) {
+  const app = useApp();
+  const isNurse = app.role === 'nurse';
   const [today] = useState(() => clinicDay(new Date()));
-  const [tab, setTab] = useState(getFullListTab);
   const [preset, setPreset] = useState('month');
   const [range, setRange] = useState(() => rangeFor('month', clinicDay(new Date())));
   const [draft, setDraft] = useState(range);
   const [search, setSearch] = useState('');
-
-  const changeTab = (next) => {
-    openFullListTab(next);
-    setTab(next);
-  };
 
   const applyPreset = (p) => {
     const next = rangeFor(p, today);
@@ -64,11 +59,7 @@ export default function FullLists() {
   const shownTotal = shown.reduce((sum, r) => sum + r.count, 0);
   const shownPct = q ? round1(shown.reduce((sum, r) => sum + r.pct, 0)) : 100;
 
-  const showPatients = (name) => openModal('complaintPatients', {
-    complaint: name,
-    visits: visitsWithComplaint(source.visits, name),
-    rangeLabel,
-  });
+  const showPatients = (name) => showComplaint(app, { name, visits: source.visits, range, rangeLabel });
 
   const exportCsv = () => {
     const csv = toCsv(shown, [
@@ -87,17 +78,9 @@ export default function FullLists() {
     <div className="view active">
       <div className="page-head">
         <div>
-          <h1>Full lists</h1>
-          <div className="sub">Every complaint, medicine and department, ranked, {rangeLabel}</div>
+          <h1>{cfg.label}</h1>
+          <div className="sub">The complete ranked list, {rangeLabel}</div>
         </div>
-      </div>
-
-      <div className="segmented tabs-menu no-print" role="tablist">
-        {Object.entries(TABS).map(([key, t]) => (
-          <button key={key} role="tab" aria-selected={tab === key} className={tab === key ? 'active' : ''} onClick={() => changeTab(key)}>
-            {t.label}
-          </button>
-        ))}
       </div>
 
       <div className="filter-card no-print">
@@ -134,6 +117,7 @@ export default function FullLists() {
                 ? 'Loading…'
                 : `${ranked.length} entries, ${fmt(ranked.reduce((sum, r) => sum + r.count, 0))} ${cfg.countLabel.toLowerCase()} in total, from ${s.total} visits`}
               {tab === 'complaints' && ranked.length > 0 && '. Click an illness to see the patients.'}
+              {tab === 'medicines' && isNurse && ranked.length > 0 && '. Click a medicine to check its stock.'}
             </div>
           </div>
           <button className="btn btn-ghost btn-sm no-print" onClick={exportCsv} disabled={!shown.length}>
@@ -164,6 +148,10 @@ export default function FullLists() {
                     <td className="nm">
                       {tab === 'complaints' ? (
                         <button type="button" className="link-btn" title={`Show patients with ${r.name}`} onClick={() => showPatients(r.name)}>
+                          {r.name}
+                        </button>
+                      ) : tab === 'medicines' && isNurse ? (
+                        <button type="button" className="link-btn" title={`Check stock of ${r.name}`} onClick={() => openStock(app, r.name)}>
                           {r.name}
                         </button>
                       ) : r.name}
