@@ -45,6 +45,7 @@ function ReviewCard({ request, stockByKey, onDone }) {
       if (kind === 'approve') {
         await approveStockRequest(request.requestId, {
           items: request.items.map((i) => ({
+            requestItemId: i.requestItemId, // the backend matches lines by this id
             itemType: i.itemType,
             medicineId: i.medicineId ?? null,
             supplyId: i.supplyId ?? null,
