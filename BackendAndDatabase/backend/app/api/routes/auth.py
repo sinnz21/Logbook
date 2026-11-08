@@ -104,12 +104,18 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
 # user asks for a new code. Only hashes of the code and the reset token are kept.
 
 log = logging.getLogger(__name__)
-_codes: dict[int, dict] = {}          # user_id -> {hash, expires, tries, sent_at}
+# Everything is keyed by the lower-cased email, registered or not, so the limits
+# and the answers are the same for every email and can't reveal which ones exist.
+_codes: dict[str, dict] = {}          # email -> {user_id, hash, expires, tries, sent_at}
+_requests: dict[str, list[float]] = {}  # email -> times of recent code requests
 _reset_tokens: dict[str, dict] = {}   # hash(reset token) -> {user_id, expires}
 _codes_lock = threading.Lock()
-RESEND_SECONDS = 30                   # matches the "Resend code in 30s" timer on the login screen
-MAX_TRIES = 5
-WRONG_CODE = "Wrong or expired code. Ask for a new one."
+RESEND_SECONDS = 60                   # matches "Resend code in 1:00" on the login screen
+REQUEST_LIMIT = 3                     # code requests per email...
+REQUEST_WINDOW = 15 * 60              # ...per 15 minutes
+MAX_TRIES = 5                         # wrong codes before the code is cancelled
+WRONG_CODE = "Wrong or expired code. Request a new one."
+EXPIRED_CODE = "That code has expired. Send a new one."
 
 
 def _code_hash(code: str) -> str:
@@ -118,6 +124,11 @@ def _code_hash(code: str) -> str:
 
 def _expires_in() -> int:
     return settings.RESET_CODE_MINUTES * 60
+
+
+def _mmss(seconds: float) -> str:
+    total = max(1, int(seconds + 0.999))
+    return f"{total // 60}:{total % 60:02d}"
 
 
 def _find_by_email(db: Session, email: str) -> User | None:
@@ -137,20 +148,35 @@ def forgot_password(body: ForgotRequest, db: Session = Depends(get_db)):
             "Email reset isn't set up on this server. Ask the system admin to reset your password.",
         )
 
-    user = _find_by_email(db, body.email)
-    if not user:
-        # Same answer either way, so the form can't be used to find registered emails.
-        return {"expiresInSeconds": _expires_in()}
-
+    email = body.email.strip().lower()
     now = time.time()
     with _codes_lock:
-        prev = _codes.get(user.user_id)
+        recent = [t for t in _requests.get(email, []) if now - t < REQUEST_WINDOW]
+        if len(recent) >= REQUEST_LIMIT:
+            _requests[email] = recent
+            raise HTTPException(
+                status.HTTP_429_TOO_MANY_REQUESTS,
+                f"Too many code requests for this email. Try again in {_mmss(recent[0] + REQUEST_WINDOW - now)}.",
+            )
+        prev = _codes.get(email)
         if prev and now - prev["sent_at"] < RESEND_SECONDS:
-            wait = int(RESEND_SECONDS - (now - prev["sent_at"])) + 1
-            raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, f"Please wait {wait} seconds before asking for another code.")
-        code = f"{secrets.randbelow(1_000_000):06d}"
-        _codes[user.user_id] = {"hash": _code_hash(code), "expires": now + _expires_in(), "tries": 0, "sent_at": now}
+            raise HTTPException(
+                status.HTTP_429_TOO_MANY_REQUESTS,
+                f"Please wait {_mmss(RESEND_SECONDS - (now - prev['sent_at']))} before asking for another code.",
+            )
+        _requests[email] = recent + [now]
 
+    user = _find_by_email(db, email)
+    if not user:
+        # No code can match, but wrong guesses are still counted the same way.
+        with _codes_lock:
+            _codes[email] = {"user_id": None, "hash": None, "expires": now + _expires_in(), "tries": 0, "sent_at": now}
+        return {"expiresInSeconds": _expires_in()}
+
+    code = f"{secrets.randbelow(1_000_000):06d}"
+    with _codes_lock:
+        _codes[email] = {"user_id": user.user_id, "hash": _code_hash(code), "expires": now + _expires_in(),
+                         "tries": 0, "sent_at": now}
     try:
         mail_service.send_mail(
             user.email,
@@ -164,7 +190,7 @@ def forgot_password(body: ForgotRequest, db: Session = Depends(get_db)):
     except Exception:
         log.exception("Sending reset code failed")
         with _codes_lock:
-            _codes.pop(user.user_id, None)
+            _codes.pop(email, None)
         raise HTTPException(
             status.HTTP_502_BAD_GATEWAY,
             "Couldn't send the email. Check the server's internet connection, or ask the system admin.",
@@ -174,24 +200,36 @@ def forgot_password(body: ForgotRequest, db: Session = Depends(get_db)):
 
 @router.post("/verify-reset-code")
 def verify_reset_code(body: VerifyCodeRequest, db: Session = Depends(get_db)):
-    """Step 2: checks the emailed code and hands back a one-time reset token."""
-    user = _find_by_email(db, body.email)
-    if not user:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, WRONG_CODE)
+    """Step 2: checks the emailed code and hands back a one-time reset token.
+    A wrong code says how many tries are left; the 5th wrong one cancels the code (429)."""
+    email = body.email.strip().lower()
     with _codes_lock:
-        entry = _codes.get(user.user_id)
-        if not entry or time.time() > entry["expires"] or entry["tries"] >= MAX_TRIES:
-            _codes.pop(user.user_id, None)
+        entry = _codes.get(email)
+        if not entry:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, WRONG_CODE)
-        if not hmac.compare_digest(entry["hash"], _code_hash(body.code.strip())):
+        if time.time() > entry["expires"]:          # doesn't count as a wrong attempt
+            _codes.pop(email, None)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, EXPIRED_CODE)
+        if not entry["hash"] or not hmac.compare_digest(entry["hash"], _code_hash(body.code.strip())):
             entry["tries"] += 1
             left = MAX_TRIES - entry["tries"]
             if left <= 0:
-                _codes.pop(user.user_id, None)
-                raise HTTPException(status.HTTP_400_BAD_REQUEST, WRONG_CODE)
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Wrong code. {left} tries left.")
-        _codes.pop(user.user_id, None)        # the code can't be used again
-        token = secrets.token_urlsafe(32)
+                _codes.pop(email, None)
+                raise HTTPException(
+                    status.HTTP_429_TOO_MANY_REQUESTS,
+                    "Too many wrong attempts. This code was cancelled. Request a new code.",
+                )
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                f"That code is incorrect. {left} attempt{'' if left == 1 else 's'} left.",
+            )
+        user_id = entry["user_id"]
+        _codes.pop(email, None)            # the code itself can't be used again
+    user = db.get(User, user_id)
+    if not user or user.deleted_at is not None or user.status != "active":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, WRONG_CODE)
+    token = secrets.token_urlsafe(32)
+    with _codes_lock:
         _reset_tokens[_code_hash(token)] = {"user_id": user.user_id, "expires": time.time() + _expires_in()}
     return {"resetToken": token}
 

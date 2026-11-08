@@ -54,7 +54,7 @@ ACTION_CODES = {
     "Delivery received": "update",
     "Account created": "create", "Account updated": "update", "Password reset by email": "update",
     "System settings changed": "update",
-    "Manual backup taken": "backup", "Automated backup completed": "backup", "Database exported": "backup",
+    "Manual backup taken": "backup", "Automated backup completed": "backup", "Automatic daily backup": "backup", "Database exported": "backup",
     "Database restored from backup": "restore", "Record restored from trash": "update",
 }
 

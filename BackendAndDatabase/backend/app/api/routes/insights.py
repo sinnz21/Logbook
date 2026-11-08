@@ -6,7 +6,7 @@ X is a tagged complaint (visit_complaints); Y is another complaint or a
 medicine actually dispensed (visit_medicines). Only complaints that appear in
 at least MIN_SUPPORT visits are considered, so one-off coincidences don't show.
 """
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import date, timedelta, timezone
 from itertools import permutations
 
@@ -18,7 +18,9 @@ from app.core.deps import get_current_user, require_admin
 from app.core.timeutil import CLINIC_TZ, clinic_day_range_utc
 from app.db.session import get_db
 from app.models.user import LoginAttempt, User
-from app.models.visit import Visit
+from app.models.inventory import Medicine
+from app.models.lookups import Complaint
+from app.models.visit import Visit, VisitComplaint, VisitMedicine
 from app.schemas.common import APIModel
 
 router = APIRouter(prefix="/insights", tags=["insights"])
@@ -42,21 +44,40 @@ def patterns(
     date_to: date | None = None,
     limit: int = Query(10, ge=1, le=50),
 ):
-    stmt = select(Visit).where(Visit.deleted_at.is_(None))
+    # Plain (visit_id, name) rows instead of full Visit objects: a year of
+    # visits is ~9,000 rows, and loading each visit with its patient, nurse
+    # and lists took seconds.
+    in_range = [Visit.deleted_at.is_(None)]
     start, end = clinic_day_range_utc(date_from, date_to)
     if start:
-        stmt = stmt.where(Visit.started_at >= start)
+        in_range.append(Visit.started_at >= start)
     if end:
-        stmt = stmt.where(Visit.started_at < end)
+        in_range.append(Visit.started_at < end)
+
+    complaints: dict[int, set[str]] = defaultdict(set)
+    for visit_id, name in db.execute(
+        select(VisitComplaint.visit_id, Complaint.complaint_name)
+        .join(Complaint, Complaint.complaint_id == VisitComplaint.complaint_id)
+        .join(Visit, Visit.visit_id == VisitComplaint.visit_id)
+        .where(*in_range)
+    ):
+        complaints[visit_id].add(name)
+    medicines: dict[int, set[str]] = defaultdict(set)
+    for visit_id, name in db.execute(
+        select(VisitMedicine.visit_id, Medicine.medicine_name)
+        .join(Medicine, Medicine.medicine_id == VisitMedicine.medicine_id)
+        .join(Visit, Visit.visit_id == VisitMedicine.visit_id)
+        .where(*in_range)
+    ):
+        medicines[visit_id].add(f"{name} given")
 
     trigger_count: Counter[str] = Counter()
     pair_count: Counter[tuple[str, str]] = Counter()
-    for v in db.execute(stmt).unique().scalars():
-        complaints = {c.complaint.complaint_name for c in v.complaints}
-        medicines = {f"{m.medicine.medicine_name} given" for m in v.medicines}
-        trigger_count.update(complaints)
-        pair_count.update(permutations(complaints, 2))
-        pair_count.update((c, m) for c in complaints for m in medicines)
+    for visit_id, tags in complaints.items():
+        given = medicines.get(visit_id, set())
+        trigger_count.update(tags)
+        pair_count.update(permutations(tags, 2))
+        pair_count.update((c, m) for c in tags for m in given)
 
     out = []
     for (x, y), both in pair_count.items():

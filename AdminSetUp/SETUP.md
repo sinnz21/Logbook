@@ -1,7 +1,7 @@
 # ISU Infirmary Log Book — Full Setup Guide
 
 Backend + frontend + nurse laptop, step by step, on Windows.
-Tested end to end on 20 October 2026 with Jaziel's new Frontend ver2 (pushed Oct 19).
+Tested end to end on 1 November 2026 with Jaziel's Frontend ver2 (matches his preview HTML).
 
 Do one command at a time: paste it, press Enter, read what it says, then the next.
 
@@ -102,6 +102,30 @@ cmd /c "mysql -u root < isu_infirmary_test_data.sql"
 Then sign in with the accounts above. (On your own laptop you can also use
 **Settings → Restore from a backup → `isu_infirmary_20261012_120000_test-data.sql`**.)
 
+### One year of demo data (for the presentation)
+
+`BackendAndDatabase\test_data\isu_infirmary_demo_data_1year.sql` has a full
+year of clinic records: **3,000 patients** (2,550 students, 240 faculty, 150
+non-teaching staff, 60 visitors), **about 8,900 visits**, 33 medicines and 20
+supplies with a year of dispensing, monthly restock requests and expiry dates,
+150 special cases, and 4 past outbreaks plus **one happening today** (Viral Flu
+in CCSICT). It uses the same accounts as above (`Cyrille` is not in it: add
+that account again in User management after loading).
+
+Like the test data, it **replaces** the whole `isu_infirmary` database. Load it
+**on the day you present**: every date moves so the data's last day becomes the
+day you load it, so "today" has patients in the infirmary and the outbreak
+alert shows on the nurse dashboard.
+
+```powershell
+cd "C:\Users\com sci\Logbook-git\BackendAndDatabase\test_data"
+$env:Path += ";C:\xampp\mysql\bin"
+cmd /c "mysql -u root < isu_infirmary_demo_data_1year.sql"
+```
+
+The last line it prints says how many days the dates moved, and the totals
+(3000 patients, 8901 visits). Then refresh the browser.
+
 ### Test run checklist (about 15 minutes)
 
 Sign in as **admin** (`acruz`):
@@ -110,6 +134,7 @@ Sign in as **admin** (`acruz`):
 2. **User management → Add user**: make a nurse account with your Gmail as Email.
 3. **Audit log**: your sign-in is at the top. The tiles count sign-ins, failed sign-ins, and records added, edited and deleted.
 4. **Settings → Back up now**: "Backup created" appears and the backup is listed under **Restore from a backup**.
+   **Export .SQL** downloads the database to your Downloads folder. **Open trash** lists deleted patients and visits; **Restore** brings one back.
 5. **Settings → Maintenance mode** on, type a message → **Save changes**. Sign out, try a nurse: blocked with your message. Sign in as admin again, turn it off, **Save changes**.
 
 Sign in as **nurse** (`nsantos`):
@@ -119,8 +144,9 @@ Sign in as **nurse** (`nsantos`):
 8. Try giving more medicine than is on hand: nothing saves, the shortage shows.
 9. **Priority & special cases**: flag the patient with Allergy.
 10. **Stock & supplies**: a low item → **Request**; then as admin approve it in **Stock requests**; as nurse **Confirm delivery**: stock goes up.
-11. **Reports**: switch to the table view. On the dashboard, **View full list** shows every complaint, not only the top 5.
+11. **Reports** (sidebar group): **Analytics** shows the charts and the **Outbreak watch** section; **Monthly supply report**; **Report tables** shows every report as rows with CSV. **Full lists** has 3 tabs (Complaints / Medicines / Departments); click an illness to see its patients.
 12. Sign out → **Forgot password?** → type the account's **email** → the 6-digit code arrives in Gmail (expires in 5:00) → type it in the boxes → set a new password → sign in.
+    A wrong code says how many attempts are left; the 5th wrong code cancels it. A new code can be asked for after 60 seconds, at most 3 per 15 minutes.
 13. Sign in as `rdomingo`: it must fail (inactive account).
 
 If every step works, the system is ready for the demo.
@@ -502,13 +528,13 @@ requests (request → approve → receive), user management, system settings,
 dashboards with charts and numbers, Reports with a table view and full lists,
 the **Audit log** (every sign-in, failed sign-in, add, edit, delete, backup and
 restore), **Backup now / Restore** (a safety backup is taken first, and a restore
-never erases the audit log), a daily automatic backup, **maintenance mode**
+never erases the audit log), an automatic backup **every day at 11:59 PM** (if the
+laptop was off at 11:59 PM, it takes the missed one as soon as the backend starts),
+**Export .SQL**, the **Trash** (restore deleted patients and visits), **maintenance mode**
 (nurses are blocked and see the admin's message), **forgot password by email**
 with a 6-digit code, and the **health surveillance** outbreak banner on the
-nurse dashboard (`BackendAndDatabase\backend\health_surveillance\`).
-
-**Backend ready, button not connected yet in the new frontend:** Export .SQL
-(`GET /api/backups/export`) and Open trash (`GET /api/trash`).
+nurse dashboard plus the **Outbreak watch** charts on Reports → Analytics
+(`BackendAndDatabase\backend\health_surveillance\`).
 
 **Not built yet:** printable Medical Certificate and Parental Notification with
 the Director co-signature workflow.
@@ -532,8 +558,10 @@ stop the backend (Ctrl+C) and start it again with
 
 "Forgot password?" works in 3 screens: (1) type the **email** saved on the
 account and a 6-digit code is emailed to it; (2) type the code in the 6 boxes
-(valid **5 minutes**, works once, 5 wrong tries cancel it; "Resend code" unlocks
-after 30 seconds); (3) only then the new-password boxes appear. The server
+(valid **5 minutes**, works once; it's checked as soon as the 6th digit is typed;
+each wrong code says how many tries are left and the 5th wrong one cancels it;
+"Resend code" unlocks after 60 seconds, and an email can ask for at most 3 codes
+every 15 minutes); (3) only then the new-password boxes appear. The server
 laptop needs internet when a code is sent. Every reset shows in the Audit log.
 
 One-time setup, using the Gmail that sends the codes:

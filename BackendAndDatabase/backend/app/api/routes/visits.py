@@ -1,7 +1,7 @@
 from datetime import date, datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
-from sqlalchemy import func, or_, select
+from sqlalchemy import exists, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, require_nurse
@@ -9,7 +9,9 @@ from app.core.timeutil import clinic_day_range_utc
 from app.db.session import get_db
 from app.models.patient import Patient
 from app.models.user import User
-from app.models.visit import Visit
+from app.models.inventory import Medicine
+from app.models.lookups import Complaint, Disposition
+from app.models.visit import Visit, VisitComplaint, VisitMedicine
 from app.schemas.common import Page
 from app.schemas.visit import (
     MedicineGivenOut, SupplyUsedOut, VisitCreate, VisitOut, VisitSignOut,
@@ -33,6 +35,7 @@ def _to_out(v: Visit) -> VisitOut:
         year_level=p.year_level,
         program=p.program,
         department=p.department,
+        age=p.age,
         special_cases=[
             VisitSpecialCase(case_name=c.case_type.case_name, notes=c.notes)
             for c in p.special_cases if c.active
@@ -78,12 +81,15 @@ def _get_visit(db: Session, visit_id: int) -> Visit:
     return v
 
 
+# Visits that left the infirmary for a hospital or a physician (dashboard "Referred today").
+REFERRED_DISPOSITIONS = ("Hospital Admission", "Referred to Doctor")
+
 @router.get("", response_model=Page[VisitOut])
 def list_visits(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
     page: int = Query(1, ge=1),
-    per_page: int = Query(50, ge=1, le=200),
+    per_page: int = Query(50, ge=1, le=1000),
     status_filter: str | None = Query(None, alias="status"),
     patient_id: int | None = None,
     search: str | None = None,
@@ -93,6 +99,9 @@ def list_visits(
     department: str | None = None,
     date_from: date | None = Query(None, description="Clinic day (Asia/Manila), inclusive"),
     date_to: date | None = Query(None, description="Clinic day (Asia/Manila), inclusive"),
+    complaint: str | None = Query(None, description="Exact complaint tag; the chief complaint when a visit has no tags"),
+    medicine: str | None = Query(None, description="Name of a medicine dispensed on the visit"),
+    referred: str | None = Query(None, description="1/true = only Hospital Admission or Referred to Doctor"),
     sort_by: str = Query("started_at"),
     order: str = Query("desc", pattern="^(asc|desc)$"),
 ):
@@ -123,6 +132,19 @@ def list_visits(
         stmt = stmt.where(Patient.program == program)
     if department:
         stmt = stmt.where(Patient.department == department)
+    if complaint:
+        tagged = exists().where(VisitComplaint.visit_id == Visit.visit_id)
+        has_tag = exists().where(VisitComplaint.visit_id == Visit.visit_id,
+                                 VisitComplaint.complaint_id == Complaint.complaint_id,
+                                 Complaint.complaint_name == complaint)
+        stmt = stmt.where(or_(has_tag, ~tagged & (Visit.chief_complaint == complaint)))
+    if medicine:
+        stmt = stmt.where(exists().where(VisitMedicine.visit_id == Visit.visit_id,
+                                         VisitMedicine.medicine_id == Medicine.medicine_id,
+                                         Medicine.medicine_name == medicine))
+    if (referred or "").strip().lower() in ("1", "true", "yes"):
+        stmt = stmt.where(exists().where(Disposition.disposition_id == Visit.disposition_id,
+                                         Disposition.disposition_name.in_(REFERRED_DISPOSITIONS)))
     start, end = clinic_day_range_utc(date_from, date_to)
     if start:
         stmt = stmt.where(Visit.started_at >= start)

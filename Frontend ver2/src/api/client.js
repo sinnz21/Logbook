@@ -72,3 +72,34 @@ export async function request(path, { method = 'GET', query, body, auth = true }
   }
   return data;
 }
+
+/**
+ * Downloads a file from an authenticated endpoint (e.g. GET /api/backups/export).
+ * The browser can't add the Bearer token to a plain link, so the file is fetched
+ * here and saved under the name the server sends. Returns that file name.
+ */
+export async function download(path, fallbackName = 'download') {
+  const headers = authToken ? { Authorization: `Bearer ${authToken}` } : {};
+  let res;
+  try {
+    res = await fetch(`${BASE_URL}/api${path}`, { headers });
+  } catch {
+    throw new ApiError(0, 'Cannot reach the server. Is the backend running?');
+  }
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    if (res.status === 401) onUnauthorized?.();
+    throw new ApiError(res.status, errorMessage(data, res.status, `/api${path}`));
+  }
+  const match = /filename="?([^";]+)"?/i.exec(res.headers.get('content-disposition') || '');
+  const name = match ? match[1] : fallbackName;
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return name;
+}

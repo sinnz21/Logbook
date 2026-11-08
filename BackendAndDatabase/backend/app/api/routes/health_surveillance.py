@@ -1,5 +1,9 @@
 """Health surveillance — outbreak early warning.
 
+GET /api/surveillance/trend
+  The same check run on each of the last N weeks, per watched illness, for the
+  Outbreak watch chart on Reports → Analytics.
+
 GET /api/surveillance/alerts
   Counts this week's visits per (college, complaint), compares each count with
   what the trained model expects for that college, complaint and time of year,
@@ -75,7 +79,7 @@ class AlertOut(APIModel):
     p_value: float
     test: str            # "week" = sudden spike, "two_weeks" = building up over 2 weeks
     headline: str        # "Possible outbreak: Viral Flu in CCSICT"
-    detail: str          # "7 cases this week, about 4× the normal rate"
+    detail: str          # "7 cases this week" (the banner never states the normal level)
     message: str         # headline + detail in one sentence
 
 
@@ -109,15 +113,13 @@ def get_model() -> Model:
     return _model
 
 
-@router.get("/alerts", response_model=SurveillanceOut)
-def alerts(
-    week: dt.date | None = Query(None, description="Any day in the week to check; default = this week"),
-    db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
-):
-    model = get_model()
-    today = (dt.datetime.utcnow() + MNL).date()
-    target = week_start(week or today)
+def _today() -> dt.date:
+    return (dt.datetime.utcnow() + MNL).date()
+
+
+def _check_week(db: Session, model: Model, target: dt.date, today: dt.date):
+    """Runs the model on one week. Returns the alerts response and, per watched
+    complaint, the clinic-wide [cases, expected, alerted] for that week."""
     first = target - dt.timedelta(weeks=HISTORY_WEEKS)
     end = target + dt.timedelta(days=7)
 
@@ -148,6 +150,7 @@ def alerts(
     prev = target - dt.timedelta(weeks=1)
 
     out_alerts, per_college = [], defaultdict(lambda: [0, 0.0])
+    per_complaint = {k: [0, 0.0, False] for k in WATCHED}
     for c in COLLEGES:
         for k in WATCHED:
             n = counts.get((c, k, target), 0)
@@ -155,14 +158,16 @@ def alerts(
             n_prev = counts.get((c, k, prev), 0)
             e_prev = model.expected(prev, c, k) * scale
             per_college[c][0] += n; per_college[c][1] += e
+            per_complaint[k][0] += n; per_complaint[k][1] += e
             fired, p, test = check_unit(n, e, n_prev, e_prev)
             if fired:
+                per_complaint[k][2] = True
                 if test == "week":
                     ratio = n / e if e > 0 else float(n)
-                    detail = f"{n} cases this week, about {_times(ratio)} the normal rate"
+                    detail = f"{n} cases this week"
                 else:
                     ratio = (n_prev + n) / max(e + e_prev, 0.1)
-                    detail = f"{n_prev + n} cases in the last 2 weeks, about {_times(ratio)} the normal rate"
+                    detail = f"{n_prev + n} cases in the last 2 weeks"
                 headline = f"Possible outbreak: {k} in {c}"
                 out_alerts.append(AlertOut(
                     college=c, complaint=k, cases=n, expected=round(e, 1), times_normal=round(ratio, 1),
@@ -172,7 +177,60 @@ def alerts(
     colleges = sorted((CollegeOut(college=c, cases=v[0], expected=round(v[1], 1),
                                   times_normal=round(v[0] / v[1], 2) if v[1] > 0 else 0.0)
                        for c, v in per_college.items()), key=lambda x: -x.times_normal)
-    return SurveillanceOut(
+    out = SurveillanceOut(
         week_start=target, week_end=target + dt.timedelta(days=6), week_progress=round(progress, 2),
         calibration_scale=round(scale, 3), history_cases=observed_hist,
         model_trained_on=model.meta.get("trained_on"), alerts=out_alerts, colleges=colleges)
+    return out, per_complaint
+
+
+@router.get("/alerts", response_model=SurveillanceOut)
+def alerts(
+    week: dt.date | None = Query(None, description="Any day in the week to check; default = this week"),
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    today = _today()
+    out, _per_complaint = _check_week(db, get_model(), week_start(week or today), today)
+    return out
+
+
+class TrendPoint(APIModel):
+    week_start: dt.date
+    cases: int
+    expected: float      # the model's normal level for that week (this week: only the days so far)
+    alert: bool          # an outbreak alert fired for this illness in some college that week
+
+
+class ComplaintTrend(APIModel):
+    complaint: str
+    points: list[TrendPoint]
+
+
+class TrendOut(APIModel):
+    weeks: list[dt.date]
+    current_week_progress: float
+    complaints: list[ComplaintTrend]
+
+
+@router.get("/trend", response_model=TrendOut)
+def trend(
+    weeks: int = Query(8, ge=2, le=26, description="How many weeks back, including this one"),
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    """Outbreak watch chart: for each watched illness, the clinic's weekly cases
+    next to the model's normal level, with the weeks that raised an alert."""
+    model, today = get_model(), _today()
+    this_week = week_start(today)
+    week_list = [this_week - dt.timedelta(weeks=i) for i in range(weeks - 1, -1, -1)]
+    series = {k: [] for k in WATCHED}
+    progress = 1.0
+    for wk in week_list:
+        out, per_complaint = _check_week(db, model, wk, today)
+        if wk == this_week:
+            progress = out.week_progress
+        for k, (n, e, alerted) in per_complaint.items():
+            series[k].append(TrendPoint(week_start=wk, cases=n, expected=round(e, 1), alert=alerted))
+    return TrendOut(weeks=week_list, current_week_progress=progress,
+                    complaints=[ComplaintTrend(complaint=k, points=series[k]) for k in WATCHED])

@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { useApp } from '../../context/useApp';
 import { useAsync } from '../../hooks/useAsync';
 import { getSettings, updateSettings } from '../../api/settings';
-import { createBackup, listBackups, restoreBackup } from '../../api/backups';
+import { createBackup, exportDatabase, listBackups, restoreBackup } from '../../api/backups';
 import { addDays, clinicDay, formatDate, formatTime, parseApiDate } from '../../lib/time';
 import Icon from '../../components/Icon';
-import { notConnected } from '../../lib/notConnected';
 
 const when = (iso) => {
   const at = parseApiDate(iso);
@@ -69,6 +68,20 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [now] = useState(() => new Date());
+  const [exporting, setExporting] = useState(false);
+
+  const exportSql = async () => {
+    setExporting(true);
+    setMessage(null);
+    try {
+      const name = await exportDatabase();
+      setMessage({ ok: true, text: `Database exported: ${name} (check your Downloads folder).` });
+    } catch (e) {
+      setMessage({ ok: false, text: `Export failed: ${e.message}` });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const current = draft || settings.data;
   const change = (patch) => {
@@ -206,11 +219,8 @@ export default function Settings() {
           <h3>Retention schedule</h3>
           <div className="card-sub">How long deleted records stay recoverable</div>
           <Row title="Export database" detail="Full dump for offline storage">
-            <button
-              className="btn btn-ghost btn-sm no-print"
-              onClick={() => notConnected('Export .SQL', 'database dumps need server-side tooling')}
-            >
-              <Icon name="download" size={16} /> Export .SQL
+            <button className="btn btn-ghost btn-sm no-print" onClick={exportSql} disabled={exporting}>
+              <Icon name="download" size={16} /> {exporting ? 'Exporting…' : 'Export .SQL'}
             </button>
           </Row>
           <Row title="Soft delete" detail="Deleted records recoverable for this many days">
@@ -228,7 +238,7 @@ export default function Settings() {
           <Row title="Trash" detail="Records waiting to be purged">
             <button
               className="btn btn-ghost btn-sm no-print"
-              onClick={() => notConnected('Open trash', 'a trash listing endpoint isn\'t available yet')}
+              onClick={() => openModal('trash', { retentionDays: settings.data?.softDeleteDays })}
             >
               Open trash
             </button>

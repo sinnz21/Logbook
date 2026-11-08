@@ -8,6 +8,7 @@ import FlagPatientModal from './modals/FlagPatientModal';
 import UserModal from './modals/UserModal';
 import ComplaintPatientsModal from './modals/ComplaintPatientsModal';
 import ConfirmModal from './modals/ConfirmModal';
+import TrashModal from './modals/TrashModal';
 
 // Each modal is only mounted while it's the active one (see Modal.jsx), so it
 // always renders "open" — no per-modal visibility prop to thread through.
@@ -21,6 +22,7 @@ const MODALS = {
   user: UserModal,
   complaintPatients: ComplaintPatientsModal,
   confirm: ConfirmModal,
+  trash: TrashModal,
 };
 
 export default function ModalRoot() {

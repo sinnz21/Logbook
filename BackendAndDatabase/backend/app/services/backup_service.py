@@ -1,7 +1,8 @@
 """Database backups with mysqldump / mysql (both ship with XAMPP).
 
 Files are plain .sql dumps in BACKUP_DIR (default: backend/backups, gitignored),
-named isu_infirmary_YYYYMMDD_HHMMSS.sql in UTC. Backups older than the
+named isu_infirmary_YYYYMMDD_HHMMSS.sql in UTC. An automatic backup runs every
+day at 11:59 PM Philippine time (see the bottom of this file). Backups older than the
 `backup_retention` setting (days, default 30) are deleted after each new backup.
 """
 import os
@@ -144,25 +145,51 @@ def restore_backup(name: str) -> dict:
     return safety
 
 
-# ── automatic daily backup ───────────────────────────────────────────────────
+# ── automatic daily backup: every day at 11:59 PM, Philippine time ─────────
+
+MANILA = timezone(timedelta(hours=8))   # the Philippines has no daylight saving
+AUTO_AT = (23, 59)                       # 11:59 PM
+
+
+def last_due_slot(now: datetime) -> datetime:
+    """The most recent 11:59 PM (Manila) that has already passed."""
+    local = now.astimezone(MANILA)
+    slot = local.replace(hour=AUTO_AT[0], minute=AUTO_AT[1], second=0, microsecond=0)
+    return slot if local >= slot else slot - timedelta(days=1)
+
+
+def next_slot(now: datetime) -> datetime:
+    """The next 11:59 PM (Manila) still to come."""
+    return last_due_slot(now) + timedelta(days=1)
+
+
+def _last_automatic() -> datetime | None:
+    autos = [b["created_at"] for b in list_backups() if b["kind"] == "automatic"]
+    return max(autos).replace(tzinfo=timezone.utc) if autos else None
+
+
+def auto_backup_due(now: datetime) -> bool:
+    """True when the latest 11:59 PM passed without an automatic backup.
+    If the server was off at 11:59 PM, the missed backup is taken as soon as it starts."""
+    last = _last_automatic()
+    return last is None or last < last_due_slot(now)
+
 
 def _auto_loop(read_settings):
     while True:
         try:
             enabled, retention = read_settings()
-            today = datetime.now(timezone.utc).strftime("%Y%m%d")
-            has_today = any(b["name"].startswith(f"isu_infirmary_{today}") and b["kind"] == "automatic"
-                            for b in list_backups())
-            if enabled and not has_today:
+            if enabled and auto_backup_due(datetime.now(timezone.utc)):
                 b = create_backup("auto", retention_days=retention)
                 from app.db.session import SessionLocal
                 from app.models.user import ActivityLog
                 with SessionLocal() as db:
-                    db.add(ActivityLog(action="Automated backup completed", detail=b["name"], log_type="backup"))
+                    db.add(ActivityLog(action="Automatic daily backup", entity_type="backup",
+                                       detail=b["name"], log_type="backup"))
                     db.commit()
         except Exception as exc:  # never kill the server over a backup
             print(f"[backup] automatic backup skipped: {exc}")
-        time.sleep(3600)
+        time.sleep(30)   # checks twice a minute, so 11:59 PM is never missed
 
 
 def start_auto_backups(read_settings) -> None:

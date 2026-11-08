@@ -1,4 +1,4 @@
-import { request } from './client';
+import { download, request } from './client';
 
 // Admin only — see "Backup and recovery" in BACKEND_REQUIREMENTS.md.
 
@@ -15,4 +15,9 @@ export function createBackup() {
 /** POST /api/backups/{id}/restore — rolls the database back to that snapshot. */
 export function restoreBackup(backupId) {
   return request(`/backups/${backupId}/restore`, { method: 'POST' });
+}
+
+/** GET /api/backups/export — a fresh full .sql dump, saved to this computer. Returns the file name. */
+export function exportDatabase() {
+  return download('/backups/export', 'isu_infirmary.sql');
 }

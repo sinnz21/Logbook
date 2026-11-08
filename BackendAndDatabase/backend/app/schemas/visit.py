@@ -78,6 +78,7 @@ class VisitOut(APIModel):
     year_level: str | None = None
     program: str | None = None
     department: str | None = None
+    age: int | None = None          # the patient's age now (Reports → Faculty & staff by age)
     special_cases: list[VisitSpecialCase] = []   # the patient's ACTIVE flags
     chief_complaint: str
     complaints: list[str] = []
