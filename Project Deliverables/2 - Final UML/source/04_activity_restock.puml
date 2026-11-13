@@ -1,0 +1,35 @@
+@startuml ISU_Infirmary_Activity_Restock
+!include style.iuml
+title Activity Diagram — Restock Requisition
+
+|Nurse|
+start
+:See low / out-of-stock alert\non Stock & supplies;
+:Create restock requisition\n(items, quantities, reasons);
+|System|
+:Save request as **Pending**;
+:Show pending count to the Administrator;
+|Administrator|
+:Open **Stock requests** and review;
+if (Approve?) then (no)
+  :Deny with a reason;
+  |System|
+  :Mark request **Denied**;
+  |Nurse|
+  :See the admin response;
+  stop
+else (yes)
+  |Administrator|
+  :Adjust approved quantities if needed;
+  :Press **Approve request**;
+  |System|
+  :Mark request **Approved**\n(awaiting delivery);
+endif
+|Nurse|
+:Delivery arrives at the clinic;
+:Press **Confirm delivery**;
+|System|
+:Add approved quantities to stock,\nwrite "restocked" ledger rows,\nmark request **Completed**\n(one transaction);
+:Update stock status\n(High / Low / Out of stock);
+stop
+@enduml

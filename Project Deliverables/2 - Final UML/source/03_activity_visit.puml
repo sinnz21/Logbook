@@ -1,0 +1,42 @@
+@startuml ISU_Infirmary_Activity_Visit
+!include style.iuml
+title Activity Diagram — Recording a Patient Visit
+
+|Nurse|
+start
+:Open **Add visit record**;
+:Search patient by ID number or name;
+if (Patient found?) then (yes)
+  :Use the existing record;
+else (no)
+  :Enter patient details\n(type, name, sex, birthdate, department...);
+endif
+|System|
+:Show the patient's active special-case flags\n(e.g. Allergy, Asthma, Hypertension);
+|Nurse|
+:Enter blood pressure, temperature,\npulse rate and chief complaint;
+if (New special case?) then (yes)
+  :Tick the special-case flag;
+else (no)
+endif
+:Add medicines and supplies given\n(quantity, dosage) and management;
+repeat :Press **Save visit record**;
+  |System|
+  :Check stock of every item;
+  backward :Show the shortage (nothing is saved);\nnurse changes the quantities or items;
+repeat while (Enough stock for all items?) is (no) not (yes)
+:Save visit as **In care**,\ndeduct stock and write ledger rows\n(one transaction);
+:Write "Visit recorded" to the audit log;
+|Nurse|
+:Treat or observe the patient;
+:Press **Sign out**, choose a disposition\n(Back to class, Sent home, Observation,\nReferred to doctor, Hospital admission);
+|System|
+:Record the time of exit;\nvisit becomes **Completed**;
+:Update dashboard, reports\nand outbreak counts;
+|Nurse|
+if (Document needed?) then (yes)
+  :Print medical certificate\nor parental notification;
+else (no)
+endif
+stop
+@enduml

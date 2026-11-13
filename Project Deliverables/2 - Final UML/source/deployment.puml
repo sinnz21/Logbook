@@ -1,0 +1,105 @@
+@startuml ISU_Infirmary_Deployment
+left to right direction
+skinparam dpi 170
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 18
+skinparam titleFontStyle bold
+skinparam ArrowColor #2F4F4A
+skinparam ArrowFontSize 11
+skinparam ArrowFontColor #1F3B36
+skinparam ArrowThickness 1.3
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam rectangle {
+  BorderColor #107A6B
+}
+skinparam node {
+  BackgroundColor #F3FAF8
+  BorderColor #107A6B
+  BorderThickness 1.6
+  FontStyle bold
+  StereotypeFontColor #107A6B
+  StereotypeFontSize 11
+}
+skinparam artifact {
+  BackgroundColor #FFFFFF
+  BorderColor #3E8E80
+  StereotypeFontColor #3E8E80
+  StereotypeFontSize 10
+}
+skinparam database {
+  BackgroundColor #FFFFFF
+  BorderColor #3E8E80
+  StereotypeFontColor #3E8E80
+}
+skinparam cloud {
+  BackgroundColor #FFF7E8
+  BorderColor #C98A1B
+}
+skinparam frame {
+  BorderColor #9DB4AE
+  FontColor #5F6D69
+}
+
+title UML Deployment Diagram — ISU Infirmary Logbook Management and Health Surveillance System
+
+frame "ISU Echague — University Health Service (UHS) Local Area Network" as LAN {
+
+  node "Nurse Workstation (×N)\nWindows PC / laptop" <<device>> as NURSE {
+    node "Web Browser\n(Chrome / Edge)" <<executionEnvironment>> as NB {
+      artifact "React SPA\n(nurse views)" <<artifact>> as NSPA
+    }
+  }
+
+  node "UHS Wi-Fi Router / LAN Switch" <<device>> as ROUTER
+
+  node "Infirmary Server PC (Admin workstation)\nWindows 10/11 • static LAN IP, e.g. 192.168.x.x" <<device>> as SERVER {
+
+    node "Web Browser\n(Chrome / Edge)" <<executionEnvironment>> as AB {
+      artifact "React SPA\n(admin views)" <<artifact>> as ASPA
+    }
+
+    node "Node.js (LTS) + Vite 8\nweb server :5173 (npm run dev, host mode)" <<executionEnvironment>> as VITE {
+      artifact "Frontend ver2\n(React 19: index.html, JS, CSS,\nISU seal)" <<artifact>> as FE
+      artifact "vite.config.js\n(/api proxy → :8000)" <<artifact>> as VCFG
+    }
+
+    node "Python 3 virtual env (.venv)\nUvicorn ASGI server :8000" <<executionEnvironment>> as PY {
+      artifact "FastAPI backend\napp.main:app (REST /api, JWT)" <<artifact>> as API
+      artifact "health_surveillance/\nmodel.json (Poisson\noutbreak model)" <<artifact>> as MODEL
+      artifact "Backup scheduler\n(daily 11:59 PM, Manila)" <<artifact>> as SCHED
+      artifact ".env\n(DB, SECRET_KEY, SMTP,\nCORS settings)" <<artifact>> as ENV
+    }
+
+    node "XAMPP\nMariaDB 10.4 server :3306" <<executionEnvironment>> as XAMPP {
+      database "isu_infirmary\n(22 tables: patients, visits,\nstock, users, audit log…)" <<schema>> as DB
+      artifact "mysqldump / mysql\n(command-line tools)" <<artifact>> as DUMP
+    }
+
+    artifact "backups/\nisu_infirmary_*.sql\n(automatic, manual, safety)" <<artifact>> as BK
+  }
+}
+
+cloud "Internet" as NET {
+  node "Gmail SMTP Server\nsmtp.gmail.com :587" <<external system>> as GMAIL
+}
+
+' ---- communication paths ----
+NB -- ROUTER : <<LAN Wi-Fi / Ethernet>>\nHTTP :5173
+ROUTER -- VITE : <<LAN>>\nHTTP :5173
+AB -- VITE : <<localhost>>\nHTTP :5173
+VITE -- API : <<HTTP / JSON>>\n/api/* proxied to :8000\n(Bearer JWT)
+API -- DB : <<TCP/IP :3306>>\nSQLAlchemy + PyMySQL
+API ..> MODEL : <<reads>>
+SCHED ..> DUMP : <<executes>>
+DUMP -- DB : <<dump / restore>>
+DUMP ..> BK : <<writes .sql>>
+API -- GMAIL : <<SMTP over TLS :587>>\n6-digit password-reset code
+
+' ---- deployment of the SPA into each browser ----
+FE ..> NSPA : <<deploy>>\ndownloaded on page load
+FE ..> ASPA : <<deploy>>
+
+@enduml

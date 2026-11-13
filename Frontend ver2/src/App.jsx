@@ -40,7 +40,7 @@ const VIEWS = {
     dashboard: AdminDashboard,
     'stock-requests': StockRequests,
     users: UserManagement,
-    ...REPORT_VIEWS,
+    'supply-report': REPORT_VIEWS['supply-report'],
     'audit-log': AuditLog,
     settings: Settings,
   },

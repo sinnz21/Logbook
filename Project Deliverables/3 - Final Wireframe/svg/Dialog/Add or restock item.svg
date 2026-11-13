@@ -1,0 +1,207 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Dialog / Add or restock item">
+<rect width="1440" height="900" fill="#516663"/>
+<g id="Dialog" filter="url(#filter0_d_8_726)">
+<rect x="440" y="140.5" width="560" height="619" rx="20" fill="white"/>
+<g id="Dialog header" clip-path="url(#clip0_8_726)">
+<g id="Group" clip-path="url(#clip1_8_726)">
+<g id="Group_2" clip-path="url(#clip2_8_726)">
+<text id="Add or restock item" fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="19" font-weight="800" letter-spacing="0em"><tspan x="468" y="186.252">Add or restock item</tspan></text>
+</g>
+<text id="Adds a new item or increases the quantity of an existing one." fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="468" y="206.804">Adds a new item or increases the quantity of an existing one.</tspan></text>
+</g>
+<g id="link:BACK">
+<rect x="938" y="166.5" width="34" height="34" rx="9" fill="#F2F6F5"/>
+<g id="icon/x">
+<path id="Vector" d="M959 179.5L951 187.5M951 179.5L959 187.5" stroke="#3E4E4B" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+<g id="Group_3">
+<g clip-path="url(#clip3_8_726)">
+<rect x="468" y="225.5" width="504" height="46" rx="12" fill="#F2F6F5"/>
+<g id="Group_4" filter="url(#filter1_d_8_726)">
+<rect x="472" y="229.5" width="246.5" height="38" rx="9" fill="white"/>
+<text id="Add new item" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="549.75" y="254.008">Add new item</tspan></text>
+</g>
+<g id="Group_5">
+<text id="Restock existing" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="790.75" y="254.008">Restock existing</tspan></text>
+</g>
+</g>
+</g>
+<g id="Field/Item name" clip-path="url(#clip4_8_726)">
+<text id="Item name" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="468" y="300.6">Item name</tspan></text>
+<g id="Input">
+<rect x="468.5" y="311" width="503" height="43" rx="10.5" fill="white"/>
+<rect x="468.5" y="311" width="503" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="e.g. Paracetamol 500mg" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="483" y="338.212">e.g. Paracetamol 500mg</tspan></text>
+</g>
+</g>
+<g id="Group_6" clip-path="url(#clip5_8_726)">
+<g id="Field/Kind" clip-path="url(#clip6_8_726)">
+<text id="Kind" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="468" y="383.6">Kind</tspan></text>
+<g id="Input_2">
+<rect x="468.5" y="394" width="244" height="43" rx="10.5" fill="white"/>
+<rect x="468.5" y="394" width="244" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="Medicine" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="483" y="421.212">Medicine</tspan></text>
+<g id="icon/chev">
+<path id="Vector_2" d="M686 413.5L690 417.5L694 413.5" stroke="#7A8A87" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+<g id="Field/Category" clip-path="url(#clip7_8_726)">
+<text id="Category" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="727" y="383.6">Category</tspan></text>
+<g id="Input_3">
+<rect x="727.5" y="394" width="244" height="43" rx="10.5" fill="white"/>
+<rect x="727.5" y="394" width="244" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="Analgesic / Antipyretic" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="742" y="421.212">Analgesic / Antipyretic</tspan></text>
+<g id="icon/chev_2">
+<path id="Vector_3" d="M945 413.5L949 417.5L953 413.5" stroke="#7A8A87" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+</g>
+<g id="Group_7" clip-path="url(#clip8_8_726)">
+<g id="Field/Unit" clip-path="url(#clip9_8_726)">
+<text id="Unit" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="468" y="466.6">Unit</tspan></text>
+<g id="Input_4">
+<rect x="468.5" y="477" width="157.667" height="43" rx="10.5" fill="white"/>
+<rect x="468.5" y="477" width="157.667" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="Box" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="483" y="504.212">Box</tspan></text>
+<g id="icon/chev_3">
+<path id="Vector_4" d="M599.667 496.5L603.667 500.5L607.667 496.5" stroke="#7A8A87" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+<g id="Field/Quantity" clip-path="url(#clip10_8_726)">
+<text id="Quantity" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="640.667" y="466.6">Quantity</tspan></text>
+<g id="Input_5">
+<rect x="641.167" y="477" width="157.667" height="43" rx="10.5" fill="white"/>
+<rect x="641.167" y="477" width="157.667" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="1" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="655.667" y="504.212">1</tspan></text>
+</g>
+</g>
+<g id="Field/Reorder level" clip-path="url(#clip11_8_726)">
+<text id="Reorder level" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="813.333" y="466.6">Reorder level</tspan></text>
+<g id="Input_6">
+<rect x="813.833" y="477" width="157.667" height="43" rx="10.5" fill="white"/>
+<rect x="813.833" y="477" width="157.667" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="50" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="828.333" y="504.212">50</tspan></text>
+</g>
+</g>
+</g>
+<g id="Group_8" clip-path="url(#clip12_8_726)">
+<g id="Field/Expiry date" clip-path="url(#clip13_8_726)">
+<text id="Expiry date" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="468" y="549.6">Expiry date</tspan></text>
+<g id="Input_7">
+<rect x="468.5" y="560" width="244" height="43" rx="10.5" fill="white"/>
+<rect x="468.5" y="560" width="244" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="dd / mm / yyyy" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="483" y="587.212">dd / mm / yyyy</tspan></text>
+</g>
+</g>
+<g id="Field/Batch or lot (optional)" clip-path="url(#clip14_8_726)">
+<text id="Batch or lot (optional)" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="727" y="549.6">Batch or lot (optional)</tspan></text>
+<g id="Input_8">
+<rect x="727.5" y="560" width="244" height="43" rx="10.5" fill="white"/>
+<rect x="727.5" y="560" width="244" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="e.g. B-2026-04" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="742" y="587.212">e.g. B-2026-04</tspan></text>
+</g>
+</g>
+</g>
+<g id="Group_9">
+<rect x="468" y="619.5" width="504" height="54" rx="11" fill="#F2F8F6"/>
+<g id="Group_10">
+<rect x="482" y="632.5" width="28" height="28" rx="14" fill="#CDE9E3"/>
+<text id="NS" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="488" y="650.988">NS</tspan></text>
+</g>
+<text id="Added by Nurse Santos. This is logged automatically to the audit ledger." fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="520" y="643.804">Added by Nurse Santos. This is logged automatically to the audit </tspan><tspan x="520" y="659.804">ledger.</tspan></text>
+</g>
+<g id="Group_11" clip-path="url(#clip15_8_726)">
+<g id="link:BACK_2">
+<text id="Cancel" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="819" y="717.008">Cancel</tspan></text>
+</g>
+<g id="link:Nurse / Stock &#38; supplies" filter="url(#filter2_d_8_726)">
+<rect x="891" y="689.5" width="81" height="44" rx="11" fill="#137A6D"/>
+<text id="Save" fill="white" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="915" y="717.008">Save</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_d_8_726" x="380" y="104.5" width="680" height="739" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="24"/>
+<feGaussianBlur stdDeviation="30"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_8_726"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_8_726" result="shape"/>
+</filter>
+<filter id="filter1_d_8_726" x="469" y="227.5" width="252.5" height="44" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1.5"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.14 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_8_726"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_8_726" result="shape"/>
+</filter>
+<filter id="filter2_d_8_726" x="875" y="679.5" width="113" height="76" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="6"/>
+<feGaussianBlur stdDeviation="8"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.075 0 0 0 0 0.478 0 0 0 0 0.427 0 0 0 0.24 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_8_726"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_8_726" result="shape"/>
+</filter>
+<clipPath id="clip0_8_726">
+<rect width="504" height="43" fill="white" transform="translate(468 166.5)"/>
+</clipPath>
+<clipPath id="clip1_8_726">
+<rect width="470" height="43" fill="white" transform="translate(468 166.5)"/>
+</clipPath>
+<clipPath id="clip2_8_726">
+<rect width="184" height="24" fill="white" transform="translate(468 166.5)"/>
+</clipPath>
+<clipPath id="clip3_8_726">
+<rect x="468" y="225.5" width="504" height="46" rx="12" fill="white"/>
+</clipPath>
+<clipPath id="clip4_8_726">
+<rect width="504" height="67" fill="white" transform="translate(468 287.5)"/>
+</clipPath>
+<clipPath id="clip5_8_726">
+<rect width="504" height="67" fill="white" transform="translate(468 370.5)"/>
+</clipPath>
+<clipPath id="clip6_8_726">
+<rect width="245" height="67" fill="white" transform="translate(468 370.5)"/>
+</clipPath>
+<clipPath id="clip7_8_726">
+<rect width="245" height="67" fill="white" transform="translate(727 370.5)"/>
+</clipPath>
+<clipPath id="clip8_8_726">
+<rect width="504" height="67" fill="white" transform="translate(468 453.5)"/>
+</clipPath>
+<clipPath id="clip9_8_726">
+<rect width="158.667" height="67" fill="white" transform="translate(468 453.5)"/>
+</clipPath>
+<clipPath id="clip10_8_726">
+<rect width="158.667" height="67" fill="white" transform="translate(640.667 453.5)"/>
+</clipPath>
+<clipPath id="clip11_8_726">
+<rect width="158.667" height="67" fill="white" transform="translate(813.333 453.5)"/>
+</clipPath>
+<clipPath id="clip12_8_726">
+<rect width="504" height="67" fill="white" transform="translate(468 536.5)"/>
+</clipPath>
+<clipPath id="clip13_8_726">
+<rect width="245" height="67" fill="white" transform="translate(468 536.5)"/>
+</clipPath>
+<clipPath id="clip14_8_726">
+<rect width="245" height="67" fill="white" transform="translate(727 536.5)"/>
+</clipPath>
+<clipPath id="clip15_8_726">
+<rect width="504" height="44" fill="white" transform="translate(468 689.5)"/>
+</clipPath>
+</defs>
+</svg>

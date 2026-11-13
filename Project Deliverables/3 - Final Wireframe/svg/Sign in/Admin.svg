@@ -1,0 +1,97 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="Sign in / Admin">
+<rect width="1440" height="900" fill="#0B3D3A"/>
+<g id="Sign-in card" filter="url(#filter0_d_5_40)">
+<rect x="505" y="119" width="430" height="624" rx="22" fill="white"/>
+<g id="Brand">
+<g id="Seal ring">
+<rect x="678.5" y="155.5" width="83" height="83" rx="41.5" fill="#F2F8F6"/>
+<rect x="678.5" y="155.5" width="83" height="83" rx="41.5" stroke="#E3EDEA"/>
+<circle id="ISU seal" cx="720" cy="197" r="36" fill="url(#pattern0_5_40)"/>
+</g>
+<text id="ISU Infirmary" fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="24" font-weight="800" letter-spacing="0em"><tspan x="645" y="281.792">ISU Infirmary</tspan></text>
+<text id="Infirmary Log Book System" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" letter-spacing="0em"><tspan x="634.5" y="305.008">Infirmary Log Book System</tspan></text>
+<text id="Isabela State University, Echague" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="618.5" y="325.304">Isabela State University, Echague</tspan></text>
+</g>
+<text id="Sign in as" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="541" y="365.304">Sign in as</tspan></text>
+<g id="Role toggle">
+<rect x="541" y="376" width="358" height="48" rx="12" fill="#F2F6F5"/>
+<g id="Tab/Admin" filter="url(#filter1_d_5_40)">
+<rect x="545" y="380" width="173" height="40" rx="9" fill="white"/>
+<text id="Admin" fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="610" y="405.508">Admin</tspan></text>
+</g>
+<g id="link:Sign in">
+<text id="Nurse / Staff" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="767.5" y="405.508">Nurse / Staff</tspan></text>
+</g>
+</g>
+<g id="Field/Username">
+<text id="Username" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="541" y="455.304">Username</tspan></text>
+<g id="Group">
+<rect x="541.5" y="465.5" width="357" height="45" rx="10.5" fill="white"/>
+<rect x="541.5" y="465.5" width="357" height="45" rx="10.5" stroke="#DCE5E2"/>
+<g id="icon/user">
+<path id="Vector" d="M564.5 488C566.065 488 567.333 486.732 567.333 485.167C567.333 483.602 566.065 482.333 564.5 482.333C562.935 482.333 561.667 483.602 561.667 485.167C561.667 486.732 562.935 488 564.5 488Z" stroke="#7A8A87" stroke-width="1.41667" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_2" d="M558.833 494.375V493.667C558.833 492.539 559.281 491.458 560.078 490.661C560.875 489.864 561.956 489.417 563.083 489.417H565.917C567.044 489.417 568.125 489.864 568.922 490.661C569.719 491.458 570.167 492.539 570.167 493.667V494.375" stroke="#7A8A87" stroke-width="1.41667" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="e.g. acruz" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="583" y="493.712">e.g. acruz</tspan></text>
+</g>
+</g>
+<g id="Field/Password">
+<text id="Password" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="541" y="538.304">Password</tspan></text>
+<g id="Group_2">
+<rect x="541.5" y="548.5" width="357" height="45" rx="10.5" fill="white"/>
+<rect x="541.5" y="548.5" width="357" height="45" rx="10.5" stroke="#DCE5E2"/>
+<g id="icon/lock">
+<path id="Vector_3" d="M568.75 570.292H560.25C559.468 570.292 558.833 570.926 558.833 571.708V575.958C558.833 576.741 559.468 577.375 560.25 577.375H568.75C569.532 577.375 570.167 576.741 570.167 575.958V571.708C570.167 570.926 569.532 570.292 568.75 570.292Z" stroke="#7A8A87" stroke-width="1.41667" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_4" d="M561.667 570.292V567.458C561.667 566.707 561.965 565.986 562.497 565.455C563.028 564.924 563.749 564.625 564.5 564.625C565.251 564.625 565.972 564.924 566.503 565.455C567.035 565.986 567.333 566.707 567.333 567.458V570.292" stroke="#7A8A87" stroke-width="1.41667" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Minimum 8 characters, 1 symbol" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="583" y="576.712">Minimum 8 characters, 1 symbol</tspan></text>
+</g>
+</g>
+<g id="Group_3">
+<text id="Forgot password?" fill="#137A6D" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="783" y="621.304">Forgot password?</tspan></text>
+</g>
+<g id="link:Admin / Dashboard" filter="url(#filter2_d_5_40)">
+<rect x="541" y="636" width="358" height="48" rx="12" fill="#137A6D"/>
+<text id="Sign in" fill="white" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="15" font-weight="bold" letter-spacing="0em"><tspan x="696" y="666.12">Sign in</tspan></text>
+</g>
+<g id="Group_4">
+<text id="Locks for 15 minutes after 5 failed attempts" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="599" y="712.396">Locks for 15 minutes after 5 failed attempts</tspan></text>
+</g>
+</g>
+<text id="University Health Services, Echague, Isabela" fill="#A9D3CB" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" letter-spacing="0em"><tspan x="590.5" y="778.1">University Health Services, Echague, Isabela</tspan></text>
+</g>
+<defs>
+<filter id="filter0_d_5_40" x="445" y="83" width="550" height="744" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="24"/>
+<feGaussianBlur stdDeviation="30"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.28 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_5_40"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_5_40" result="shape"/>
+</filter>
+<pattern id="pattern0_5_40" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_5_40" transform="scale(0.0126582)"/>
+</pattern>
+<filter id="filter1_d_5_40" x="542" y="378" width="179" height="46" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1.5"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.043 0 0 0 0 0.239 0 0 0 0 0.227 0 0 0 0.14 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_5_40"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_5_40" result="shape"/>
+</filter>
+<filter id="filter2_d_5_40" x="521" y="624" width="398" height="88" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="8"/>
+<feGaussianBlur stdDeviation="10"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.075 0 0 0 0 0.478 0 0 0 0 0.427 0 0 0 0.28 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_5_40"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_5_40" result="shape"/>
+</filter>
+<image id="image0_5_40" width="79" height="79" preserveAspectRatio="none" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE8AAABPCAMAAACd6mi0AAAAwFBMVEXb5tjn3qSjmV1ZcS9dkWSbrJzm0l+dkzcgWiFupIxXcliy3MueybDSq5ntyyAqaUqXdS9ojDA3hF+XbVfPWF3JqmOiNCvLKCw0jDaow13OoSsvKUcmKj1zc4R3wqPNO0P9/fsFZDYKWi+ohzb7+dDz54779q+vlUntyC8vdlQsZC7u2W4VaEPu1FRMiGuqi0YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB2CTgyAAAAMHRSTlP///////////////////////////////////////////////////////////////9Ppz/1AAAK+ElEQVR42q1Yh5ajOhKVhEQUBqdOm0Akgwn//3d7q4Td03Nm34S3zDmetoGrCreiqP6/l/jZA63ITZ4r+meMbP8OnhAyV8NWNmXZ8FUOashzIf4IT+TDNmxR0wxR1AxNNOAPYEYNMMXv4gl53QCA149aB8GEKw6CQEWEvW3DVYrfwGulgoZRBIQgjh1dNX86D0q6b/KX8aQaPBrh1HWSZZl2Y5ZZjW/AnIKIzKDkL+EJxQ8HE97V2tVzkol1dqtIkqT2l5sCOnJT4ud4chhg/GAiyWogQdM1w0cikqLgH2fNiLDINsif4eVb06gANlvtqS4yI8a6HrOxdiZLjGbhNH6DJaB1WW75X+K1amsiFbh6tBAHQKnIasCOzmXGWxNCGxhzhMgxOPS9zuKrI8pmgHB1YS00daMQRth6hjucFcKuJF4qCpdkM7s7GKLyK6D44glQNiBu1DNegc4idSOccCpgtXFdRxLPGleLxDn2TlCCpeLHeIKUDchyZKc5S9zJQkO3+3RXFwelFg5aK74ZEBnED/HAEzIdEWPm98ZvkTyf6asRsMUoKuMSOCZQcOAP8MgVKmBzp5lIPC0IZkpTZayU1ug0ZcR5duR5s5Lz6yn61inPP/KmZLg6ESLRwsvmYq1si4sOrFrEIXGJhXcZu4xsCGrn3+PJLRqgLBSti3TU2cxhoCUuQhOUUoDbd9KSkLidVeQUSzaET+RXPLg2Oj4sD2qMpOlR9l3n4S4v/GDbS9l17ylRSlhHQQN/kVMeGu//gSnHeI/Oei7IH9M7hOl8Rs5fX71GEBBXqAA4zvDM6sjMCJVNfYsnB3btLiDryqrucOLy+nrxabmlX7teUu5BMOIDpiEn7xqLh3iA08k4jgw6A44lYTwhLpf8JRc5lxM6JbzT8Ro20ewUF4A07ROPrDeBWPgmbOJYunC53+9dz4lfAE0a9gkEpHMgYUp0HAUy2kikGUr5xAMlcRzCP0EWgT1iDbvLMPTi5TkUhroizz0eDlruYQh7zzgeeXZmH6sHnkTUTj4TUd7AzRCXfKhLMPkLA3qP4KBO3u+KxBMm0WTvabegYPGiwMemEeTZglwhybsd452h6eU/EO8iWD5YsKcLGWwcKQrnmVltPJ4om2jnSpFR7jUQ4Q774UXGe8nz8+U1v1wu3sFddw9vuN2lHNcjWOjqWDWlYDxZ7uJRUiJTLCGZDk6872S+EGHyy6u3n7yHRJowXK6g4Qr2e86wR8SDLCPFooW3nILtIANEfBgQAr5ewGnh+Yc7kL3vZafdLLJEFHhv9wgeQV6J4Vuoyok9RZSGS7hAjvsjPC75GTrv7oDY8D0g+1bESKsuW7UlhTdQUFQSFQPmG00mMvzsbHe/hfe+JynpHZxp9svTpQdX+r5bbrel0/GYFdpnNrBOAg81g0PNFZoKREzGIzSYEPJ1sKD41z9w/TM11IfgEBIPB8IrIRxpOUDqnYKCzYfkOe9pWEMmerQbFBqfsJeQcBcQwUbmww1FHOxhl5BEceOqKUaG5orYVJGa3Ckb/12syMqxgfnut0W2KgdEbpSSrUzpMpU0yiOn9EyIo1pQxthMVMiDYIwC6VUJvNUUWUEVa7L+SRmWjwxpTbrqI/osbR6t3xlM6sLbLWxR7GxiDJX8ifHkeTgif5vUOAPzIdRuZJsw9OFodHCMog6aqQCYiWHE9E42BuISkr7CFJSBoyaSQsIdcGoGScWJQxdPIjp6ZFyRBsqGt8PhXfbH4zE8SGnWIgNev+BUUvoQo/jjVWpJiNFCbnBH7eZVJ+gwXEBmXm5L354hSaruvbwdgjetT2/Hw+HQ4QySr21hFfi+C8FAMCY5cRJkPM5V1CvSf2nVgll3HE3RaCIgd2F0fIu1VsC7SauBV0I4Sear2tgV816YPV5J0VavxD6ckbZs5n4JObqDAwBlpI+B1nEEwEVZyiCwR9vdSI0Y/RzCjvFYX6Yziq6w1IelgOtI45AqliAdF7KdPr7pcMG3I/2cdreQ6AedY+o0teCciibY6+syNJ9OnBDVIeBa0pgrIOFBpre3t/gY9f0Tj8zXVzj2EOPdAhmGfIkW2OuL7i6Fz1fCY+mWlv1RafIuAPUxIs37ZfF4FQCXHp8h4SUiZbyI9AULqTCDHeBLHcuqZfd2XF9W5DmYLezVFZ/KdiHjBZJ0gIStpa5OrBk1FMeokUJcGzXV87qu6cjNQXuHF0EExksxfcRxEFEKOAbxlOqJCg60YGX7irrW8cQdIuLjKigfbNTKgzFFUs+x8Q4Jb+TfanL73JE+BhEnGO8mqz483PrUnZLR8wWNFuWXvGkmzl8rdWlO3w4hsXWh8ULsbR+Rc79q1vd+WNoKTA8nMpU13Ljt+aocHn0aFcs4vLcVqNUz3rdI/m/GS/vb4Y7oWJD/ZodUDHegwpU552c4hOASQ61BjKTNTyvEaVU4Gt2mAkNRMfnL+xcndlXVBXvvSv0YGlLKz62i+jGTfytiILiwwDCVovSu0dHoCanKf4xaF+QP/wzejmdErm8bkf629lnfHNJBopOZCgjsDE6fKTXZmJGKOI5TDWdrR6fkKeuwtCiHVti08Nllr2++/npjrwUofWBjl5zqEmAkK5JzirIDwJXrHfhXIVdRHUNlFD7ahsjXX6EGvoGklVW2qOOImB96vGqdNOV65Pg01UXKv5mAqLwcuA2gsUdTuXzUc8xsvkEYU4wW1Drgd/Dv7JN7QmiQTxtdJHt7F4TQoI9iP5JQ9YV43KLu/RXaPzRLGACoE4dLwOcPdVY84trUaMinTZEw2DlVA3nXxnWykncRH2h5/YQtPtvTEVG9Is046k7phfYaBSncQuJZC3/IXKVBiUOIULKgoS5Zx5F6MhQZ9dmf4gsENBkPgZiO4oDTEUpTa8ogMDouYqiMWV+AeJwyDn4Oqbh0wOaNkl/6XRo+1hW6ZpbIFBBbUS9Ee7+WxiTkkfN16QWCbKmqnjp8cgaS31j7/vmbflwMzc4ZTb2cH0srUPZaXq9leTYMV5Yf+fl8I7JbD8eDEo1I3/X3mAUjGqRcssNRl6qWQ3h+KT9eyhyFM0BT/vJxPb8gw0pd7E9h8KbP41Cq7+ejhnq/RD8exOwWqE7k8vZxrUBe1DL5cQhzZMIofj6Elpac8TkRPuc30vg57NZvk58GRUXBV0H1Awi3UOAYVqR+eyK6YGuU/H6+BOAQPM/VfvpCHlURPF0xUnv/iFTBHI59z+fhhm+WO5/zNM2/0+OhWB0fw3QcIDRgX/g4mHZN4+PntIc0v6n2R/M5fD7tEuL9/Y0v+flhWbB3n0ZpttzUj/cHA03o8S7AA7BIvFF5h1XwzSD6PI3WOkr81X5jNyAkfI9pD2NrnSX1iPRYWC6LMeDe9Q5HVhL/a/+C3jLanQIB1Tt6HS30KBJMdehCMRhkkDB+h3heZBr1v67Fvtvu5LQKYyOi/3njiWlcRWFQtu06YwJISd/j+9ELB5JdxS/sr55+dkCaLdKIW+3srE4yb14OcThwMz/dr6ltaILp4Wjk11OyIu9Yw12T9fM7beyaaNjkr+z/Njyp9o3djPKawSfAolnNnD73f2X5K/u/535SpfFj6jxBorHwLiC78cpz+8X9pEekFSmtPKfnmmkPFlwb3VPy9/a7JCPoWEYqoP1uPE0Bel6/341+c7+7c2fbNlo5A3gYaEu80REb6tjv75/3/XieY4jbl+O8JB5ULv9wP/7cRWOGy9X1Skv8v7e//5Prv82bXtTNaGKpAAAAAElFTkSuQmCC"/>
+</defs>
+</svg>

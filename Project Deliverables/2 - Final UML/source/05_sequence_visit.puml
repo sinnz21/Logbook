@@ -1,0 +1,43 @@
+@startuml ISU_Infirmary_Sequence_Save_Visit
+!include style.iuml
+autonumber
+title Sequence Diagram — Saving a Visit with Medicine
+
+actor Nurse
+participant "React SPA\n(Add visit record)" as UI
+participant "FastAPI\nPOST /api/visits" as API
+participant "Auth\n(JWT, require_nurse)" as AUTH
+participant "visit_service" as VS
+participant "stock_service" as SS
+database "MariaDB\nisu_infirmary" as DB
+participant "Audit\nmiddleware" as AUD
+
+Nurse -> UI : Fill vitals, complaint,\nmedicine (Paracetamol × 2)
+Nurse -> UI : Save visit record
+UI -> API : POST /api/visits\n{patientId, vitals, medicines[]}\nAuthorization: Bearer JWT
+API -> AUTH : verify token and role
+AUTH --> API : nurse
+API -> VS : create_visit(payload, user)
+VS -> DB : INSERT visits (status = in_care)
+VS -> DB : INSERT visit_complaints (tags)
+loop each medicine / supply
+  VS -> DB : INSERT visit_medicines / visit_supplies
+  VS -> SS : release_medicine(id, qty, visit_id)
+  SS -> DB : SELECT ... FROM medicine_stock FOR UPDATE
+  alt quantity < qty
+    SS --> VS : InsufficientStock
+    VS -> DB : ROLLBACK
+    API --> UI : 409 "Not enough stock"
+    UI --> Nurse : Show shortage (nothing saved)
+  else enough stock
+    SS -> DB : UPDATE medicine_stock (quantity - qty)
+    SS -> DB : INSERT inventory_transactions\n(released, -qty, reference = visit)
+  end
+end
+VS -> DB : COMMIT
+VS --> API : visit
+API -> AUD : response 201
+AUD -> DB : INSERT activity_log ("Visit recorded")
+API --> UI : 201 VisitOut
+UI --> Nurse : Patient appears in today's queue (In care)
+@enduml

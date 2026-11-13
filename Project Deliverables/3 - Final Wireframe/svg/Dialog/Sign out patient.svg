@@ -1,0 +1,161 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Dialog / Sign out patient">
+<rect width="1440" height="900" fill="#516663"/>
+<g id="Dialog" filter="url(#filter0_d_7_2)">
+<rect x="430" y="167.5" width="580" height="565" rx="20" fill="white"/>
+<g id="Dialog header" clip-path="url(#clip0_7_2)">
+<g id="Group" clip-path="url(#clip1_7_2)">
+<text id="Sign out, Santos, Maria R." fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="19" font-weight="800" letter-spacing="0em"><tspan x="458" y="213.252">Sign out, Santos, Maria R.</tspan></text>
+<text id="Student, BS Computer Science, 3rd year, 2023-04512" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="458" y="233.804">Student, BS Computer Science, 3rd year, 2023-04512</tspan></text>
+</g>
+<g id="link:BACK">
+<rect x="948" y="193.5" width="34" height="34" rx="9" fill="#F2F6F5"/>
+<g id="icon/x">
+<path id="Vector" d="M969 206.5L961 214.5M961 206.5L969 214.5" stroke="#3E4E4B" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+<g id="Group_2" clip-path="url(#clip2_7_2)">
+<g id="Group_3">
+<rect x="458" y="252.5" width="168" height="60" rx="12" fill="#F2F8F6"/>
+<text id="Time in" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="470" y="276.896">Time in</tspan></text>
+<text id="8:42 AM" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="15" font-weight="800" letter-spacing="0em"><tspan x="470" y="297.12">8:42 AM</tspan></text>
+</g>
+<g id="Group_4">
+<rect x="636" y="252.5" width="168" height="60" rx="12" fill="#F2F8F6"/>
+<text id="Time of exit" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="648" y="276.896">Time of exit</tspan></text>
+<text id="9:05 AM" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="15" font-weight="800" letter-spacing="0em"><tspan x="648" y="297.12">9:05 AM</tspan></text>
+</g>
+<g id="Group_5">
+<rect x="814" y="252.5" width="168" height="60" rx="12" fill="#F2F8F6"/>
+<text id="Duration" fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12" letter-spacing="0em"><tspan x="826" y="276.896">Duration</tspan></text>
+<text id="Under 1 hour" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="15" font-weight="800" letter-spacing="0em"><tspan x="826" y="297.12">Under 1 hour</tspan></text>
+</g>
+</g>
+<text id="Disposition" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="458" y="341.6">Disposition</tspan></text>
+<g id="Group_6" clip-path="url(#clip3_7_2)">
+<g id="Option/Sent home">
+<rect x="458.75" y="361.25" width="167.833" height="44.5" rx="10.25" fill="#F2F8F6"/>
+<rect x="458.75" y="361.25" width="167.833" height="44.5" rx="10.25" stroke="#137A6D" stroke-width="1.5"/>
+<g id="Group_7">
+<rect x="472.5" y="375.5" width="16" height="16" rx="8" stroke="#137A6D" stroke-width="2"/>
+<circle id="Ellipse" cx="480.5" cy="383.5" r="4" fill="#137A6D"/>
+</g>
+<text id="Sent home" fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="499.5" y="388.804">Sent home</tspan></text>
+</g>
+<g id="Option/Back to class / work">
+<rect x="636.083" y="361.25" width="167.833" height="44.5" rx="10.25" fill="white"/>
+<rect x="636.083" y="361.25" width="167.833" height="44.5" rx="10.25" stroke="#DCE5E2" stroke-width="1.5"/>
+<g id="Group_8">
+<rect x="649.833" y="375.5" width="16" height="16" rx="8" stroke="#A9BDB8" stroke-width="2"/>
+</g>
+<text id="Back to class / work" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="676.833" y="388.804">Back to class / work</tspan></text>
+</g>
+<g id="Option/Hospital admission">
+<rect x="813.417" y="361.25" width="167.833" height="44.5" rx="10.25" fill="white"/>
+<rect x="813.417" y="361.25" width="167.833" height="44.5" rx="10.25" stroke="#DCE5E2" stroke-width="1.5"/>
+<g id="Group_9">
+<rect x="827.167" y="375.5" width="16" height="16" rx="8" stroke="#A9BDB8" stroke-width="2"/>
+</g>
+<text id="Hospital admission" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="500" letter-spacing="0em"><tspan x="854.167" y="388.804">Hospital admission</tspan></text>
+</g>
+</g>
+<g id="Group_10" clip-path="url(#clip4_7_2)">
+<g id="Group_11" clip-path="url(#clip5_7_2)">
+<text id="Treatment given" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="458" y="435.6">Treatment given</tspan></text>
+<g id="Group_12">
+<rect x="458" y="444.5" width="256" height="39" rx="11" fill="#F2F6F5"/>
+<text id="Biogesic 500mg &#195;&#151; 1" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="472" y="469.508">Biogesic 500mg &#xd7; 1</tspan></text>
+</g>
+</g>
+<g id="Group_13" clip-path="url(#clip6_7_2)">
+<text id="Supplies used" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="726" y="435.6">Supplies used</tspan></text>
+<g id="Group_14">
+<rect x="726" y="444.5" width="256" height="39" rx="11" fill="#F2F6F5"/>
+<text id="Sterile Gauze 4x4 &#195;&#151; 2" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="740" y="469.508">Sterile Gauze 4x4 &#xd7; 2</tspan></text>
+</g>
+</g>
+</g>
+<g id="Group_15" clip-path="url(#clip7_7_2)">
+<text id="Sign-out notes" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="458" y="512.6">Sign-out notes</tspan></text>
+<g id="Group_16">
+<rect x="458.5" y="523" width="523" height="69" rx="10.5" stroke="#DCE5E2"/>
+<text id="e.g. Advised rest, no further symptoms" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="473" y="550.212">e.g. Advised rest, no further symptoms</tspan></text>
+</g>
+</g>
+<g id="Group_17">
+<rect x="458" y="608.5" width="524" height="38" rx="11" fill="#E3F3EF"/>
+<g id="icon/print">
+<path id="Vector_2" d="M476 625.5V620.833H484V625.5M476 631.5H474.667C474.313 631.5 473.974 631.36 473.724 631.109C473.474 630.859 473.333 630.52 473.333 630.167V626.833C473.333 626.48 473.474 626.141 473.724 625.891C473.974 625.64 474.313 625.5 474.667 625.5H485.333C485.687 625.5 486.026 625.64 486.276 625.891C486.526 626.141 486.667 626.48 486.667 626.833V630.167C486.667 630.52 486.526 630.859 486.276 631.109C486.026 631.36 485.687 631.5 485.333 631.5H484" stroke="#0F5E56" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M483.333 628.833H476.667C476.298 628.833 476 629.132 476 629.5V633.5C476 633.868 476.298 634.167 476.667 634.167H483.333C483.702 634.167 484 633.868 484 633.5V629.5C484 629.132 483.702 628.833 483.333 628.833Z" stroke="#0F5E56" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Sending a student home prints a parental notification automatically." fill="#0F5E56" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" font-weight="600" letter-spacing="0em"><tspan x="498" y="632.804">Sending a student home prints a parental notification automatically.</tspan></text>
+</g>
+<g id="Group_18" clip-path="url(#clip8_7_2)">
+<g id="link:Form / Parental notification">
+<rect x="458.5" y="663" width="113" height="43" rx="10.5" fill="white"/>
+<rect x="458.5" y="663" width="113" height="43" rx="10.5" stroke="#DCE5E2"/>
+<g id="icon/print_2">
+<path id="Vector_4" d="M479 682.5V677.833H487V682.5M479 688.5H477.667C477.313 688.5 476.974 688.36 476.724 688.109C476.474 687.859 476.333 687.52 476.333 687.167V683.833C476.333 683.48 476.474 683.141 476.724 682.891C476.974 682.64 477.313 682.5 477.667 682.5H488.333C488.687 682.5 489.026 682.64 489.276 682.891C489.526 683.141 489.667 683.48 489.667 683.833V687.167C489.667 687.52 489.526 687.859 489.276 688.109C489.026 688.36 488.687 688.5 488.333 688.5H487" stroke="#137A6D" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_5" d="M486.333 685.833H479.667C479.298 685.833 479 686.132 479 686.5V690.5C479 690.868 479.298 691.167 479.667 691.167H486.333C486.702 691.167 487 690.868 487 690.5V686.5C487 686.132 486.702 685.833 486.333 685.833Z" stroke="#137A6D" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text id="Print slip" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="499" y="690.008">Print slip</tspan></text>
+</g>
+<g id="link:BACK_2">
+<text id="Cancel" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="770" y="690.008">Cancel</tspan></text>
+</g>
+<g id="link:Nurse / Patient records" filter="url(#filter1_d_7_2)">
+<rect x="842" y="662.5" width="140" height="44" rx="11" fill="#137A6D"/>
+<text id="Confirm sign out" fill="white" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="858" y="690.008">Confirm sign out</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_d_7_2" x="370" y="131.5" width="700" height="685" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="24"/>
+<feGaussianBlur stdDeviation="30"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_7_2"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_7_2" result="shape"/>
+</filter>
+<filter id="filter1_d_7_2" x="826" y="652.5" width="172" height="76" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="6"/>
+<feGaussianBlur stdDeviation="8"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.075 0 0 0 0 0.478 0 0 0 0 0.427 0 0 0 0.24 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_7_2"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_7_2" result="shape"/>
+</filter>
+<clipPath id="clip0_7_2">
+<rect width="524" height="43" fill="white" transform="translate(458 193.5)"/>
+</clipPath>
+<clipPath id="clip1_7_2">
+<rect width="460" height="43" fill="white" transform="translate(458 193.5)"/>
+</clipPath>
+<clipPath id="clip2_7_2">
+<rect width="524" height="60" fill="white" transform="translate(458 252.5)"/>
+</clipPath>
+<clipPath id="clip3_7_2">
+<rect width="524" height="46" fill="white" transform="translate(458 360.5)"/>
+</clipPath>
+<clipPath id="clip4_7_2">
+<rect width="524" height="61" fill="white" transform="translate(458 422.5)"/>
+</clipPath>
+<clipPath id="clip5_7_2">
+<rect width="256" height="61" fill="white" transform="translate(458 422.5)"/>
+</clipPath>
+<clipPath id="clip6_7_2">
+<rect width="256" height="61" fill="white" transform="translate(726 422.5)"/>
+</clipPath>
+<clipPath id="clip7_7_2">
+<rect width="524" height="93" fill="white" transform="translate(458 499.5)"/>
+</clipPath>
+<clipPath id="clip8_7_2">
+<rect width="524" height="44" fill="white" transform="translate(458 662.5)"/>
+</clipPath>
+</defs>
+</svg>

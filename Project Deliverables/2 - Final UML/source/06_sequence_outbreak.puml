@@ -1,0 +1,35 @@
+@startuml ISU_Infirmary_Sequence_Outbreak_Alert
+!include style.iuml
+autonumber
+title Sequence Diagram — Outbreak Alert on the Nurse Dashboard
+
+actor Nurse
+participant "React SPA\n(Nurse dashboard)" as UI
+participant "FastAPI\nGET /api/surveillance/alerts" as API
+participant "Surveillance check\n(_check_week)" as CHK
+participant "Poisson model\n(model.json)" as M
+database "MariaDB\nisu_infirmary" as DB
+
+Nurse -> UI : Open the dashboard
+UI -> API : GET /api/surveillance/alerts\nAuthorization: Bearer JWT
+API -> CHK : check this week (Monday–Sunday, Manila)
+CHK -> DB : SELECT visits of the last 13 weeks\n+ patient department + primary complaint tag
+DB --> CHK : rows
+CHK -> CHK : classify each visit (tag, or keywords such as\n"lagnat", "trangkaso", "ubo")\nand count per college × illness × week
+CHK -> M : expected(week, college, illness) for the 12 earlier weeks
+M --> CHK : normal levels
+CHK -> CHK : calibration scale = observed / expected
+loop each college × watched illness
+  CHK -> M : expected(this week)
+  M --> CHK : e
+  CHK -> CHK : e × scale × share of week passed
+  CHK -> CHK : Poisson test: this week alone,\nand last 2 weeks together\n(at least 4 cases, p < 0.0025)
+end
+CHK --> API : alerts[], colleges[]
+API --> UI : 200 JSON
+alt an alert fired
+  UI --> Nurse : Banner "Possible outbreak: Viral Flu in CCSICT\n– 18 cases this week"
+else none
+  UI --> Nurse : No banner
+end
+@enduml

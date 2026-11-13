@@ -1,0 +1,59 @@
+skinparam dpi 160
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam titleFontSize 18
+skinparam titleFontStyle bold
+skinparam titleFontColor #1F3B36
+skinparam ArrowColor #2F4F4A
+skinparam ArrowFontSize 11
+skinparam ArrowFontColor #1F3B36
+skinparam roundCorner 8
+skinparam actorBorderColor #107A6B
+skinparam actorBackgroundColor #F3FAF8
+skinparam usecase {
+  BackgroundColor #F3FAF8
+  BorderColor #107A6B
+  BorderThickness 1.3
+}
+skinparam package {
+  BorderColor #9DB4AE
+  FontColor #1F3B36
+  BackgroundColor #FFFFFF
+}
+skinparam rectangle {
+  BorderColor #107A6B
+  FontStyle bold
+}
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #107A6B
+  HeaderBackgroundColor #E3F2EE
+  AttributeFontSize 11
+  StereotypeFontColor #107A6B
+}
+skinparam activity {
+  BackgroundColor #F3FAF8
+  BorderColor #107A6B
+  DiamondBackgroundColor #FFF7E8
+  DiamondBorderColor #C98A1B
+}
+skinparam swimlane {
+  BorderColor #9DB4AE
+  TitleFontStyle bold
+}
+skinparam sequence {
+  ParticipantBackgroundColor #F3FAF8
+  ParticipantBorderColor #107A6B
+  LifeLineBorderColor #9DB4AE
+  ActorBackgroundColor #F3FAF8
+  ActorBorderColor #107A6B
+  GroupBorderColor #9DB4AE
+  GroupBackgroundColor #FFF7E8
+  DatabaseBackgroundColor #F3FAF8
+  DatabaseBorderColor #107A6B
+}
+skinparam note {
+  BackgroundColor #FFF7E8
+  BorderColor #C98A1B
+}

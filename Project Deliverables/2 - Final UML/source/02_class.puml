@@ -1,0 +1,194 @@
+@startuml ISU_Infirmary_Class_Diagram
+!include style.iuml
+skinparam dpi 120
+skinparam linetype ortho
+skinparam nodesep 45
+skinparam ranksep 60
+hide empty methods
+title Class Diagram — ISU Infirmary Logbook Management and Health Surveillance System\n(the 22 database tables, plus the health-surveillance model; PK = primary key)
+
+package "Accounts and audit" {
+  class User <<users>> {
+    +user_id : int <<PK>>
+    {field} username : varchar(50) <<unique>>
+    first_name, middle_name, last_name
+    password_hash : bcrypt
+    role : {admin, nurse}
+    email : varchar <<unique>>
+    status : {active, inactive}
+    last_login_at, created_at, deleted_at
+  }
+  class LoginAttempt <<login_attempts>> {
+    +attempt_id : bigint <<PK>>
+    username, ip_address
+    successful : bool
+    attempted_at : datetime
+  }
+  class ActivityLog <<activity_log>> {
+    +log_id : bigint <<PK>>
+    {field} action : varchar(150)
+    entity_type, entity_id, detail
+    log_type : {account, record, inventory, security, backup}
+    created_at : datetime
+  }
+  class SystemSetting <<system_settings>> {
+    +setting_id : int <<PK>>
+    setting_name <<unique>>
+    setting_value, value_type
+  }
+}
+
+package "Patients and visits" {
+  class Patient <<patients>> {
+    +patient_id : int <<PK>>
+    patient_number <<unique>>
+    first_name, middle_name, last_name
+    sex, date_of_birth, civil_status
+    contact_number
+    department, program, year_level
+    created_at, deleted_at
+    --
+    age() : int
+  }
+  class PatientType <<patient_types>> {
+    +patient_type_id <<PK>>
+    type_name : Student | Faculty | NASA | Visitor
+  }
+  class Visit <<visits>> {
+    +visit_id : int <<PK>>
+    chief_complaint : text
+    management, treatment_notes
+    blood_pressure, temperature, pulse_rate
+    {field} started_at, ended_at : datetime (UTC)
+    status : {waiting, in_care, completed, cancelled}
+    created_by, updated_by, deleted_at
+    --
+    duration_minutes() : int
+  }
+  class Complaint <<complaints>> {
+    +complaint_id <<PK>>
+    complaint_name <<unique>>
+  }
+  class VisitComplaint <<visit_complaints>> {
+    +visit_complaint_id <<PK>>
+    is_primary : bool
+  }
+  class Disposition <<dispositions>> {
+    +disposition_id <<PK>>
+    disposition_name <<unique>>
+  }
+  class SpecialCaseType <<special_case_types>> {
+    +special_case_type_id <<PK>>
+    case_name : PWD | Allergy | Asthma | ...
+  }
+  class PatientSpecialCase <<patient_special_cases>> {
+    +patient_special_case_id <<PK>>
+    notes, flagged_at
+    active : bool
+  }
+}
+
+package "Inventory" {
+  class ItemCategory <<item_categories>> {
+    +category_id <<PK>>
+    category_name, applies_to
+  }
+  class Medicine <<medicines>> {
+    +medicine_id <<PK>>
+    medicine_name <<unique>>
+    unit, description
+  }
+  class Supply <<supplies>> {
+    +supply_id <<PK>>
+    supply_name <<unique>>
+    unit, description
+  }
+  class MedicineStock <<medicine_stock>> {
+    quantity : decimal
+    reorder_level, expiry_date
+    stock_status : {high, low, out_of_stock} <<generated>>
+  }
+  class SupplyStock <<supply_stock>> {
+    quantity : decimal
+    reorder_level, expiry_date
+    stock_status <<generated>>
+  }
+  class VisitMedicine <<visit_medicines>> {
+    quantity_given : decimal
+    dosage, instructions, given_at
+  }
+  class VisitSupply <<visit_supplies>> {
+    quantity_used : decimal
+    remarks, given_at
+  }
+  class StockRequest <<stock_requests>> {
+    +request_id <<PK>>
+    status : {pending, approved, denied, completed}
+    request_date, approved_at, received_at
+    admin_response, remarks
+  }
+  class StockRequestItem <<stock_request_items>> {
+    item_type : {medicine, supply}
+    requested_quantity, approved_quantity
+    reason
+  }
+  class InventoryTransaction <<inventory_transactions>> {
+    +transaction_id <<PK>>
+    transaction_type : {released, restocked, adjustment, expired, damaged}
+    {field} quantity : decimal (signed)
+    reference_type : {visit, stock_request, manual}
+    reference_id, transaction_date, remarks
+  }
+}
+
+package "Health surveillance (not stored in the database)" {
+  class SurveillanceModel <<model.json>> {
+    intercept : float
+    coef : map<feature, float>
+    --
+    expected(week, college, complaint) : float
+  }
+  class OutbreakAlert <<API response>> {
+    college, complaint
+    cases : int
+    expected : float
+    p_value : float
+    test : {week, two_weeks}
+    headline : "Possible outbreak: ..."
+  }
+}
+
+User "1" -- "0..*" LoginAttempt : attempts >
+User "0..1" -- "0..*" ActivityLog : performs >
+User "1" -- "0..*" Visit : attends >
+User "1" -- "0..*" StockRequest : requests / approves / receives >
+User "0..1" -- "0..*" PatientSpecialCase : flags >
+User "0..1" -- "0..*" SystemSetting : updates >
+
+PatientType "1" -- "0..*" Patient : classifies >
+Patient "1" -- "0..*" Visit : has >
+Patient "1" *-- "0..*" PatientSpecialCase
+SpecialCaseType "1" -- "0..*" PatientSpecialCase
+PatientSpecialCase "0..*" -- "0..1" Visit : flagged during >
+Visit "1" *-- "0..*" VisitComplaint
+Complaint "1" -- "0..*" VisitComplaint
+Disposition "0..1" -- "0..*" Visit : outcome of <
+Visit "1" *-- "0..*" VisitMedicine
+Visit "1" *-- "0..*" VisitSupply
+Medicine "1" -- "0..*" VisitMedicine
+Supply "1" -- "0..*" VisitSupply
+
+ItemCategory "0..1" -- "0..*" Medicine
+ItemCategory "0..1" -- "0..*" Supply
+Medicine "1" *-- "1" MedicineStock
+Supply "1" *-- "1" SupplyStock
+StockRequest "1" *-- "1..*" StockRequestItem
+StockRequestItem "0..*" -- "0..1" Medicine
+StockRequestItem "0..*" -- "0..1" Supply
+InventoryTransaction "0..*" -- "0..1" Medicine
+InventoryTransaction "0..*" -- "0..1" Supply
+InventoryTransaction "0..*" -- "0..1" User : performed by >
+
+SurveillanceModel ..> Visit : reads weekly counts
+SurveillanceModel ..> OutbreakAlert : produces
+@enduml

@@ -1,0 +1,147 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Dialog / Add user">
+<rect width="1440" height="900" fill="#516663"/>
+<g id="Dialog" filter="url(#filter0_d_11_614)">
+<rect x="440" y="165" width="560" height="570" rx="20" fill="white"/>
+<g id="Group" clip-path="url(#clip0_11_614)">
+<g id="Group_2" clip-path="url(#clip1_11_614)">
+<text id="Add user" fill="#0B3D3A" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="19" font-weight="800" letter-spacing="0em"><tspan x="468" y="210.752">Add user</tspan></text>
+<text id="Only admin and nurse or staff roles exist in this system." fill="#5B6B68" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13" letter-spacing="0em"><tspan x="468" y="231.304">Only admin and nurse or staff roles exist in this system.</tspan></text>
+</g>
+<g id="link:BACK">
+<rect x="938" y="191" width="34" height="34" rx="9" fill="#F2F6F5"/>
+<g id="icon/x">
+<path id="Vector" d="M959 204L951 212M951 204L959 212" stroke="#3E4E4B" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+<g id="Group_3" clip-path="url(#clip2_11_614)">
+<g id="Group_4" clip-path="url(#clip3_11_614)">
+<text id="First name" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="468" y="263.1">First name</tspan></text>
+<g id="Group_5">
+<rect x="468.5" y="273.5" width="244" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="e.g. Nina" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="483" y="300.712">e.g. Nina</tspan></text>
+</g>
+</g>
+<g id="Group_6" clip-path="url(#clip4_11_614)">
+<text id="Last name" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="727" y="263.1">Last name</tspan></text>
+<g id="Group_7">
+<rect x="727.5" y="273.5" width="244" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="e.g. Santos" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="742" y="300.712">e.g. Santos</tspan></text>
+</g>
+</g>
+</g>
+<g id="Group_8" clip-path="url(#clip5_11_614)">
+<text id="Middle name (optional)" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="468" y="346.1">Middle name (optional)</tspan></text>
+<g id="Group_9">
+<rect x="468.5" y="356.5" width="503" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="e.g. Reyes" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="483" y="383.712">e.g. Reyes</tspan></text>
+</g>
+</g>
+<g id="Group_10" clip-path="url(#clip6_11_614)">
+<g id="Group_11" clip-path="url(#clip7_11_614)">
+<text id="Username" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="468" y="429.1">Username</tspan></text>
+<g id="Group_12">
+<rect x="468.5" y="439.5" width="244" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="e.g. nsantos" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="483" y="466.712">e.g. nsantos</tspan></text>
+</g>
+</g>
+<g id="Group_13" clip-path="url(#clip8_11_614)">
+<text id="Email" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="727" y="429.1">Email</tspan></text>
+<g id="Group_14">
+<rect x="727.5" y="439.5" width="244" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="e.g. nsantos@isu.edu.ph" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="742" y="466.712">e.g. nsantos@isu.edu.ph</tspan></text>
+</g>
+</g>
+</g>
+<g id="Group_15" clip-path="url(#clip9_11_614)">
+<g id="Group_16" clip-path="url(#clip10_11_614)">
+<text id="Role" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="468" y="512.1">Role</tspan></text>
+<g id="Group_17">
+<rect x="468.5" y="522.5" width="244" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="Nurse / Staff" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="483" y="549.712">Nurse / Staff</tspan></text>
+<g id="icon/chev">
+<path id="Vector_2" d="M686 542L690 546L694 542" stroke="#7A8A87" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+<g id="Group_18" clip-path="url(#clip11_11_614)">
+<text id="Status" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="727" y="512.1">Status</tspan></text>
+<g id="Group_19">
+<rect x="727.5" y="522.5" width="244" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="Active" fill="#13201E" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="742" y="549.712">Active</tspan></text>
+<g id="icon/chev_2">
+<path id="Vector_3" d="M945 542L949 546L953 542" stroke="#7A8A87" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+</g>
+<g id="Group_20" clip-path="url(#clip12_11_614)">
+<text id="Temporary password" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="12.5" font-weight="600" letter-spacing="0em"><tspan x="468" y="595.1">Temporary password</tspan></text>
+<g id="Group_21">
+<rect x="468.5" y="605.5" width="503" height="43" rx="10.5" stroke="#DCE5E2"/>
+<text id="At least 8 characters with 1 symbol" fill="#9AA8A5" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="14" letter-spacing="0em"><tspan x="483" y="632.712">At least 8 characters with 1 symbol</tspan></text>
+</g>
+</g>
+<g id="Group_22">
+<g id="link:BACK_2">
+<text id="Cancel" fill="#3E4E4B" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="600" letter-spacing="0em"><tspan x="780" y="692.508">Cancel</tspan></text>
+</g>
+<g id="link:Admin / User management">
+<rect x="852" y="665" width="120" height="44" rx="11" fill="#137A6D"/>
+<text id="Create user" fill="white" style="white-space: pre" xml:space="preserve" font-family="Plus Jakarta Sans" font-size="13.5" font-weight="bold" letter-spacing="0em"><tspan x="874" y="692.508">Create user</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_d_11_614" x="380" y="129" width="680" height="690" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="24"/>
+<feGaussianBlur stdDeviation="30"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_614"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_11_614" result="shape"/>
+</filter>
+<clipPath id="clip0_11_614">
+<rect width="504" height="43" fill="white" transform="translate(468 191)"/>
+</clipPath>
+<clipPath id="clip1_11_614">
+<rect width="329" height="43" fill="white" transform="translate(468 191)"/>
+</clipPath>
+<clipPath id="clip2_11_614">
+<rect width="504" height="67" fill="white" transform="translate(468 250)"/>
+</clipPath>
+<clipPath id="clip3_11_614">
+<rect width="245" height="67" fill="white" transform="translate(468 250)"/>
+</clipPath>
+<clipPath id="clip4_11_614">
+<rect width="245" height="67" fill="white" transform="translate(727 250)"/>
+</clipPath>
+<clipPath id="clip5_11_614">
+<rect width="504" height="67" fill="white" transform="translate(468 333)"/>
+</clipPath>
+<clipPath id="clip6_11_614">
+<rect width="504" height="67" fill="white" transform="translate(468 416)"/>
+</clipPath>
+<clipPath id="clip7_11_614">
+<rect width="245" height="67" fill="white" transform="translate(468 416)"/>
+</clipPath>
+<clipPath id="clip8_11_614">
+<rect width="245" height="67" fill="white" transform="translate(727 416)"/>
+</clipPath>
+<clipPath id="clip9_11_614">
+<rect width="504" height="67" fill="white" transform="translate(468 499)"/>
+</clipPath>
+<clipPath id="clip10_11_614">
+<rect width="245" height="67" fill="white" transform="translate(468 499)"/>
+</clipPath>
+<clipPath id="clip11_11_614">
+<rect width="245" height="67" fill="white" transform="translate(727 499)"/>
+</clipPath>
+<clipPath id="clip12_11_614">
+<rect width="504" height="67" fill="white" transform="translate(468 582)"/>
+</clipPath>
+</defs>
+</svg>

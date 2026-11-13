@@ -41,7 +41,8 @@ export const NAVS = {
     { section: 'Management' },
     { id: 'stock-requests', label: 'Stock requests', icon: 'clipboardCheck', badge: 'pendingRequests' },
     { id: 'users', label: 'User management', icon: 'users' },
-    REPORTS_GROUP,
+    // Admins only get the monthly supply report; the clinical analytics and tables are for nurses.
+    { id: 'supply-report', label: 'Monthly supply report', icon: 'chart' },
     { section: 'System' },
     { id: 'audit-log', label: 'Audit log', icon: 'history' },
     { id: 'settings', label: 'Settings', icon: 'settings' },
